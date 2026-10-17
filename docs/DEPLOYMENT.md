@@ -2,6 +2,14 @@
 
 ## Trạng thái an toàn sau khi tách
 
+Đợt kiểm thử trên nhánh `split/notes-standalone` có workflow riêng
+`notes-preview-qualify.yml`: chỉ push vào đúng nhánh này với marker `[notes-live]`,
+dùng hai URL preview được pin trong workflow và secrets Koofr riêng.
+OIDC khóa đúng nhánh/event/file workflow. Không cần merge main để kiểm thử.
+Endpoint fixture tự hết hạn lúc 10:00 ngày 18/10/2026 giờ Việt Nam.
+Artifact public chỉ chứa số liệu tổng hợp đã lọc, không có raw report/account config.
+Đường manual main dưới đây dành cho giai đoạn sau khi review.
+
 Chỉ tách mã, không chuyển production. Chưa nối repo mới với Vercel Git integration.
 Không import repo backup hay secret rclone. Không cài lịch chạy nền.
 
