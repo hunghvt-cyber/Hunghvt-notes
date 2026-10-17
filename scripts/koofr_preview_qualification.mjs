@@ -22,9 +22,9 @@ try{
   console.log(JSON.stringify({stage:name,chunk:extra.chunk,passed:result.passed,checks:result.checks,details:result.details,errors:result.errors,serverMs:result.ms,wallMs:row.wallMs}));
   must(result.passed&&r.status===200&&result.region==='fra1','STAGE_FAILED_'+name.toUpperCase().replaceAll('-','_'));return result;
  }
- const previewEndpoint=endpoint.replace('/api/bench','/api/preview');
- const hp=await fetch(previewEndpoint+'?route=health',{redirect:'error',signal:AbortSignal.timeout(15000)}),hpj=await hp.json();must(hp.status===200&&!hpj.configured,'STANDALONE_PREVIEW_NOT_CLOSED');
- const denied=await fetch(previewEndpoint+'?route=notes',{redirect:'error',signal:AbortSignal.timeout(15000)});must(denied.status===503,'UNCONFIGURED_OWNER_ROUTE_NOT_CLOSED');report.standaloneHttpSmoke={healthStatus:hp.status,configured:hpj.configured,ownerStatus:denied.status};
+ const previewApiEndpoint=endpoint.replace('/api/bench','/api/preview');
+ const hp=await fetch(previewApiEndpoint+'?route=health',{redirect:'error',signal:AbortSignal.timeout(15000)}),hpj=await hp.json();must(hp.status===200&&!hpj.configured,'STANDALONE_PREVIEW_NOT_CLOSED');
+ const denied=await fetch(previewApiEndpoint+'?route=notes',{redirect:'error',signal:AbortSignal.timeout(15000)});must(denied.status===503,'UNCONFIGURED_OWNER_ROUTE_NOT_CLOSED');report.standaloneHttpSmoke={healthStatus:hp.status,configured:hpj.configured,ownerStatus:denied.status};
  for(const name of ['restore-empty','restore-marker-loss','restore-catalog-loss','restore-catalog-verify-loss','restore-unowned','restore-mkcol-loss','restore-partial','api-owner','api-sharing','prepare-browser-preview']){
   const ns='Homepage-Notes-Vercel-Probe-'+process.env.GITHUB_RUN_ID+'-'+randomUUID(),ss='Homepage-Notes-Vercel-Probe-'+process.env.GITHUB_RUN_ID+'-'+randomUUID();const r=await stage(name,{},'preview-qualify',{namespace:ns,sourceNamespace:ss});if(name==='prepare-browser-preview')report.browserPreviewNamespace=ns;
  }
