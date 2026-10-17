@@ -35,8 +35,12 @@ Không kéo dài vô hạn. Trước đợt live mới phải review và đặt 
 6. Run workflow “Notes synthetic live qualification”, chọn suite và nhập
    `SYNTHETIC_ONLY`. Mỗi suite tự tạo root mới theo run ID, không đụng backup.
 
-Danh tính OIDC khóa repo ID `1423348828`, main, event workflow_dispatch và đúng
-file notes-live.yml. Workflow dùng repository secrets, không environment context
+Danh tính OIDC khóa owner ID `252749231`, repo ID `1423348828`, main,
+event workflow_dispatch và đúng file notes-live.yml (hoặc nhánh/workflow thử
+nghiệm giới hạn như mô tả ở đầu tài liệu). Repo mới dùng immutable subject:
+`repo:hunghvt-cyber@252749231/Hunghvt-notes@1423348828:ref:<ref>`.
+Tham khảo [GitHub OIDC immutable subject](https://docs.github.com/en/actions/reference/security/oidc#immutable-subject-claims).
+Workflow dùng repository secrets, không environment context
 (đổi environment làm thay subject và phải review OIDC). Ai có quyền write repo
 có thể sửa code/workflow: chỉ cấp quyền cho người tin cậy, bảo vệ main trước live.
 CI không cần secret vẫn chạy trước khi làm các bước trên.

@@ -1,0 +1,209 @@
+{
+  "kind": "NOTES_SYNTHETIC_MULTI_PREVIEW_RELIABILITY",
+  "at": "2026-10-17",
+  "runId": "39045843870",
+  "runUrl": "https://github.com/hunghvt-cyber/Hunghvt-notes/actions/runs/39045843870",
+  "jobId": "117434276991",
+  "scope": "GitHub runner -> two isolated Vercel previews -> fresh synthetic Koofr root. Operation timings include deliberate transport faults and lock contention; not iPad end-to-end latency.",
+  "suite": "reliability",
+  "passed": true,
+  "completed": true,
+  "deployedCode": "f7ce12b21994283473454cadd3a076f9ed4c0b1d",
+  "driverCode": "9b5599a6ced863c00c4a286f8538897d16cc9734",
+  "errors": [],
+  "requests": 698,
+  "metrics": {
+    "save-note": {
+      "attempted": 491,
+      "successful": {
+        "n": 332,
+        "p50": 973.1957839999814,
+        "p95": 4110.076510999934,
+        "max": 7407.191639000084
+      },
+      "committed": {
+        "n": 161,
+        "p50": 2431.182858000044,
+        "p95": 4704.960030999966,
+        "max": 7407.191639000084
+      }
+    },
+    "list-notes": {
+      "attempted": 1,
+      "successful": {
+        "n": 1,
+        "p50": 317.2938570000697,
+        "p95": 317.2938570000697,
+        "max": 317.2938570000697
+      },
+      "committed": {
+        "n": 0,
+        "p50": null,
+        "p95": null,
+        "max": null
+      }
+    },
+    "get-note": {
+      "attempted": 417,
+      "successful": {
+        "n": 417,
+        "p50": 634.0920560000231,
+        "p95": 1409.5203390000388,
+        "max": 2957.7920319999103
+      },
+      "committed": {
+        "n": 0,
+        "p50": null,
+        "p95": null,
+        "max": null
+      }
+    },
+    "create-share": {
+      "attempted": 1,
+      "successful": {
+        "n": 1,
+        "p50": 1266.1161209999118,
+        "p95": 1266.1161209999118,
+        "max": 1266.1161209999118
+      },
+      "committed": {
+        "n": 1,
+        "p50": 1266.1161209999118,
+        "p95": 1266.1161209999118,
+        "max": 1266.1161209999118
+      }
+    },
+    "revoke-share": {
+      "attempted": 5,
+      "successful": {
+        "n": 1,
+        "p50": 1392.775530999992,
+        "p95": 1392.775530999992,
+        "max": 1392.775530999992
+      },
+      "committed": {
+        "n": 1,
+        "p50": 1392.775530999992,
+        "p95": 1392.775530999992,
+        "max": 1392.775530999992
+      }
+    },
+    "seed-batch": {
+      "attempted": 10,
+      "successful": {
+        "n": 10,
+        "p50": 11664.357891000007,
+        "p95": 22699.523182999998,
+        "max": 22699.523182999998
+      },
+      "committed": {
+        "n": 10,
+        "p50": 11664.357891000007,
+        "p95": 22699.523182999998,
+        "max": 22699.523182999998
+      }
+    },
+    "restore-batch": {
+      "attempted": 0,
+      "successful": {
+        "n": 0,
+        "p50": null,
+        "p95": null,
+        "max": null
+      },
+      "committed": {
+        "n": 0,
+        "p50": null,
+        "p95": null,
+        "max": null
+      }
+    }
+  },
+  "counts": {
+    "faultCases": 13,
+    "faultPassed": 13,
+    "samePairs": 50,
+    "differentPairs": 50,
+    "busyResponses": 104,
+    "invocations": 698,
+    "runtimes": 3
+  },
+  "uniqueRequestIds": true,
+  "faults": [
+    {
+      "case": "lost-lock-reply",
+      "passed": true,
+      "errors": []
+    },
+    {
+      "case": "lost-base-read",
+      "passed": true,
+      "errors": []
+    },
+    {
+      "case": "before-immutable",
+      "passed": true,
+      "errors": []
+    },
+    {
+      "case": "lost-immutable-reply",
+      "passed": true,
+      "errors": []
+    },
+    {
+      "case": "lost-immutable-verify",
+      "passed": true,
+      "errors": []
+    },
+    {
+      "case": "before-publish",
+      "passed": true,
+      "errors": []
+    },
+    {
+      "case": "lost-publish-reply",
+      "passed": true,
+      "errors": []
+    },
+    {
+      "case": "lost-publish-verify",
+      "passed": true,
+      "errors": []
+    },
+    {
+      "case": "lost-publish-and-reconcile",
+      "passed": true,
+      "errors": []
+    },
+    {
+      "case": "lost-unlock-request",
+      "passed": true,
+      "errors": []
+    },
+    {
+      "case": "lost-unlock-reply",
+      "passed": true,
+      "errors": []
+    },
+    {
+      "case": "replace-socket-after-base",
+      "passed": true,
+      "errors": []
+    },
+    {
+      "case": "replace-socket-after-immutable",
+      "passed": true,
+      "errors": []
+    }
+  ],
+  "final": {
+    "stored": 100,
+    "active": 100
+  },
+  "crossDeploymentRevoke": {
+    "passed": true,
+    "unpublishedOrphanObserved": true,
+    "expiredPublicationFenced": true,
+    "revokedRetryDenied": true
+  }
+}

@@ -15,7 +15,7 @@ export function summarize(report,suite){
  if(suite==='qualification'){
   out.stages=rows.map(r=>({stage:typeof r.stage==='string'&&/^[a-z-]{1,50}$/.test(r.stage)?r.stage:null,passed:r.passed===true,httpStatus:number(r.httpStatus),errors:codes(r.errors),wallMs:number(r.wallMs)}));
   out.verifiedOriginalNotes=number(report.verifiedOriginalNotes);
-  out.restore={passed:rows.some(r=>r.stage==='restore-verify'&&r.passed),active:number(report.restoreResult?.active),count:number(report.restoreResult?.count)};
+  out.restore={passed:rows.some(r=>r.stage==='restore-verify'&&r.passed),active:number(report.restoreResult?.active),stored:number(report.restoreResult?.stored),byteExact:number(report.restoreResult?.byteExact)};
  }else{
   out.counts=Object.fromEntries(['faultCases','faultPassed','samePairs','differentPairs','busyResponses','invocations','runtimes'].map(k=>[k,number(report.summary?.[k])]));
   out.uniqueRequestIds=report.requestIdsVerifiedUnique===true;
