@@ -4,7 +4,7 @@ export function diagnoseOidc(token){
  if(diagnosed)return;diagnosed=true;
  let c={},h={};try{const p=token.split('.');c=JSON.parse(Buffer.from(p[1],'base64url'));h=JSON.parse(Buffer.from(p[0],'base64url'));}catch{}
  const repo='hunghvt-cyber/Hunghvt-notes',ref='refs/heads/split/notes-standalone',now=Date.now()/1000;
- console.log(JSON.stringify({kind:'oidc-context-check',repository:c.repository===repo,repositoryId:String(c.repository_id)==='1423348828',ref:c.ref===ref,subject:c.sub==='repo:'+repo+':ref:'+ref,workflow:c.workflow_ref===repo+'/.github/workflows/notes-preview-qualify.yml@'+ref,event:c.event_name==='push',audience:c.aud==='homepage-koofr-synthetic-benchmark-v1',issuer:c.iss==='https://token.actions.githubusercontent.com',algorithm:h.alg==='RS256',lifetime:Number.isFinite(c.exp)&&Number.isFinite(c.iat)&&c.exp>now&&c.iat<=now+30&&c.iat>=now-600&&c.exp-c.iat<=600,run:String(c.run_id)===process.env.GITHUB_RUN_ID}));
+ console.log(JSON.stringify({kind:'oidc-context-check',repository:c.repository===repo,repositoryId:String(c.repository_id)==='1423348828',ownerId:String(c.repository_owner_id)==='252749231',ref:c.ref===ref,subject:c.sub==='repo:hunghvt-cyber@252749231/Hunghvt-notes@1423348828:ref:'+ref,workflow:c.workflow_ref===repo+'/.github/workflows/notes-preview-qualify.yml@'+ref,event:c.event_name==='push',audience:c.aud==='homepage-koofr-synthetic-benchmark-v1',issuer:c.iss==='https://token.actions.githubusercontent.com',algorithm:h.alg==='RS256',lifetime:Number.isFinite(c.exp)&&Number.isFinite(c.iat)&&c.exp>now&&c.iat<=now+30&&c.iat>=now-600&&c.exp-c.iat<=600,run:String(c.run_id)===process.env.GITHUB_RUN_ID}));
 }
 export function credentials(env){
  const user=env.KOOFR_WEBDAV_USER,password=env.KOOFR_WEBDAV_APP_PASSWORD;
