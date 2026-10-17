@@ -1,5 +1,9 @@
 # Triển khai thử và rollback
 
+**Bản phát hành tối thiểu ngày 18/10/2026:** xem [RELEASE.md](RELEASE.md).
+Project live mới là hunghvt-notes, không phải lab bên dưới. Các hướng dẫn dưới
+đây giữ lại cho benchmark synthetic và không được dùng để trỏ Preview vào root thật.
+
 ## Trạng thái an toàn sau khi tách
 
 Đợt kiểm thử trên nhánh `split/notes-standalone` có workflow riêng

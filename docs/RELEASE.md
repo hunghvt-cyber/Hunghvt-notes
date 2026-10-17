@@ -66,6 +66,23 @@ NOTES_DATA_NAMESPACE. Không thay file catalog production bằng thao tác PUT t
 
 ## Gate phát hành
 
+Bằng chứng đã có ngày 18/10/2026: 90/90 unit/integration tests pass; 6/6 Chromium
+scenarios pass tại [run 39057457895](https://github.com/hunghvt-cyber/Hunghvt-notes/actions/runs/39057457895).
+Kho mới được khởi tạo thật tại [run 39057321414](https://github.com/hunghvt-cyber/Hunghvt-notes/actions/runs/39057321414),
+count 0, không migration dữ liệu cũ. JSON kết quả đã chọn lọc tại docs/results.
+
+Deployment đầu project riêng được Vercel gán target production:
+`dpl_7rdKgAjtDKryMVMApjyQHj2ZMY9B`, source
+`e4bf6d2f478f29acbb8954c07031fa11ba3c85a3`, URL
+`https://hunghvt-notes.vercel.app/`. Health 200/configured false; owner route 503
+NOTES_AUTH_MISSING; benchmark route 404. Đây là shell đang đóng, chưa phải
+deployment đã được xác minh đọc/ghi production. Sau khi thêm secret phải redeploy
+và kiểm tra lại; không chỉ refresh trình duyệt.
+
+Browser suite dùng API handler thật nhưng chặn request trong Playwright để mô
+phỏng WebDAV. Tình huống offline kiểm dữ liệu IndexedDB sau reload, public shell
+do harness cung cấp; chưa chứng minh mở lại trang khi mất hoàn toàn internet.
+
 `npm test`, `npm run test:browser` và CI phải đạt. Browser test dùng Chromium thật
 với HTTP handler thật và WebDAV mô phỏng; tách khỏi live Koofr evidence trước đó.
 Sau khi đủ secret, tạo deployment target production, kiểm health/login/CRUD/share/

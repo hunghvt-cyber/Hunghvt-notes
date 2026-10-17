@@ -17,10 +17,11 @@ PUT kèm lock token và xác minh kết quả. Không cho client ghi WebDAV tr�
 Mỗi phiên dùng một socket tuần tự; không tăng maxSockets khi chưa kiểm chứng lại.
 Lock toàn catalog gây tuần tự hóa: BUSY 423 phải retry có giới hạn, không ghi đè.
 
-Receipt gắn operation ID với payload/base/actor, tối đa 24 receipt mỗi Note.
+Receipt gắn operation ID với payload/base/actor, tối đa 24 receipt trong catalog.
 Retry sau timeout dùng cùng clientOpId và baseRevision. Base cũ nhận conflict,
 không tự ghi đè. UUID được hỗ trợ bên cạnh các slot số phục vụ fixture cũ.
-Thu hồi quyền được kiểm trước replay. Frontend local-first chưa triển khai.
+Thu hồi quyền được kiểm trước replay. Giao diện tối thiểu giữ nháp/pending operation
+trong IndexedDB; xem RELEASE.md cho trạng thái phát hành và giới hạn.
 
 Restore dùng snapshot hash + source epoch trong reservation marker và catalog.
 Ghi revision, kiểm hash, cuối cùng đổi HEAD trong lock. Retry init không reset
@@ -31,7 +32,8 @@ không tự nhận quyền sở hữu thư mục đã tồn tại.
 ## Giới hạn và việc còn thiếu
 
 - Catalog giới hạn ghi 240 KB / đọc 256 KB; payload Note 1 MB; export backup 2 MB.
-- Tìm kiếm nội dung đầy đủ, đồng bộ giao diện, bản nháp offline và UX conflict chưa có.
+- Tìm kiếm toàn văn chưa có. UI tìm trong tiêu đề/đoạn xem trước và giữ nháp,
+  hiển thị conflict; chưa có app-shell offline hoặc chứng nhận Safari thật.
 - Global lock có thể gây nghẽn; cần đo lại nhiều phiên sau khi tách repo.
 - Deep validation catalog lỗi, backup độc lập có retention, GC orphan chưa hoàn thiện.
 - Share-create chưa có receipt idempotency; mất response có thể tạo link thừa,
