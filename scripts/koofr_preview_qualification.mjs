@@ -1,5 +1,5 @@
 /* GitHub OIDC -> isolated Vercel fixture -> new synthetic Koofr stores only. */
-import {credentials,previewEndpoint} from './live-config.mjs';
+import {credentials,previewEndpoint,diagnoseOidc} from './live-config.mjs';
 import {audience} from '../lib/oidc.mjs';
 import {randomUUID} from 'node:crypto';
 import {writeFile} from 'node:fs/promises';
@@ -14,12 +14,12 @@ try{
  const health=await fetch(endpoint,{redirect:'error',signal:AbortSignal.timeout(15000)});must(health.ok,'HEALTH_FAILED');const h=await health.json();must(h.active&&h.region==='fra1','REGION_OR_EXPIRY_MISMATCH');report.region=h.region;
  let probe;
  async function stage(name,extra={},mode='store100',names={}){
-  const token=await oidc(),start=performance.now(),namespace=names.namespace??(name.startsWith('restore-')?target:source);
+  const token=await oidc(),start=performance.now(),namespace=names.namespace??(name.startsWith('restore-')?target:source);diagnoseOidc(token);
   const r=await fetch(endpoint,{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({user:c.user,password:c.password,namespace,mode,transport:'pooled',stage:name,...extra,...(name.startsWith('restore-')?{sourceNamespace:names.sourceNamespace??source}:{}),...(name==='restore-verify'?{probe}:{})}),redirect:'error',signal:AbortSignal.timeout(115000)});
   const result=await r.json();if(result.privateProbe){probe=result.privateProbe;delete result.privateProbe;}
   const row={...result,httpStatus:r.status,wallMs:performance.now()-start};report.stages.push(row);
   await writeFile('koofr-preview-qualification.local.json',JSON.stringify(report,null,2)+'\n');
-  console.log(JSON.stringify({stage:name,chunk:extra.chunk,passed:result.passed,checks:result.checks,details:result.details,errors:result.errors,serverMs:result.ms,wallMs:row.wallMs}));
+  console.log(JSON.stringify({stage:name,chunk:extra.chunk,httpStatus:r.status,code:result.code,passed:result.passed,checks:result.checks,details:result.details,errors:result.errors,serverMs:result.ms,wallMs:row.wallMs}));
   must(result.passed&&r.status===200&&result.region==='fra1','STAGE_FAILED_'+name.toUpperCase().replaceAll('-','_'));return result;
  }
  const previewApiEndpoint=endpoint.replace('/api/bench','/api/preview');

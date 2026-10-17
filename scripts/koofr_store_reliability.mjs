@@ -1,5 +1,5 @@
 /* Existing Actions credential -> two pinned isolated previews -> fresh synthetic root. */
-import {credentials,previewEndpoint} from './live-config.mjs';
+import {credentials,previewEndpoint,diagnoseOidc} from './live-config.mjs';
 import {audience} from '../lib/oidc.mjs';
 import {faultPlans} from '../lib/store-reliability.mjs';
 import {randomUUID} from 'node:crypto';
@@ -11,7 +11,7 @@ function persist(){writes=writes.then(()=>writeFile('koofr-store-reliability.loc
 async function oidc(){const u=new URL(process.env.ACTIONS_ID_TOKEN_REQUEST_URL);must(u.protocol==='https:'&&u.hostname.endsWith('.githubusercontent.com'),'OIDC_ENDPOINT_INVALID');u.searchParams.set('audience',audience);const r=await fetch(u,{headers:{Authorization:'Bearer '+process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN},redirect:'error',signal:AbortSignal.timeout(10000)});must(r.ok,'OIDC_FAILED');const j=await r.json();must(typeof j.value==='string','OIDC_FAILED');return j.value;}
 let c,namespace;
 async function request(which,stage,extra={},mode='store-reliability',auth){
- const token=auth??await oidc(),start=performance.now();let row;
+ const token=auth??await oidc(),start=performance.now();diagnoseOidc(token);let row;
  try{
   const r=await fetch(deployments[which].endpoint,{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({user:c.user,password:c.password,namespace,mode,transport:'pooled',stage,...extra}),redirect:'error',signal:AbortSignal.timeout(115000)});
   const result=await r.json();let privateProbe=result.privateProbe;delete result.privateProbe;
