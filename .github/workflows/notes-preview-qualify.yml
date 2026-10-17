@@ -34,9 +34,9 @@ jobs:
           KOOFR_WEBDAV_PROBE: ISOLATED_SYNTHETIC_ONLY
           KOOFR_WEBDAV_USER: ${{ secrets.KOOFR_WEBDAV_USER }}
           KOOFR_WEBDAV_APP_PASSWORD: ${{ secrets.KOOFR_WEBDAV_APP_PASSWORD }}
-          NOTES_PREVIEW_URL: https://homepage-koofr-onqc1wm40-hunghvt.vercel.app
-          NOTES_SECOND_PREVIEW_URL: https://homepage-koofr-pcve5j9sq-hunghvt.vercel.app
-          NOTES_DEPLOYED_SHA: 4bfb12896b2390058d15cbc0105775cb1754f78c
+          NOTES_PREVIEW_URL: https://homepage-koofr-ghxvkwf1i-hunghvt.vercel.app
+          NOTES_SECOND_PREVIEW_URL: https://homepage-koofr-miee5x8c0-hunghvt.vercel.app
+          NOTES_DEPLOYED_SHA: f7ce12b21994283473454cadd3a076f9ed4c0b1d
         run: |
           case "$SUITE" in
             qualification) node scripts/koofr_preview_qualification.mjs ;;
