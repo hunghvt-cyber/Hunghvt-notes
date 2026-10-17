@@ -1,1 +1,21 @@
-<!doctype html><html lang="en"><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"><title>Isolated Koofr lab</title><p>Synthetic backend validation only. No Homepage production data.</p></html>
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer"><title>Notes</title><link rel="stylesheet" href="/app.css"></head>
+<body><main><header><a href="https://homepage-nas.vercel.app/">← Homepage</a><h1>Notes</h1><p>Ghi chú, checklist và thư mục</p></header>
+<p id="global-status" role="status">Đang kết nối…</p>
+<section id="login" hidden><h2>Mở Notes</h2><form id="login-form"><label for="password">Mật khẩu Notes</label><input id="password" type="password" autocomplete="current-password" required><button>Mở khóa</button></form></section>
+<div id="workspace" hidden>
+<nav class="toolbar"><button id="new">Note mới</button><button id="refresh">Làm mới</button><button id="backup">Tải backup</button><button id="logout">Khóa</button></nav>
+<p id="old-store">Notes cũ vẫn ở <a href="https://homepage-nas.vercel.app/notes/" target="_blank" rel="noreferrer">kho Blob của Homepage</a>. Bản này chưa tự nhập dữ liệu cũ.</p>
+<details id="draft-panel"><summary>Bản nháp trên thiết bị <span id="draft-count"></span></summary><p>Bản nháp chỉ nằm trên thiết bị này cho đến khi được đồng bộ.</p><div id="draft-list"></div><button id="export-drafts">Tải các bản nháp</button></details>
+<div class="layout"><aside><label for="search">Tìm trong tiêu đề và đoạn xem trước</label><input id="search" type="search"><div id="folder-list"></div>
+<details id="folder-controls"><summary>Quản lý thư mục</summary><input id="new-folder" maxlength="80" aria-label="Tên thư mục mới"><button id="create-folder">Tạo thư mục</button><select id="manage-folder" aria-label="Chọn thư mục"></select><button id="remove-folder">Xóa thư mục, giữ Notes</button><button id="share-folder">Chia sẻ thư mục</button></details>
+</aside><div><h2 id="list-title">Tất cả ghi chú</h2><div id="note-list" class="grid"></div></div></div>
+<section id="editor" hidden><div class="toolbar"><h2>Soạn ghi chú</h2><button id="close-editor">Đóng soạn thảo</button></div>
+<label for="title">Tiêu đề</label><input id="title" maxlength="200"><label for="folder">Thư mục</label><input id="folder" list="folders" maxlength="80"><datalist id="folders"></datalist><label id="pin-label"><input id="pinned" type="checkbox"> Ghim</label>
+<label for="text">Nội dung</label><textarea id="text" rows="10" spellcheck="false" wrap="soft"></textarea><div id="checklist"></div><button id="add-check">Chèn checklist</button>
+<div class="toolbar"><button id="save">Lưu ngay</button><button id="copy">Copy toàn bộ</button><button id="clear">Xóa nội dung</button><button id="undo" disabled>Hoàn tác</button><button id="delete">Xóa Note</button></div><p id="save-status" role="status"></p>
+<div id="conflict" hidden><p>Note trên máy chủ đã thay đổi. Bản nháp này vẫn được giữ; hệ thống chưa ghi đè.</p><button id="conflict-copy">Lưu nháp thành Note mới</button><button id="remote-version">Mở bản trên máy chủ</button><button id="download-draft">Tải bản nháp này</button></div>
+<label for="history">Bản trước · chọn để xem lại rồi bấm Lưu</label><select id="history"></select>
+<details id="note-sharing"><summary>Chia sẻ Note</summary><button id="share-note">Tạo link sửa Note</button><div id="share-list"></div></details>
+</section><section id="share-result" hidden><h2>Chia sẻ</h2><p>Ai có link đều có quyền đã chọn. Link hoạt động đến khi thu hồi.</p><input id="share-url" readonly aria-label="Link chia sẻ"><button id="copy-share">Sao chép link</button><div id="all-shares"></div></section>
+</div><footer><small>Bản nháp chưa đồng bộ cần được giữ hoặc tải xuống trước khi xóa dữ liệu trình duyệt.</small></footer></main><script type="module" src="/app.js"></script></body></html>

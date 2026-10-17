@@ -23,3 +23,27 @@ jobs:
           node --check api/preview.js
           node --check scripts/koofr_preview_qualification.mjs
           node --check scripts/koofr_store_reliability.mjs
+          node --check api/app.js
+          node --check public/app.js
+          node --check public/sync.js
+  browser:
+    if: github.ref == 'refs/heads/release/minimal-notes' && github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:browser
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: notes-browser-simulated-backend
+          path: browser-result.local.json
+          if-no-files-found: warn
+          retention-days: 7

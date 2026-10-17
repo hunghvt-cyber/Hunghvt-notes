@@ -1,0 +1,46 @@
+// Real Chromium UI + HTTP handler + simulated WebDAV. Never uses account secrets.
+import {chromium,expect} from '@playwright/test';
+import {readFile,writeFile} from 'node:fs/promises';
+import {randomUUID} from 'node:crypto';
+import {backend} from '../test/helpers/collection.mjs';
+import {createAppHandler,productionProject} from '../lib/app-config.mjs';
+import {provisionStore} from '../lib/production-store.mjs';
+expect.configure({timeout:15000});
+const origin='https://notes.test',password='synthetic-test-only',results=[];
+const gate=()=>{let resolve;const promise=new Promise(r=>resolve=r);return {promise,resolve};};
+const browser=await chromium.launch({headless:true});
+async function fixture(seed=0){
+ const b=backend(),namespace='Hunghvt-Notes-Data-'+randomUUID(),input={user:'fake',password:'synthetic',namespace},store=b.makeStore(input);
+ await provisionStore(store);const ids=[];for(let i=0;i<seed;i++){const id=randomUUID();ids.push(id);await store.save(id,{title:'Ghi chú '+i,text:'Nội dung '+i,checklist:[],folder:'Công việc'},null,randomUUID());}
+ const env={NOTES_MODE:'live-v1',NOTES_PROJECT_ID:productionProject,VERCEL_PROJECT_ID:productionProject,VERCEL_ENV:'production',NOTES_BASE_URL:origin,NOTES_DATA_NAMESPACE:namespace,NOTES_SESSION_PASSWORD:randomUUID()+randomUUID(),NOTES_PASSWORD:password,KOOFR_NOTES_USER:input.user,KOOFR_NOTES_APP_PASSWORD:input.password};
+ const handler=createAppHandler({env:()=>env,makeStore:b.makeStore,observe:()=>{}}),context=await browser.newContext({viewport:{width:1024,height:768}}),hooks={block:false,drop:false,hold:null,began:null,posts:[]},errors=[];
+ await context.route(origin+'/**',async route=>{
+  const req=route.request(),u=new URL(req.url());
+  if(u.pathname==='/api/app'){
+   if(hooks.block)return route.abort('internetdisconnected');
+   const data=req.postData(),save=req.method()==='POST'&&JSON.parse(data??'{}').action==='save';
+   if(save)hooks.posts.push(JSON.parse(data));
+   const response=await handler(new Request(req.url(),{method:req.method(),headers:await req.allHeaders(),...(data?{body:data}:{})}));
+   if(save&&hooks.began)hooks.began.resolve();
+   if(save&&hooks.hold){const pending=hooks.hold;hooks.hold=null;await pending.promise;}
+   if(save&&hooks.drop){hooks.drop=false;hooks.block=true;return route.abort('internetdisconnected');}
+   return route.fulfill({status:response.status,headers:Object.fromEntries(response.headers),body:Buffer.from(await response.arrayBuffer())});
+  }
+  const name=u.pathname==='/'?'index.html':u.pathname.slice(1);
+  if(!['index.html','app.css','app.js','sync.js'].includes(name))return route.fulfill({status:404,body:''});
+  await route.fulfill({status:200,contentType:name.endsWith('.js')?'application/javascript':name.endsWith('.css')?'text/css':'text/html',body:await readFile(new URL('../public/'+name,import.meta.url))});
+ });
+ const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());
+ async function login(p=page){await p.goto(origin);await expect(p.locator('#login')).toBeVisible();await p.locator('#password').fill(password);await p.locator('#login-form button').click();await expect(p.locator('#workspace')).toBeVisible();await expect(p.locator('#login')).toBeHidden();}
+ return {b,store,context,page,hooks,errors,ids,login,async done(){await context.close();store.agent.destroy();assertNoErrors(errors);}};
+}
+function assertNoErrors(errors){if(errors.length)throw Error('BROWSER_PAGE_ERRORS: '+errors.join(';'));}
+async function run(name,fn){const started=Date.now();try{await fn();results.push({name,passed:true,ms:Date.now()-started});console.log(JSON.stringify(results.at(-1)));}catch(e){results.push({name,passed:false,error:String(e.message).slice(0,1200)});console.error(JSON.stringify(results.at(-1)));throw e;}}
+try{
+ await run('ipad-grid-and-checklist',async()=>{const f=await fixture(6);try{await f.login();await expect(f.page.locator('.card')).toHaveCount(6);const xs=await f.page.locator('.card').evaluateAll(rows=>rows.map(r=>Math.round(r.getBoundingClientRect().x)));expect(new Set(xs).size).toBeGreaterThan(1);expect(await f.page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(1024);await expect(f.page.locator('#editor')).toBeHidden();await f.page.locator('.card').first().click();await f.page.locator('#add-check').click();const field=f.page.locator('.check-row textarea');await field.pressSequentially('Tiếng Việt 😀');await f.page.locator('#save').click();await expect(f.page.locator('#save-status')).toHaveAttribute('data-state','saved');const n=await f.store.get(f.ids[0]);expect(n.checklist[0].text).toBe('Tiếng Việt 😀');await f.page.screenshot({path:'/tmp/hunghvt-notes-ipad.png',fullPage:true});}finally{await f.done();}});
+ await run('typing-during-save-keeps-latest-input',async()=>{const f=await fixture();try{await f.login();await f.page.locator('#new').click();const hold=gate();f.hooks.hold=hold;f.hooks.began=gate();await f.page.locator('#title').fill('Đang lưu');await f.page.locator('#text').fill('A gửi trước');await f.page.locator('#save').click();await f.hooks.began.promise;await f.page.locator('#text').fill('B gõ trong lúc chờ');hold.resolve();await expect(f.page.locator('#save-status')).toHaveAttribute('data-state','saved');expect(await f.page.locator('#text').inputValue()).toBe('B gõ trong lúc chờ');const cat=await f.store.capture(),id=Object.keys(cat.entries)[0];expect((await f.store.get(id)).text).toBe('B gõ trong lúc chờ');}finally{await f.done();}});
+ await run('lost-response-reload-replays-one-operation',async()=>{const f=await fixture();try{await f.login();await f.page.locator('#new').click();await f.page.locator('#title').fill('Response thất lạc');await f.page.locator('#text').fill('Không mất chữ 日本語 😀');f.hooks.drop=true;await f.page.locator('#save').click();await expect(f.page.locator('#save-status')).toHaveAttribute('data-state','error');await f.page.reload();await expect(f.page.locator('.draft-row').first()).toBeVisible();await f.page.locator('.draft-row').first().getByRole('button',{name:'Mở nháp'}).click();expect(await f.page.locator('#text').inputValue()).toBe('Không mất chữ 日本語 😀');f.hooks.block=false;await f.page.locator('#password').fill(password);await f.page.locator('#login-form button').click();await expect(f.page.locator('#save-status')).toHaveAttribute('data-state','saved');const cat=await f.store.capture();expect(Object.keys(cat.entries)).toHaveLength(1);expect(Object.values(cat.entries)[0].version).toBe(1);expect(new Set(f.hooks.posts.map(p=>p.clientOpId)).size).toBe(1);}finally{await f.done();}});
+ await run('two-tabs-conflict-preserves-local-text',async()=>{const f=await fixture(1);try{await f.login();await f.page.locator('.card').click();const second=await f.context.newPage();second.on('pageerror',e=>f.errors.push(e.message));second.on('dialog',d=>d.accept());await second.goto(origin);await expect(second.locator('.card')).toBeVisible();await second.locator('.card').click();await f.page.locator('#text').fill('Tab A đã xác nhận');await f.page.locator('#save').click();await expect(f.page.locator('#save-status')).toHaveAttribute('data-state','saved');await second.locator('#text').fill('Tab B giữ nháp');await second.locator('#save').click();await expect(second.locator('#conflict')).toBeVisible();expect(await second.locator('#text').inputValue()).toBe('Tab B giữ nháp');expect((await f.store.get(f.ids[0])).text).toBe('Tab A đã xác nhận');}finally{await f.done();}});
+ await run('offline-reload-recovers-indexeddb-draft',async()=>{const f=await fixture(1);try{await f.login();await f.page.locator('.card').click();f.hooks.block=true;await f.context.setOffline(true);await f.page.locator('#text').fill('Nháp offline sau tải lại');await expect(f.page.locator('#save-status')).toContainText('Đã giữ bản nháp');await f.page.reload();await expect(f.page.locator('.draft-row').first()).toBeVisible();await f.page.locator('.draft-row').first().getByRole('button',{name:'Mở nháp'}).click();expect(await f.page.locator('#text').inputValue()).toBe('Nháp offline sau tải lại');expect((await f.store.get(f.ids[0])).text).toBe('Nội dung 0');}finally{await f.done();}});
+ await run('view-only-share-disables-editor',async()=>{const f=await fixture(1);try{const link=await f.store.share('note',f.ids[0],'view');await f.page.goto(origin+'/#note='+link.token);await expect(f.page.locator('#editor')).toBeVisible();await expect(f.page.locator('#text')).toBeDisabled();await expect(f.page.locator('#save')).toBeDisabled();}finally{await f.done();}});
+}finally{await browser.close();await writeFile('browser-result.local.json',JSON.stringify({kind:'CHROMIUM_UI_REAL_BROWSER_SIMULATED_WEBDAV',passed:results.length===6&&results.every(x=>x.passed),tests:results},null,2)+'\n');}

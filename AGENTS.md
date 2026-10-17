@@ -1,11 +1,15 @@
 # Notes safety boundaries
 
-- Work on a feature branch and open a draft PR; do not merge or release without approval.
-- Production Homepage Notes remains on private Vercel Blob. Do not migrate real data.
+- User authorized the minimal live Notes release on 2026-10-18, preserving Blob.
+- Work on release/minimal-notes; test before release and record exact source/deployment.
+- Keep Homepage Blob and its deployment as rollback. Never delete or overwrite Blob.
+- Do not silently present an empty Koofr store as migrated data: verify any import,
+  or clearly expose old Notes separately until transfer is verified.
 - Never change NAS reports, Google Apps Script, expense/Gemini or backup workloads.
 - This repository is public: do not commit account configs, real Notes, credentials,
   runtime logs, raw provider responses or historical private-repository artifacts.
-- Live tests may only create fresh `Homepage-Notes-Vercel-Probe-<run>-<uuid>` roots.
+- Live tests use fresh synthetic roots. Production provisioning uses only the exact
+  configured `Hunghvt-Notes-Data-<uuid>` root, never a backup path.
 - Use dedicated Koofr WebDAV secrets. Never access the backup rclone configuration.
 - Preserve revision checks, lock fencing, operation idempotency, live share checks
   and snapshot-bound restore. Never replace them with read-then-unconditional-write.
