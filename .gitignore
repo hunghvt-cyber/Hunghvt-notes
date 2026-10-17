@@ -1,0 +1,9 @@
+node_modules/
+.vercel/
+.env*
+!.env.preview.example
+*.local.json
+*.local.log
+*.gz
+*.zip
+coverage/
