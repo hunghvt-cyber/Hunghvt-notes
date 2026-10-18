@@ -13,7 +13,9 @@ export function parseFolders(xml){
   const href=m[1].match(/<(?:[\w.-]+:)?href\b[^>]*>([^<]+)<\/(?:[\w.-]+:)?href>/)?.[1];
   if(!href)throw Error('INVALID_HREF');
   const u=new URL(href.replaceAll('&amp;','&'),base);
-  if(u.origin!==new URL(base).origin||!u.pathname.startsWith('/dav/Koofr/'))throw Error('FOREIGN_HREF');
+  if(u.origin!==new URL(base).origin)throw Error('FOREIGN_HREF');
+  if(u.pathname==='/dav/Koofr'||u.pathname==='/dav/Koofr/')continue;
+  if(!u.pathname.startsWith('/dav/Koofr/'))throw Error('FOREIGN_HREF');
   let name;try{name=decodeURIComponent(u.pathname.slice('/dav/Koofr/'.length).replace(/\/$/,''));}catch{throw Error('INVALID_ENCODING');}
   if(!name||name.includes('/')||name.includes('\\'))continue;
   result.push(name);
