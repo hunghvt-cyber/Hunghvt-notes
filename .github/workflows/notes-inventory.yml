@@ -1,0 +1,24 @@
+name: Inventory Notes test folders (read only)
+on:
+  push:
+    branches: [release/minimal-notes]
+permissions:
+  contents: read
+jobs:
+  inventory:
+    if: contains(github.event.head_commit.message, '[notes-inventory]')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24'
+      - name: Read only collection names; never export credentials or unrelated paths
+        env:
+          NOTES_MAINTENANCE: READ_ONLY_TEST_FOLDER_INVENTORY
+          KOOFR_WEBDAV_USER: ${{ secrets.KOOFR_WEBDAV_USER }}
+          KOOFR_WEBDAV_APP_PASSWORD: ${{ secrets.KOOFR_WEBDAV_APP_PASSWORD }}
+        run: node scripts/inventory-test-folders.mjs
