@@ -26,7 +26,7 @@ function render(){
  const list=notes.filter(n=>(!folder||n.folder===folder)&&[n.title,n.text,n.folder].some(v=>String(v??'').toLocaleLowerCase('vi').includes(q)));
  $('list-title').textContent=folder||'Tất cả ghi chú';
  for(const n of list){const b=button('',()=>openNote(n.id));b.className='card';b.dataset.note=n.id;b.setAttribute('aria-current',String(active?.note.id===n.id));const title=document.createElement('strong'),text=document.createElement('p'),meta=document.createElement('small');title.textContent=(n.pinned?'📌 ':'')+n.title;text.textContent=n.text;meta.textContent=n.folder||'Chưa phân loại';b.append(title,text,meta);$('note-list').append(b);}
- if(!list.length){const p=document.createElement('p');p.textContent=notes.length?'Không có kết quả phù hợp.':'Chưa có Note trong kho này. Notes cũ vẫn ở Homepage.';$('note-list').append(p);}
+ if(!list.length){const p=document.createElement('p');p.textContent=notes.length?'Không có kết quả phù hợp.':'Chưa có Note trong kho này.';$('note-list').append(p);}
  $('folder-list').replaceChildren(button('Tất cả',()=>{folder='';render();}));
  for(const f of folders){const b=button(f,()=>{folder=f;render();});b.setAttribute('aria-pressed',String(folder===f));$('folder-list').append(b);}
  $('folders').replaceChildren(...folders.map(f=>new Option(f,f)));const current=$('manage-folder').value;$('manage-folder').replaceChildren(new Option('Chọn thư mục…',''),...folders.map(f=>new Option(f,f)));if(folders.includes(current))$('manage-folder').value=current;

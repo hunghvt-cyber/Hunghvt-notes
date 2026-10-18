@@ -2,9 +2,8 @@
 
 - User authorized the minimal live Notes release on 2026-10-18, preserving Blob.
 - Work on release/minimal-notes; test before release and record exact source/deployment.
-- Keep Homepage Blob and its deployment as rollback. Never delete or overwrite Blob.
-- Do not silently present an empty Koofr store as migrated data: verify any import,
-  or clearly expose old Notes separately until transfer is verified.
+- On 2026-10-18 the user superseded legacy Blob preservation and authorized deleting old Homepage Notes. Keep Koofr production data intact. Homepage QR guides and login limits remain outside that cleanup scope.
+- Do not claim old data was imported without verification. Do not link to the retired Homepage Notes editor.
 - Never change NAS reports, Google Apps Script, expense/Gemini or backup workloads.
 - This repository is public: do not commit account configs, real Notes, credentials,
   runtime logs, raw provider responses or historical private-repository artifacts.
