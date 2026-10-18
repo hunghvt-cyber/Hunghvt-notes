@@ -36,6 +36,10 @@ Không yêu cầu gửi secret qua chat. GitHub Actions secrets không thể đ�
 Preview không được cấu hình namespace production; appConfig từ chối truy cập
 root thật khi target Preview. Khi thiếu secret, API đóng và UI báo chờ kết nối.
 
+Cập nhật 18/10/2026: cả 3 secret đã có target Production, type sensitive.
+Agent chỉ kiểm metadata, không đọc giá trị; đã redeploy và đăng nhập bằng
+biểu mẫu browserAuth bảo mật, không nhận mật khẩu trong chat.
+
 ## Dữ liệu cũ và rollback
 
 Kho Koofr mới được tạo ở đúng namespace đã cấu hình bằng marker/LOCK; retry
@@ -88,3 +92,35 @@ với HTTP handler thật và WebDAV mô phỏng; tách khỏi live Koofr eviden
 Sau khi đủ secret, tạo deployment target production, kiểm health/login/CRUD/share/
 backup trên Note smoke riêng và đối chiếu readback rồi mới tuyên bố bản dùng thật
 hoạt động. Ghi source SHA/deployment ID, không ghi nội dung thật vào report public.
+
+## Triển khai Production đã xác minh ngày 18/10/2026
+
+- URL: https://hunghvt-notes.vercel.app/
+- Deployment READY/production: `dpl_BNPiGYePB3ecjsZF6Uo8BcGiNZjy`.
+- Source: `34be6a30a1ea6865081937cd8ac71b6d867ce299`; đối chiếu Git blob hash
+  toàn bộ 21 file triển khai trước khi gửi Vercel.
+- Health 200/configured true; owner Notes và backup chưa đăng nhập trả 401;
+  benchmark route trả 404. Preview health vẫn đóng/configured false.
+- Browser thực gọi Vercel → Koofr thực: đăng nhập, tạo/lưu Unicode + checklist,
+  reload và đọc lại, tạo thư mục, cập nhật Note vào thư mục và đánh dấu checklist.
+- Tạo link sửa, mở phiên chia sẻ, sửa và nhận xác nhận lưu; owner reload đọc lại
+  nội dung sửa. Thu hồi link, phiên chia sẻ bị từ chối với mã hỗ trợ.
+- Tải snapshot thật 3.929 byte, decodeSnapshot xác minh hash tổng và hash các
+  head; đối chiếu title, Unicode, checklist checked/text và folder trong catalog.
+  1 Note active, lịch sử 2 bản tại thời điểm snapshot. Không đưa snapshot,
+  capability token, credential hay runtime log thô vào repository public.
+- Ba lần owner save trong log API: 3.025, 6.447 và 7.400 giây; save qua link
+  chia sẻ 4.042 giây (server duration). Không có lỗi lưu trong smoke này.
+  Đây là smoke nhỏ, không phải p50/p95, benchmark iPad hay cam kết độ trễ.
+- CI source phát hành đã success tại run `39057766989`; bằng chứng browser mô
+  phỏng và live qualification cũ vẫn phân biệt như phần trên.
+
+Bản tối thiểu đã đọc/ghi thật trên project riêng. Không migration Blob, không
+đổi Homepage, NAS, GAS hoặc workflow backup khác. Rollback dữ liệu vẫn cần đối
+chiếu các thay đổi mới trên Koofr; không có tự đồng bộ ngược về Blob.
+
+Note giả lập đã xóa mềm sau kiểm thử; không purge file/history/tombstone.
+Link thử đã thu hồi. Snapshot trước khi xóa đã tải trong phiên kiểm thử,
+không phải backup tự động của các Notes người dùng sẽ tạo về sau.
+Lần dọn thư mục đầu nhận 423 BUSY; không có ghi đè. Thử lại sau đó thành công,
+UI không còn thư mục thử. Phản hồi khóa bận không được tính là lần thành công.
