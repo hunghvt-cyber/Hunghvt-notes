@@ -35,3 +35,11 @@ test('typing while the old acknowledged draft is being removed survives cleanup'
  const gate=wait(),began=wait(),files=new Map();const vault={async put(v){files.set(v.key,clone(v));},async remove(k){began.resolve();await gate.promise;files.delete(k);}};const {d}=setup(async p=>ack(p),{vault});
  await d.edit({text:'A'});const saving=d.flush();await began.promise;const editing=d.edit({text:'B'});gate.resolve();await Promise.all([saving,editing]);assert.equal(d.note.text,'B');assert.equal(d.dirty,true);assert.equal(files.get(d.key).note.text,'B');
 });
+
+test('only safe GET requests retry BUSY with a bounded jittered delay',async()=>{
+ const {apiClient}=await import('../public/sync.js');let calls=0;const waits=[];
+ const client=apiClient({fetcher:async()=>{calls++;return Response.json(calls<3?{code:'BUSY'}:{notes:[]},{status:calls<3?423:200});},wait:async ms=>waits.push(ms),random:()=>0});
+ assert.deepEqual(await client('notes'),{notes:[]});assert.equal(calls,3);assert.deepEqual(waits,[1000,1500]);
+ calls=0;await assert.rejects(client('notes-save',{method:'POST',data:{action:'save'}}),e=>e.status===423);assert.equal(calls,1);
+ const capped=apiClient({fetcher:async()=>{calls++;return Response.json({code:'BUSY'},{status:423});},wait:async()=>{}});calls=0;await assert.rejects(capped('notes'),e=>e.status===423);assert.equal(calls,4);
+});

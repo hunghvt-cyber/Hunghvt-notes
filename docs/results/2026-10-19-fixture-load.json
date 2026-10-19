@@ -1,0 +1,53 @@
+{
+  "kind": "IN_PROCESS_SIMULATED_WEBDAV_NOT_KOOFR_CAPACITY",
+  "results": [
+    {
+      "users": 50,
+      "editors": 0,
+      "p50Ms": 7.547471000000002,
+      "p95Ms": 10.413097,
+      "statuses": {
+        "200": 1,
+        "423": 49
+      },
+      "webdavRequests": 55,
+      "lockAttempts": 51
+    },
+    {
+      "users": 50,
+      "editors": 5,
+      "p50Ms": 5.147522000000009,
+      "p95Ms": 6.396042999999992,
+      "statuses": {
+        "200": 1,
+        "423": 49
+      },
+      "webdavRequests": 55,
+      "lockAttempts": 51
+    },
+    {
+      "users": 100,
+      "editors": 0,
+      "p50Ms": 9.479861,
+      "p95Ms": 11.532107999999994,
+      "statuses": {
+        "200": 1,
+        "423": 99
+      },
+      "webdavRequests": 105,
+      "lockAttempts": 101
+    },
+    {
+      "users": 100,
+      "editors": 10,
+      "p50Ms": 7.566389000000001,
+      "p95Ms": 8.996367000000006,
+      "statuses": {
+        "200": 1,
+        "423": 99
+      },
+      "webdavRequests": 105,
+      "lockAttempts": 101
+    }
+  ]
+}

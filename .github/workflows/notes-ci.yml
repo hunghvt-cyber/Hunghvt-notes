@@ -27,7 +27,6 @@ jobs:
           node --check public/app.js
           node --check public/sync.js
   browser:
-    if: github.ref == 'refs/heads/release/minimal-notes' && github.event_name == 'push'
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
