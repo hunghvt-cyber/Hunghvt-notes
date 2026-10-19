@@ -17,6 +17,15 @@ jobs:
           node-version: '24'
       - run: npm ci --ignore-scripts --no-audit --no-fund
       - run: npm test
+      - name: Simulated retry load (no live provider)
+        run: node scripts/retry-load.mjs > retry-load.local.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: notes-retry-load-simulation
+          path: retry-load.local.json
+          if-no-files-found: warn
+          retention-days: 7
       - name: Check migrated entry points
         run: |
           node --check api/bench.js
