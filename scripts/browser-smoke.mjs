@@ -1,11 +1,11 @@
 // Real Chromium UI + HTTP handler + simulated WebDAV. Never uses account secrets.
-import {chromium,expect} from '@playwright/test';
+import {chromium,expect as baseExpect} from '@playwright/test';
 import {readFile,writeFile} from 'node:fs/promises';
 import {randomUUID} from 'node:crypto';
 import {backend} from '../test/helpers/collection.mjs';
 import {createAppHandler,productionProject} from '../lib/app-config.mjs';
 import {provisionStore} from '../lib/production-store.mjs';
-expect.configure({timeout:15000});
+const expect=baseExpect.configure({timeout:15000});
 const origin='https://notes.test',password='synthetic-test-only',results=[];
 const gate=()=>{let resolve;const promise=new Promise(r=>resolve=r);return {promise,resolve};};
 const browser=await chromium.launch({headless:true});
