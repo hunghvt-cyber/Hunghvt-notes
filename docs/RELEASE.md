@@ -1,3 +1,13 @@
+# Trạng thái phát hành hiện tại — 19/10/2026
+
+Production: https://hunghvt-notes.vercel.app/ ; source **release/minimal-notes**, không phải main. Koofr là nguồn dữ liệu chính. Homepage Notes cũ đã nghỉ; không dùng URL cũ hay Blob để rollback các thay đổi mới. Backup tải xuống phải kiểm chứng riêng; không có đồng bộ ngược tự động sang Blob.
+
+Bản 0ea57f7 đã READY trước lượt thêm sắp xếp/di chuyển. Có cache danh sách sau xác thực, bộ nhớ phiên cho Note đã mở, bản nháp IndexedDB, Thùng rác tìm toàn văn/checklist và tick khôi phục. Không có chế độ Thiết bị riêng. Xem README/AGENTS hiện tại và PR triển khai mới nhất để xác định source cuối.
+
+Sắp xếp/di chuyển chỉ phát hành sau Node và Chromium CI. Giữ Koofr lock, idempotency, revision và kiểm quyền chia sẻ. Kiểm thử bằng fixture; không xóa hoặc di chuyển Note thật để smoke test. Chưa chứng nhận 50–100 người đồng thời; xem docs/PERFORMANCE-20261019.md.
+
+## Hồ sơ lịch sử ngày 18/10 — không phải hướng dẫn rollback hiện hành
+
 # Bản tối thiểu dùng thật
 
 Người dùng đã cho phép triển khai ngày 18/10/2026, giữ Vercel Blob để rollback.

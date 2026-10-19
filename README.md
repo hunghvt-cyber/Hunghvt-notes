@@ -75,3 +75,9 @@ Trang chia sẻ không dùng cache lâu dài; quyền được kiểm tra lại 
 ### Thùng rác
 
 Thùng rác là mục riêng trong danh sách thư mục. Tìm kiếm trong mục này gồm tiêu đề, nội dung đầy đủ, checklist và tên thư mục gốc. Tick một hoặc nhiều Note rồi bấm **Khôi phục đã chọn**. Có thể mở nội dung chỉ đọc trước khi khôi phục. Note trở về thư mục cũ nếu còn, nếu không về Chưa phân loại. Link chia sẻ riêng của Note bị thu hồi khi khôi phục; tạo link mới khi cần. Không xóa vĩnh viễn hoặc tự dọn rác.
+
+### Sắp xếp và di chuyển
+
+Menu **Sắp xếp**: cập nhật mới/cũ, tiêu đề A–Z/Z–A, hoặc **Tùy chỉnh**. Kiểu tự động ưu tiên Note đã ghim; Tùy chỉnh theo đúng thứ tự đã đặt. Chọn nhiều Note rồi dùng **Lên / Xuống** để đổi vị trí trong kiểu Tùy chỉnh, kể cả khi lọc theo thư mục/tìm kiếm. Thứ tự tùy chỉnh đồng bộ qua Koofr; kiểu xem lưu riêng theo thiết bị và đúng kho.
+
+Trong chế độ chọn nhiều, chọn **Chuyển đến** rồi **Di chuyển** để chuyển cả nhóm sang thư mục có sẵn hoặc Chưa phân loại. Chặn thao tác nếu nhóm có bản nháp; kiểm tra revision của toàn bộ nhóm trước khi thay đổi, không di chuyển một phần khi có xung đột. Nội dung/checklist/lịch sử giữ nguyên. Thay thư mục sẽ thay quyền nhìn thấy qua link chia sẻ thư mục tương ứng. Trang chia sẻ không có quyền di chuyển hoặc sắp xếp kho của chủ.

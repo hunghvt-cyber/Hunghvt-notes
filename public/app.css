@@ -3,3 +3,5 @@
 #sync-banner{position:sticky;top:0;z-index:50;background:#e9f1f4;border:1px solid #9aafba;border-radius:5px;padding:10px 12px;margin:8px 0;box-shadow:0 2px 5px #0002}#sync-progress{height:4px;margin:-10px -12px 8px;background:linear-gradient(90deg,#b6d5e5 0%,#197690 45%,#b6d5e5 100%);background-size:200% 100%;animation:sync-moving 1.2s linear infinite}@keyframes sync-moving{to{background-position:-200% 0}}#bulk-toolbar{margin:10px 0;padding:8px;background:#e1ebf0;border-radius:5px}#bulk-toolbar span{margin-right:auto}.card[aria-pressed=true]{border:3px solid #197690;background:#d9edf4}#select-mode[aria-pressed=true]{background:#d9edf4}
 
 #draft-toggle{margin-left:auto}#draft-panel[hidden]{display:none!important}#copy-status,#share-copy-status{min-height:1.25em;color:#176077}#folder-controls label{display:block;margin:10px 0}#folder-controls input[type=checkbox]{width:auto}
+
+#sort-mode,#move-folder{width:auto;max-width:100%}#bulk-toolbar label{margin:0}.toolbar select{min-height:42px}
