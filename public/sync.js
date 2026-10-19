@@ -51,9 +51,9 @@ export class SyncDraft{
  }
  dispose(){this.disposed=true;}
 }
-export function apiClient({route,token,fetcher=fetch,timeout=30000}={}){
+export function apiClient({route,token,fetcher=fetch,timeout=30000,wait=ms=>new Promise(resolve=>setTimeout(resolve,ms)),random=Math.random}={}){
  return async(path,{method='GET',data,query='',long=false}={})=>{
-  const response=await fetcher('/api/app?route='+encodeURIComponent(route??path)+query,{method,credentials:'same-origin',headers:{...(method!=='GET'?{'Content-Type':'application/json'}:{}),...(token?{Authorization:'Bearer '+token}:{})},...(data!==undefined?{body:JSON.stringify(data)}:{}),cache:'no-store',signal:AbortSignal.timeout(long?120000:timeout)});
+  let response;for(let attempt=0;;attempt++){response=await fetcher('/api/app?route='+encodeURIComponent(route??path)+query,{method,credentials:'same-origin',headers:{...(method!=='GET'?{'Content-Type':'application/json'}:{}),...(token?{Authorization:'Bearer '+token}:{})},...(data!==undefined?{body:JSON.stringify(data)}:{}),cache:'no-store',signal:AbortSignal.timeout(long?120000:timeout)});if(method!=='GET'||response.status!==423||attempt>=3)break;await response.body?.cancel();await wait(1000+Math.floor(random()*500)+attempt*500);}
   let body;try{body=await response.json();}catch{throw Object.assign(Error('INVALID_RESPONSE'),{status:response.status});}
   if(!response.ok)throw Object.assign(Error(body.code??'REQUEST_FAILED'),{status:response.status,reference:body.reference});return body;
  };

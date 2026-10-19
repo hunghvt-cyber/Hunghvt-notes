@@ -56,3 +56,19 @@ test('actual local HTTP server preserves route status, privacy headers, session 
  const r=await fetch(base+'notes-save',{method:'POST',headers:{Origin:s.cfg.PREVIEW_BASE_URL,'Content-Type':'application/json',Cookie:session},body:JSON.stringify({action:'save',clientOpId:randomUUID(),title:'HTTP test',text:'日本語'})});assert.equal(r.status,200);assert.equal(r.headers.get('cache-control'),'no-store');const n=await r.json();
  const read=await fetch(base+'notes&id='+n.id,{headers:{Cookie:session}});assert.equal(read.status,200);assert.equal((await read.json()).text,'日本語');
 });
+
+test('cache identity is authenticated, stable, isolated by namespace/account/password and never sent to public shares',async()=>{
+ const s=setup();await s.init();assert.equal((await call(s,'auth')).body.cacheScope,undefined);
+ const session=await owner(s),one=(await call(s,'auth',{session})).body.cacheScope;
+ assert.match(one,/^[a-f0-9]{64}$/);assert.equal((await call(s,'auth',{session})).body.cacheScope,one);
+ const before=s.b.requests.length;await call(s,'auth',{session});assert.equal(s.b.requests.length,before);
+ s.cfg.KOOFR_NOTES_USER='another-account';assert.notEqual((await call(s,'auth',{session})).body.cacheScope,one);
+ s.cfg.KOOFR_NOTES_NAMESPACE='Homepage-Notes-Vercel-Probe-123-'+randomUUID();assert.equal((await call(s,'auth',{session})).body.cacheScope,undefined);
+ s.cfg.PREVIEW_PORTAL_PASSWORD='rotated-synthetic-password';assert.equal((await call(s,'auth',{session})).body.cacheScope,undefined);
+});
+
+test('owner bootstrap reads notes and folders under exactly one lock',async()=>{
+ const s=setup();await s.init();const session=await owner(s);const start=s.b.requests.length;
+ const response=await call(s,'notes',{session,query:'&includeFolders=1'});assert.equal(response.status,200);assert.deepEqual(response.body.notes,[]);assert.ok(Array.isArray(response.body.folders));assert.ok(response.body.folders.includes('Công việc'));
+ assert.equal(s.b.requests.slice(start).filter(r=>r.method==='LOCK').length,1);
+});

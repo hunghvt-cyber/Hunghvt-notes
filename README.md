@@ -63,3 +63,11 @@ còn phải hoàn tất. Workflow benchmark vẫn chỉ chạy với marker, có
 - Xóa hàng loạt là thao tác thay đổi dữ liệu thật **chỉ khi người dùng bấm xác nhận**; CI/smoke không được gọi xóa trên Koofr production. Luôn kiểm tra quyền truy cập, bản nháp, xung đột và kết quả từng Note.
 - CI `Notes simulation` chạy trên dữ liệu giả; CI xanh không đồng nghĩa Vercel đã triển khai. Sau merge cần đối chiếu commit production, kiểm tra UI và smoke không phá hủy dữ liệu.
 - Không chỉnh NAS, Homepage, GAS, Supabase, Tapo, backup hoặc kho Notes thật khi bảo trì giao diện.
+
+### Tải nhanh và dữ liệu trên thiết bị
+
+Danh sách và thư mục được đọc từ cùng một catalog dưới một khóa WebDAV. Sau khi xác thực đúng kho, ứng dụng hiện danh sách đã lưu trên thiết bị rồi đồng bộ máy chủ. Tiêu đề, đoạn xem trước và thư mục có thể tồn tại trong IndexedDB của trình duyệt sau khi khóa ứng dụng.
+
+Chỉ bật **Thiết bị riêng** trên máy cá nhân: nội dung Notes đã mở được lưu cục bộ để mở nhanh, sau đó kiểm tra cập nhật. Tắt lựa chọn này xóa cache nội dung, giữ nguyên bản nháp. Cache không phải backup, không thay thế xác nhận lưu của máy chủ. Khóa ứng dụng không mã hóa dữ liệu trong hồ sơ trình duyệt; người có quyền truy cập hồ sơ thiết bị có thể đọc cache và bản nháp.
+
+Trang chia sẻ không dùng cache lâu dài; quyền được kiểm tra lại trên máy chủ. Thu hồi link không thể xóa nội dung người nhận đã đọc hoặc sao chép; trang đang mở kiểm tra lại khi quay về tab và mỗi phút. Chưa có bằng chứng đáp ứng 100 người đồng thời. Xem `docs/PERFORMANCE-20261019.md`.
