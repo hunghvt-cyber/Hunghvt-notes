@@ -3,7 +3,7 @@ import {DraftVault,SyncDraft,apiClient,clone} from './sync.js';
 const $=id=>document.getElementById(id),vault=new DraftVault(),sessions=new Map();
 let active=null,notes=[],folders=[],folder='',scope='owner',shared=null,api=apiClient(),authenticated=false,timer,refreshing=false,undo=null,shareTarget=null,canEdit=true,retries=0,selecting=false,selected=new Set(),pending=0;
 const cache=new NoteCache();let cacheScope=null,cacheState={notes:[],folders:[],content:{},privateDevice:false};
-async function cacheAuth(){const state=await api('auth');if(!state.authenticated)throw Object.assign(Error('LOGIN_REQUIRED'),{status:401});cacheScope=state.cacheScope;cacheState=await cache.get(cacheScope).catch(()=>null)??{notes:[],folders:[],content:{},privateDevice:false};$('private-device').checked=!!cacheState.privateDevice;notes=cacheState.notes;folders=cacheState.folders;render();}
+async function cacheAuth(state){state??=await api('auth');if(!state.authenticated)throw Object.assign(Error('LOGIN_REQUIRED'),{status:401});cacheScope=state.cacheScope;cacheState=await cache.get(cacheScope).catch(()=>null)??{notes:[],folders:[],content:{},privateDevice:false};$('private-device').checked=!!cacheState.privateDevice;notes=cacheState.notes;folders=cacheState.folders;render();}
 async function cacheList(){if(shared||!cacheScope)return;const content={};for(const n of notes)if(reusableNote(cacheState.content[n.id],n))content[n.id]=cacheState.content[n.id];cacheState={...cacheState,notes:clone(notes),folders:clone(folders),content};await cache.put(cacheScope,cacheState).catch(()=>{});}
 const status=text=>$('global-status').textContent=text;
 function busy(on){pending=Math.max(0,pending+(on?1:-1));$('sync-progress').hidden=pending===0;}
@@ -41,7 +41,7 @@ function render(){
 async function refresh(){
  if(refreshing||(!authenticated&&!shared))return;refreshing=true;busy(true);
  try{
-  if(shared?.route==='shared-note'){const n=await api(shared.route);notes=[n];folders=[];shared.permission=n.permission;canEdit=n.permission==='edit';if(!active)active=makeSession(n);}
+  if(shared?.route==='shared-note'){const n=await api(shared.route);notes=[n];folders=[];shared.permission=n.permission;canEdit=n.permission==='edit';if(!active||!active.dirty)active=makeSession(n);}
   else{const result=await api(shared?.route??'notes',{query:shared?'':'&includeFolders=1'});notes=result.notes;folders=shared?[result.folder]:result.folders;if(shared){shared.permission=result.permission;shared.folder=result.folder;canEdit=result.permission==='edit';$('new').hidden=!canEdit;}}
   await cacheList();render();if(shared&&active&&(shared.route==='shared-note'||!canEdit))fill();await drafts();status(navigator.onLine?'Đã tải danh sách Notes.':'Đang ngoại tuyến.');
  }catch(e){fail(e);}finally{refreshing=false;busy(false);}
@@ -73,7 +73,7 @@ async function createShare(kind,target){await hold();const r=await api('note-sha
 async function boot(){
  const match=location.hash.match(/^#(note|folder)=([a-f0-9]{32}\.[a-f0-9]{64})$/);
  if(match){shared={kind:match[1],token:match[2],route:match[1]==='note'?'shared-note':'shared-folder'};const h=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(match[2]));scope='share-'+Array.from(new Uint8Array(h),b=>b.toString(16).padStart(2,'0')).join('');api=apiClient({token:shared.token});$('workspace').hidden=false;for(const id of ['login','logout','backup','draft-toggle','draft-panel','select-mode','bulk-toolbar','folder-controls','cache-control']){const element=$(id);if(element)element.hidden=true;}$('new').hidden=shared.kind==='note';await refresh();return;}
- try{const h=await api('health');if(!h.configured){status('Kho Notes đang chờ cấu hình kết nối. Chưa chuyển dữ liệu từ Homepage.');await localDrafts();return;}const state=await api('auth');authenticated=state.authenticated;$('login').hidden=authenticated;$('workspace').hidden=!authenticated;if(authenticated){await cacheAuth();status(notes.length?'Đang hiện danh sách trên thiết bị · đang đồng bộ…':'Đang tải Notes…');await refresh();}else{status('Nhập mật khẩu để mở Notes.');await localDrafts();}}catch(e){fail(e);await localDrafts();}
+ try{const h=await api('health');if(!h.configured){status('Kho Notes đang chờ cấu hình kết nối. Chưa chuyển dữ liệu từ Homepage.');await localDrafts();return;}const state=await api('auth');authenticated=state.authenticated;$('login').hidden=authenticated;$('workspace').hidden=!authenticated;if(authenticated){await cacheAuth(state);status(notes.length?'Đang hiện danh sách trên thiết bị · đang đồng bộ…':'Đang tải Notes…');await refresh();}else{status('Nhập mật khẩu để mở Notes.');await localDrafts();}}catch(e){fail(e);await localDrafts();}
 }
 async function localDrafts(){try{const rows=await vault.list(scope);if(rows.length){$('workspace').hidden=false;$('login').hidden=false;await drafts();$('draft-panel').hidden=false;$('draft-toggle').setAttribute('aria-expanded','true');$('draft-panel').open=true;status('Chỉ đang mở bản nháp trên thiết bị. Mở khóa để kết nối và đồng bộ.');}}catch{}}
 $('login-form').addEventListener('submit',async e=>{e.preventDefault();try{await api('auth',{method:'POST',data:{password:$('password').value}});$('password').value='';authenticated=true;for(const s of sessions.values())s.disposed=false;$('login').hidden=true;$('workspace').hidden=false;await cacheAuth();await refresh();if(active?.dirty&&active.status!=='conflict')save();}catch(e){fail(e);}});
@@ -106,5 +106,5 @@ addEventListener('online',()=>{retries=0;boot().then(()=>{if(active?.dirty&&acti
 addEventListener('beforeunload',e=>{if(active?.dirty){e.preventDefault();e.returnValue='';}});addEventListener('pagehide',()=>{if(active?.dirty)active.persist().catch(()=>{});});
 addEventListener('hashchange',()=>location.reload());
 setInterval(()=>{if(!document.hidden&&(shared||!active?.dirty))refresh();},60000);
-addEventListener('visibilitychange',()=>{if(!document.hidden&&shared)refresh();});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&shared)refresh();});
 boot();
