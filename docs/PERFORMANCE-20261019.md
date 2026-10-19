@@ -17,3 +17,7 @@ These results demonstrate that current per-request root locking is insufficient 
 ## Remaining qualification
 
 Real PC/iPad/phone hardware, real Koofr read/open/save latency, Vercel usage, sustained load and provider retry behavior have not been measured here. Chromium fixtures cover iPad viewport, drafts, conflicting tabs, uncertain responses and share permissions; they are not live Koofr tests. Trash list/restore remains unimplemented. No destructive production smoke test or real-data benchmark is authorized.
+
+## Follow-up: simpler cache and searchable Trash
+
+User removed the private-device option. Only list previews persist by default; full content is kept automatically in session memory, cleared on lock or failed authentication, and revalidated on reopen. Legacy persisted full-content entries and the separate drafts database are preserved. Owner-only Trash searches full text and checklist on the server under the existing collection lock. Restore requires the tombstone revision and preserves immutable content, falls back to unfiled when the original folder no longer exists, and revokes individual Note links to avoid resurrecting old capabilities. No permanent deletion or cleanup was added.
