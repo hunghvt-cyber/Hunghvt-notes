@@ -44,3 +44,14 @@
 - Step 2 moves only normal owner/shared content GET outside the lease between two locked snapshots. Final live ACL, epoch, entry version/head/hash/folder validation is mandatory; retry once then BUSY. Lists/trash/backup/mutations are unchanged. See `docs/PERFORMANCE-STEP2-20261020.md`; do not describe this as lock-free reads or proven live capacity.
 - Step 3 retry load remains a virtual-time fake-WebDAV simulation. Existing apiClient GET retries and SyncDraft frozen POST retries are exercised; synchronized 50-reader/10-editor target still fails. Multi-wave retries of retained drafts are explicitly manual, not infinite automatic retries. See `docs/PERFORMANCE-STEP3-RETRY-20261020.md`; do not quote its assumed delays as live latency.
 - Step 4 trial client prioritizes delivery: patientRetry uses a 120-second retry window / max32 attempts with jitter for GET and SyncDraft saves only. Preserve frozen operations, single delivery per session, terminal conflicts/ACL handling and honest server-confirmed status. Loading is indeterminate, never fabricated percentage. See `docs/PERFORMANCE-STEP4-PATIENT-20261020.md`; this remains simulation evidence, not live readiness.
+
+## Production authorization and release, 2026-10-20
+
+- User explicitly requested deployment now and no further load testing before release.
+  This supersedes the earlier trial-only/no-production restriction for PR #9.
+- PR #9 merged at `06b1709dec8786e0b501d9a4a31d3aca89b062db` and deployed READY
+  as `dpl_AxdEPmXSkWKfyg9BZ6mNb5aajixM`, production alias hunghvt-notes.vercel.app.
+- Follow-up removes eager owner share-link reads: load links when Chia sẻ Note is
+  expanded; preserve live ACL checks and ignore link-list responses for an old note.
+- Do not run more load benchmarks unless requested. Continue practical fixes using
+  production observations; never interpret simulated 40-second latency as a live measure.
