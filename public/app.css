@@ -5,3 +5,5 @@
 #draft-toggle{margin-left:auto}#draft-panel[hidden]{display:none!important}#copy-status,#share-copy-status{min-height:1.25em;color:#176077}#folder-controls label{display:block;margin:10px 0}#folder-controls input[type=checkbox]{width:auto}
 
 #sort-mode,#move-folder{width:auto;max-width:100%}#bulk-toolbar label{margin:0}.toolbar select{min-height:42px}
+
+@media(prefers-reduced-motion:reduce){#sync-progress{animation:none;background:#197690}}

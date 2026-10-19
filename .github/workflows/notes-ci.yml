@@ -18,7 +18,7 @@ jobs:
       - run: npm ci --ignore-scripts --no-audit --no-fund
       - run: npm test
       - name: Simulated retry load (no live provider)
-        run: node scripts/retry-load.mjs > retry-load.local.json
+        run: node scripts/retry-load.mjs --patient > retry-load.local.json
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
