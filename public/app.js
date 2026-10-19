@@ -38,7 +38,7 @@ async function refresh(){
  if(refreshing||(!authenticated&&!shared))return;refreshing=true;busy(true);
  try{
   if(shared?.route==='shared-note'){const n=await api(shared.route);notes=[n];folders=[];shared.permission=n.permission;canEdit=n.permission==='edit';if(!active)active=makeSession(n);}
-  else{const [result,folderResult]=await Promise.all([api(shared?.route??'notes'),shared?Promise.resolve(null):api('folders')]);notes=result.notes;folders=shared?[result.folder]:folderResult.folders;if(shared){shared.permission=result.permission;shared.folder=result.folder;canEdit=result.permission==='edit';$('new').hidden=!canEdit;}}
+  else{const result=await api(shared?.route??'notes',{query:shared?'':'&includeFolders=1'});notes=result.notes;folders=shared?[result.folder]:result.folders;if(shared){shared.permission=result.permission;shared.folder=result.folder;canEdit=result.permission==='edit';$('new').hidden=!canEdit;}}
   render();if(shared?.route==='shared-note'&&active)fill();await drafts();status(navigator.onLine?'Đã tải danh sách Notes.':'Đang ngoại tuyến.');
  }catch(e){fail(e);}finally{refreshing=false;busy(false);}
 }
