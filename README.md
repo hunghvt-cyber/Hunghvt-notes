@@ -68,6 +68,10 @@ còn phải hoàn tất. Workflow benchmark vẫn chỉ chạy với marker, có
 
 Danh sách và thư mục được đọc từ cùng một catalog dưới một khóa WebDAV. Sau khi xác thực đúng kho, ứng dụng hiện danh sách đã lưu trên thiết bị rồi đồng bộ máy chủ. Tiêu đề, đoạn xem trước và thư mục có thể tồn tại trong IndexedDB của trình duyệt sau khi khóa ứng dụng.
 
-Chỉ bật **Thiết bị riêng** trên máy cá nhân: nội dung Notes đã mở được lưu cục bộ để mở nhanh, sau đó kiểm tra cập nhật. Tắt lựa chọn này xóa cache nội dung, giữ nguyên bản nháp. Cache không phải backup, không thay thế xác nhận lưu của máy chủ. Khóa ứng dụng không mã hóa dữ liệu trong hồ sơ trình duyệt; người có quyền truy cập hồ sơ thiết bị có thể đọc cache và bản nháp.
+Không có lựa chọn chế độ thiết bị. Nội dung Notes đã mở chỉ được giữ trong bộ nhớ của phiên, tự kiểm tra revision khi mở lại; không ghi thêm nội dung đầy đủ vào cache lâu dài. Cache nội dung từ phiên bản cũ được giữ nguyên nhưng không dùng. Bản nháp vẫn được lưu trên thiết bị để phục hồi. Cache không phải backup, không thay thế xác nhận lưu của máy chủ. Khóa ứng dụng không mã hóa dữ liệu trong hồ sơ trình duyệt; người có quyền truy cập hồ sơ thiết bị có thể đọc cache và bản nháp.
 
 Trang chia sẻ không dùng cache lâu dài; quyền được kiểm tra lại trên máy chủ. Thu hồi link không thể xóa nội dung người nhận đã đọc hoặc sao chép; trang đang mở kiểm tra lại khi quay về tab và mỗi phút. Chưa có bằng chứng đáp ứng 100 người đồng thời. Xem `docs/PERFORMANCE-20261019.md`.
+
+### Thùng rác
+
+Thùng rác là mục riêng trong danh sách thư mục. Tìm kiếm trong mục này gồm tiêu đề, nội dung đầy đủ, checklist và tên thư mục gốc. Tick một hoặc nhiều Note rồi bấm **Khôi phục đã chọn**. Có thể mở nội dung chỉ đọc trước khi khôi phục. Note trở về thư mục cũ nếu còn, nếu không về Chưa phân loại. Link chia sẻ riêng của Note bị thu hồi khi khôi phục; tạo link mới khi cần. Không xóa vĩnh viễn hoặc tự dọn rác.

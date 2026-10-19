@@ -28,9 +28,9 @@
 - Keep Koofr as source of truth; no NAS, Blob, Redis or new database dependency.
 - Owner bootstrap uses `notes&includeFolders=1` and one locked catalog snapshot. Parallel calls to `notes` and `folders` contend on the same lock and can fail with 423.
 - Cache is separate IndexedDB `hunghvt-notes-cache-v1`; never delete/migrate the draft DB implicitly. Obtain the HMAC cache identity only from a successful authenticated `auth` response. No persistent shared-link cache.
-- Full content cache requires explicit private-device opt-in. List previews persist after authenticated use. Disabling opt-in removes only cached content, never drafts. Cached revisions never bypass server CAS or create unconditional writes.
+- User removed private-device options on 2026-10-19. Persist list previews only; opened full content uses session memory automatically. Preserve legacy cache and every draft; never use legacy full-content disk cache. Cached revisions never bypass server CAS.
 - Revalidate cached opened notes; never replace an active dirty or edited session. Shared revocation is checked on API requests, visibility return and periodic refresh, not by cached authorization.
 - Only GET retries 423 (bounded jitter). Mutation retry remains SyncDraft's exact frozen operation protocol.
 - Browser fixture tests must run on PRs before merging cache changes. Local browser availability is not evidence of production UI correctness.
 - Synchronized fixture bursts currently demonstrate root-lock contention, not 100-user readiness. Report 423 separately from successful latency; never quote fake-WebDAV latency as Koofr/Vercel performance.
-- Trash remains incomplete: do not test deletion on real production notes.
+- Trash is owner-only, supports full text/checklist search and revision-checked restore. Retain immutable heads, revoke individual note links on restore, fall back to unfiled if the folder is gone. Never test deletion on real production notes.
