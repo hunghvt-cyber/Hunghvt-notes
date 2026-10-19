@@ -51,9 +51,26 @@ export class SyncDraft{
  }
  dispose(){this.disposed=true;}
 }
-export function apiClient({route,token,fetcher=fetch,timeout=30000,wait=ms=>new Promise(resolve=>setTimeout(resolve,ms)),random=Math.random}={}){
+// A delivery window, not a durable background job. Closing/suspending the page
+// leaves SyncDraft's persisted operation available for an exact retry later.
+export async function patientRetry(run,{wait=ms=>new Promise(resolve=>setTimeout(resolve,ms)),now=Date.now,random=Math.random,onWait=()=>{},canContinue=()=>true,budgetMs=120000,maxAttempts=32}={}){
+ const started=now();let last;
+ for(let attempt=0;attempt<maxAttempts;attempt++){
+  if(!canContinue())throw Object.assign(Error('RETRY_CANCELLED'),{cancelled:true});
+  if(attempt&&now()-started>=budgetMs)throw last;
+  try{return await run();}catch(e){
+   last=e;const transient=!e.status||[408,423,500,502,503,504].includes(e.status)||['ACK_UNVERIFIED','INVALID_RESPONSE'].includes(e.message);
+   if(!transient||!canContinue()||attempt+1>=maxAttempts)throw e;
+   const remaining=budgetMs-(now()-started),cap=Math.min(10000,1500*2**Math.min(attempt+1,3));
+   const delay=1000+Math.floor(random()*(cap-1000));if(delay>=remaining)throw e;
+   onWait({attempt:attempt+1,delay,error:e});await wait(delay);
+  }
+ }
+ throw last;
+}
+export function apiClient({route,token,fetcher=fetch,timeout=30000,wait=ms=>new Promise(resolve=>setTimeout(resolve,ms)),random=Math.random,getRetries=3}={}){
  return async(path,{method='GET',data,query='',long=false}={})=>{
-  let response;for(let attempt=0;;attempt++){response=await fetcher('/api/app?route='+encodeURIComponent(route??path)+query,{method,credentials:'same-origin',headers:{...(method!=='GET'?{'Content-Type':'application/json'}:{}),...(token?{Authorization:'Bearer '+token}:{})},...(data!==undefined?{body:JSON.stringify(data)}:{}),cache:'no-store',signal:AbortSignal.timeout(long?120000:timeout)});if(method!=='GET'||response.status!==423||attempt>=3)break;await response.body?.cancel();await wait(1000+Math.floor(random()*500)+attempt*500);}
+  let response;for(let attempt=0;;attempt++){response=await fetcher('/api/app?route='+encodeURIComponent(route??path)+query,{method,credentials:'same-origin',headers:{...(method!=='GET'?{'Content-Type':'application/json'}:{}),...(token?{Authorization:'Bearer '+token}:{})},...(data!==undefined?{body:JSON.stringify(data)}:{}),cache:'no-store',signal:AbortSignal.timeout(long?120000:timeout)});if(method!=='GET'||response.status!==423||attempt>=getRetries)break;await response.body?.cancel();await wait(1000+Math.floor(random()*500)+attempt*500);}
   let body;try{body=await response.json();}catch{throw Object.assign(Error('INVALID_RESPONSE'),{status:response.status});}
   if(!response.ok)throw Object.assign(Error(body.code??'REQUEST_FAILED'),{status:response.status,reference:body.reference});return body;
  };

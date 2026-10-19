@@ -21,3 +21,18 @@ Real PC/iPad/phone hardware, real Koofr read/open/save latency, Vercel usage, su
 ## Follow-up: simpler cache and searchable Trash
 
 User removed the private-device option. Only list previews persist by default; full content is kept automatically in session memory, cleared on lock or failed authentication, and revalidated on reopen. Legacy persisted full-content entries and the separate drafts database are preserved. Owner-only Trash searches full text and checklist on the server under the existing collection lock. Restore requires the tombstone revision and preserves immutable content, falls back to unfiled when the original folder no longer exists, and revokes individual Note links to avoid resurrecting old capabilities. No permanent deletion or cleanup was added.
+
+## Trial follow-up, 2026-10-20 (not production)
+
+See [Step 1](PERFORMANCE-STEP1-20261020.md) for consolidated shared reads/saves,
+unchanged-revision short circuit, protocol call counts, and fresh fixture evidence.
+Collection locking is retained; synchronized burst admission is still insufficient.
+
+## Trial step 2, 2026-10-20
+
+See `PERFORMANCE-STEP2-20261020.md`: normal content transfers run between two short
+locked catalog snapshots with final live ACL and head validation. Shared open uses
+7 calls / 2 leases rather than step 1's 4 / 1; the content transfer is outside both
+leases. 123 Node tests pass, including deterministic cross-instance revoke/save races.
+This supersedes step 1's open-read implementation only; no production release or live
+capacity claim.

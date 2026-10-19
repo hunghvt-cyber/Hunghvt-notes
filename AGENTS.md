@@ -34,3 +34,13 @@
 - Browser fixture tests must run on PRs before merging cache changes. Local browser availability is not evidence of production UI correctness.
 - Synchronized fixture bursts currently demonstrate root-lock contention, not 100-user readiness. Report 423 separately from successful latency; never quote fake-WebDAV latency as Koofr/Vercel performance.
 - Trash is owner-only, supports full text/checklist search and revision-checked restore. Retain immutable heads, revoke individual note links on restore, fall back to unfiled if the folder is gone. Never test deletion on real production notes.
+
+## Trial performance branch, 2026-10-20
+
+- `perf/reduce-lock-cycles-20261020` is trial-only; user explicitly forbids production deployment.
+- Consolidated shared operations and inline save responses retain the root lock and catalog schema.
+- Fresh fixture counts reduce successful list/open/save lock cycles to one, but 60-call burst still has 59 BUSY responses. Do not claim 10-editor/50-reader readiness.
+- See `docs/PERFORMANCE-STEP1-20261020.md`; require browser CI and real-provider qualification before any later release.
+- Step 2 moves only normal owner/shared content GET outside the lease between two locked snapshots. Final live ACL, epoch, entry version/head/hash/folder validation is mandatory; retry once then BUSY. Lists/trash/backup/mutations are unchanged. See `docs/PERFORMANCE-STEP2-20261020.md`; do not describe this as lock-free reads or proven live capacity.
+- Step 3 retry load remains a virtual-time fake-WebDAV simulation. Existing apiClient GET retries and SyncDraft frozen POST retries are exercised; synchronized 50-reader/10-editor target still fails. Multi-wave retries of retained drafts are explicitly manual, not infinite automatic retries. See `docs/PERFORMANCE-STEP3-RETRY-20261020.md`; do not quote its assumed delays as live latency.
+- Step 4 trial client prioritizes delivery: patientRetry uses a 120-second retry window / max32 attempts with jitter for GET and SyncDraft saves only. Preserve frozen operations, single delivery per session, terminal conflicts/ACL handling and honest server-confirmed status. Loading is indeterminate, never fabricated percentage. See `docs/PERFORMANCE-STEP4-PATIENT-20261020.md`; this remains simulation evidence, not live readiness.
