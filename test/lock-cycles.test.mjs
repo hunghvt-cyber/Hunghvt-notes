@@ -18,10 +18,10 @@ async function fixture(t){
 }
 const locks=r=>r.calls.filter(x=>x.method==='LOCK').length;
 
-test('shared list/open/save each use one lock while retaining exact acknowledged content',async t=>{
+test('shared list/save use one lock and content open uses two short snapshots',async t=>{
  const {id,head,call}=await fixture(t);
  const list=await call('shared-folder');assert.equal(list.status,200);assert.equal(list.body.notes.length,1);assert.equal(locks(list),1);assert.equal(list.calls.length,3);
- const open=await call('shared-folder',{query:'&id='+id});assert.equal(open.body.text,'original');assert.equal(locks(open),1);assert.equal(open.calls.length,4);
+ const open=await call('shared-folder',{query:'&id='+id});assert.equal(open.body.text,'original');assert.equal(locks(open),2);assert.equal(open.calls.length,7);
  const op=randomUUID(),data={action:'save',id,revision:head.revision,clientOpId:op,title:'Synthetic',text:'changed'};
  const saved=await call('shared-folder',{data});assert.equal(saved.status,200);assert.equal(saved.body.text,'changed');assert.equal(saved.body.revision,saved.body.acknowledgedRevision);assert.equal(saved.body.clientOpId,op);assert.equal(locks(saved),1);assert.equal(saved.calls.length,9);
  assert.equal((await call('shared-folder',{query:'&id='+id})).body.text,'changed');

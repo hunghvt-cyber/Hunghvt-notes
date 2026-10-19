@@ -41,3 +41,4 @@
 - Consolidated shared operations and inline save responses retain the root lock and catalog schema.
 - Fresh fixture counts reduce successful list/open/save lock cycles to one, but 60-call burst still has 59 BUSY responses. Do not claim 10-editor/50-reader readiness.
 - See `docs/PERFORMANCE-STEP1-20261020.md`; require browser CI and real-provider qualification before any later release.
+- Step 2 moves only normal owner/shared content GET outside the lease between two locked snapshots. Final live ACL, epoch, entry version/head/hash/folder validation is mandatory; retry once then BUSY. Lists/trash/backup/mutations are unchanged. See `docs/PERFORMANCE-STEP2-20261020.md`; do not describe this as lock-free reads or proven live capacity.

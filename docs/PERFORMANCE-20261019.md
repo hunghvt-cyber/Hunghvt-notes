@@ -27,3 +27,12 @@ User removed the private-device option. Only list previews persist by default; f
 See [Step 1](PERFORMANCE-STEP1-20261020.md) for consolidated shared reads/saves,
 unchanged-revision short circuit, protocol call counts, and fresh fixture evidence.
 Collection locking is retained; synchronized burst admission is still insufficient.
+
+## Trial step 2, 2026-10-20
+
+See `PERFORMANCE-STEP2-20261020.md`: normal content transfers run between two short
+locked catalog snapshots with final live ACL and head validation. Shared open uses
+7 calls / 2 leases rather than step 1's 4 / 1; the content transfer is outside both
+leases. 123 Node tests pass, including deterministic cross-instance revoke/save races.
+This supersedes step 1's open-read implementation only; no production release or live
+capacity claim.
