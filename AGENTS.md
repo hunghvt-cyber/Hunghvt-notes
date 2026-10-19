@@ -55,3 +55,4 @@
   expanded; preserve live ACL checks and ignore link-list responses for an old note.
 - Do not run more load benchmarks unless requested. Continue practical fixes using
   production observations; never interpret simulated 40-second latency as a live measure.
+- User authorized foreground-priority/background reduction and quieter draft UI. Per-tab request lane prioritizes queued writes/reads over optional polls; background reads are single-attempt and coalesced. Shared accessOnly checks must retain live capability/scope/membership under a lease; no cached authorization shortcut. Recovery stays collapsed/hidden when empty, with all durable draft records and frozen operations preserved. Do not turn Đã lưu into an optimistic status.

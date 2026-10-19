@@ -68,6 +68,18 @@ export async function patientRetry(run,{wait=ms=>new Promise(resolve=>setTimeout
  }
  throw last;
 }
+// One browser tab shares one HTTP lane. A running request completes normally;
+// queued saves go ahead of reads, and optional background work is last.
+export class RequestLane{
+ constructor(){this.active=false;this.queue=[];this.sequence=0;}
+ run(fn,{priority=1,valid=()=>true}={}){return new Promise((resolve,reject)=>{this.queue.push({fn,priority,valid,resolve,reject,sequence:this.sequence++});this.drain();});}
+ async drain(){
+  if(this.active||!this.queue.length)return;
+  this.queue.sort((a,b)=>b.priority-a.priority||a.sequence-b.sequence);const task=this.queue.shift();this.active=true;
+  try{if(!task.valid())throw Object.assign(Error('BACKGROUND_DEFERRED'),{cancelled:true});task.resolve(await task.fn());}
+  catch(e){task.reject(e);}finally{this.active=false;this.drain();}
+ }
+}
 export function apiClient({route,token,fetcher=fetch,timeout=30000,wait=ms=>new Promise(resolve=>setTimeout(resolve,ms)),random=Math.random,getRetries=3}={}){
  return async(path,{method='GET',data,query='',long=false}={})=>{
   let response;for(let attempt=0;;attempt++){response=await fetcher('/api/app?route='+encodeURIComponent(route??path)+query,{method,credentials:'same-origin',headers:{...(method!=='GET'?{'Content-Type':'application/json'}:{}),...(token?{Authorization:'Bearer '+token}:{})},...(data!==undefined?{body:JSON.stringify(data)}:{}),cache:'no-store',signal:AbortSignal.timeout(long?120000:timeout)});if(method!=='GET'||response.status!==423||attempt>=getRetries)break;await response.body?.cancel();await wait(1000+Math.floor(random()*500)+attempt*500);}

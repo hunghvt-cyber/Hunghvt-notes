@@ -1,40 +1,52 @@
 import {sortNotes,shiftSelection,sortModes} from './sort.js';
 import {NoteCache,reusableNote} from './cache.js';
-import {DraftVault,SyncDraft,apiClient,patientRetry,clone} from './sync.js';
-const $=id=>document.getElementById(id),vault=new DraftVault(),sessions=new Map();
-let active=null,notes=[],folders=[],folder='',scope='owner',shared=null,api=appApi(),authenticated=false,timer,refreshing=false,undo=null,shareTarget=null,canEdit=true,selecting=false,selected=new Set(),pending=0;
+import {DraftVault,SyncDraft,apiClient,patientRetry,RequestLane,clone} from './sync.js';
+const $=id=>document.getElementById(id),vault=new DraftVault(),sessions=new Map(),requestLane=new RequestLane();
+let active=null,notes=[],folders=[],folder='',scope='owner',shared=null,api=appApi(),authenticated=false,timer,refreshing=false,undo=null,shareTarget=null,canEdit=true,selecting=false,selected=new Set(),pending=0,foregroundWork=0,openSequence=0;
 let sortMode='updated-desc',noteOrder=[],orderRevision=null,organizing=false;
 let inTrash=false,trashNotes=[],refreshQueued=false;const trashSelection=new Map();const contentCache=new Map();const cache=new NoteCache();let cacheScope=null,cacheState={notes:[],folders:[],content:{}};
 async function cacheAuth(state){state??=await api('auth');if(!state.authenticated)throw Object.assign(Error('LOGIN_REQUIRED'),{status:401});cacheScope=state.cacheScope;cacheState=await cache.get(cacheScope).catch(()=>null)??{notes:[],folders:[],content:{}};contentCache.clear();sortMode=sortModes.includes(cacheState.sortMode)?cacheState.sortMode:'updated-desc';noteOrder=cacheState.order??[];orderRevision=cacheState.orderRevision??null;notes=cacheState.notes;folders=cacheState.folders;render();}
 async function cacheList(){if(shared||!cacheScope||inTrash)return;cacheState={...cacheState,notes:clone(notes),folders:clone(folders),sortMode,order:noteOrder,orderRevision};await cache.put(cacheScope,cacheState).catch(()=>{});}
 const status=text=>$('global-status').textContent=text;
 function busy(on){pending=Math.max(0,pending+(on?1:-1));$('sync-progress').hidden=pending===0;}
+function backgroundBlocked(){return document.hidden||!navigator.onLine||foregroundWork>0||organizing||[...sessions.values()].some(s=>s.delivery||s.running);}
 function appApi(options={}){
- const client=apiClient({...options,getRetries:0});
- return async(path,params={})=>{busy(true);try{
-  const run=()=>client(path,params);
-  return (params.method??'GET')==='GET'&&!params.long?await patientRetry(run,{canContinue:()=>navigator.onLine,onWait:({error})=>status(error.status===423?'Kho đang bận · đang chờ và tự thử đọc lại…':'Chưa kết nối được · đang tự thử đọc lại…')}):await run();
- }finally{busy(false);}};
+ const client=apiClient({...options,getRetries:0}),reads=new Map();
+ return (path,params={})=>{
+  const method=params.method??'GET',background=params.background===true,security=params.security===true;
+  const key=JSON.stringify([path,params.query??'',!!params.long,background,security]);
+  if(method==='GET'&&reads.has(key))return reads.get(key);
+  if(background&&!security&&backgroundBlocked())return Promise.reject(Object.assign(Error('BACKGROUND_DEFERRED'),{cancelled:true}));
+  const task=(async()=>{
+   if(!background){foregroundWork++;busy(true);}
+   try{
+    const run=()=>requestLane.run(()=>client(path,params),{priority:method==='POST'?2:background&&!security?0:1,valid:()=>!background||security||!backgroundBlocked()});
+    return method==='GET'&&!params.long&&!background?await patientRetry(run,{canContinue:()=>navigator.onLine,onWait:({error})=>status(error.status===423?'Kho đang bận · đang chờ và tự thử đọc lại…':'Chưa kết nối được · đang tự thử đọc lại…')}):await run();
+   }finally{if(!background){foregroundWork--;busy(false);}}
+  })();
+  if(method!=='GET')return task;
+  reads.set(key,task);task.then(()=>{if(reads.get(key)===task)reads.delete(key);},()=>{if(reads.get(key)===task)reads.delete(key);});return task;
+ };
 }
 const empty=()=>({id:crypto.randomUUID(),title:'',text:'',checklist:[],folder:'',pinned:false,history:[]});
 function button(text,fn){const b=document.createElement('button');b.type='button';b.textContent=text;b.addEventListener('click',()=>Promise.resolve(fn()).catch(fail));return b;}
-function fail(e){status(({401:'Phiên đăng nhập đã hết. Hãy mở khóa lại; bản nháp vẫn được giữ.',403:'Link đã thu hồi hoặc không còn quyền truy cập.',409:'Dữ liệu đã thay đổi. Bản nháp được giữ để đối chiếu.',413:'Dữ liệu vượt giới hạn; hãy rút gọn hoặc chia Note.',423:'Kho đang bận. Chờ một chút rồi thử lại.',429:'Đã thử đăng nhập nhiều lần. Hãy chờ 15 phút.',503:'Chưa kết nối được kho Notes. Bản nháp chưa được đồng bộ.'})[e.status]??'Chưa hoàn tất thao tác. Bản nháp vẫn được giữ.');if(e.reference)$('global-status').textContent+=' Mã hỗ trợ: '+e.reference;if(e.status===403&&shared){canEdit=false;notes=[];active?.dispose();active=null;$('editor').hidden=true;render();}if(e.status===401){inTrash=false;trashNotes=[];trashSelection.clear();selected.clear();cacheScope=null;contentCache.clear();authenticated=false;$('editor').hidden=true;$('workspace').hidden=true;for(const s of sessions.values())s.dispose();$('login').hidden=false;}}
+function fail(e){if(e.cancelled)return;status(({401:'Phiên đăng nhập đã hết. Hãy mở khóa lại; bản nháp vẫn được giữ.',403:'Link đã thu hồi hoặc không còn quyền truy cập.',409:'Dữ liệu đã thay đổi. Bản nháp được giữ để đối chiếu.',413:'Dữ liệu vượt giới hạn; hãy rút gọn hoặc chia Note.',423:'Kho đang bận. Chờ một chút rồi thử lại.',429:'Đã thử đăng nhập nhiều lần. Hãy chờ 15 phút.',503:'Chưa kết nối được kho Notes. Bản nháp chưa được đồng bộ.'})[e.status]??'Chưa hoàn tất thao tác. Bản nháp vẫn được giữ.');if(e.reference)$('global-status').textContent+=' Mã hỗ trợ: '+e.reference;if(e.status===403&&shared){canEdit=false;notes=[];active?.dispose();active=null;$('editor').hidden=true;render();}if(e.status===401){inTrash=false;trashNotes=[];trashSelection.clear();selected.clear();cacheScope=null;contentCache.clear();authenticated=false;$('editor').hidden=true;$('workspace').hidden=true;for(const s of sessions.values())s.dispose();$('login').hidden=false;}}
 function download(name,value){const u=URL.createObjectURL(new Blob([JSON.stringify(value,null,2)],{type:'application/json'})),a=document.createElement('a');a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);}
 function displayState(s){
  if(active!==s)return;
- const labels={clean:'Đã tải bản trên máy chủ.',saved:'Đã xác nhận lưu trên máy chủ.',draft:s.persisted?'Đã giữ bản nháp trên thiết bị · chờ đồng bộ.':'Đang giữ bản nháp…',saving:'Đang đồng bộ · bản nháp vẫn được giữ.',error:s.retryWait?'Kho đang bận hoặc mất kết nối · bản nháp đã giữ · đang tự thử lưu lại…':'Chưa xác nhận lưu. Bấm Lưu ngay để thử lại cùng thao tác.',conflict:'Có xung đột · bản nháp vẫn được giữ, chưa ghi đè.', 'local-error':'Không lưu được bản nháp trên thiết bị. Hãy Copy hoặc tải bản nháp ngay.', 'login-required':'Phiên đã hết · mở khóa lại để đồng bộ.'};
+ const labels={clean:'Đã tải.',saved:'Đã lưu.',draft:s.persisted?'Chưa đồng bộ.':'Đang giữ thay đổi…',saving:'Đang lưu…',error:s.retryWait?'Chưa đồng bộ · đang tự thử lại…':'Chưa đồng bộ. Bấm Lưu ngay để thử lại.',conflict:'Có thay đổi ở phiên khác · nội dung của bạn vẫn được giữ.', 'local-error':'Không giữ được nội dung trên thiết bị. Hãy Copy hoặc tải xuống ngay.', 'login-required':'Mở khóa lại để tiếp tục lưu.'};
  $('save-status').textContent=labels[s.status]??s.status;$('save-status').dataset.state=s.status;$('conflict').hidden=s.status!=='conflict';
  $('save').disabled=inTrash||!canEdit||s.status==='saving'||!!s.delivery||s.status==='conflict';
  $('delete').disabled=inTrash||!!shared||s.dirty||!s.baseRevision;
 }
 async function drafts(){
- try{const rows=await vault.list(scope);$('draft-count').textContent='('+rows.length+')';$('draft-badge').textContent='('+rows.length+')';$('draft-list').replaceChildren();
-  for(const d of rows){const row=document.createElement('div');row.className='draft-row';const label=document.createElement('span');label.textContent=(d.note.title||'Note chưa có tiêu đề')+' · '+new Date(d.updatedAt).toLocaleString('vi-VN');row.append(label,button('Mở nháp',()=>restoreDraft(d)),button('Tải xuống',()=>download('notes-draft.json',d)),button('Bỏ nháp',async()=>{if(active?.key===d.key&&active.dirty)throw Error('ACTIVE_DRAFT');if(confirm('Bỏ bản nháp trên thiết bị?')){await vault.remove(d.key);await drafts();}}));$('draft-list').append(row);}
+ try{const rows=await vault.list(scope);$('draft-count').textContent='('+rows.length+')';$('draft-badge').textContent='('+rows.length+')';$('draft-list').replaceChildren();$('draft-toggle').hidden=!!shared||rows.length===0;if(!rows.length){$('draft-panel').hidden=true;$('draft-panel').open=false;$('draft-toggle').setAttribute('aria-expanded','false');}
+  for(const d of rows){const row=document.createElement('div');row.className='draft-row';const label=document.createElement('span');label.textContent=(d.note.title||'Note chưa có tiêu đề')+' · '+new Date(d.updatedAt).toLocaleString('vi-VN');row.append(label,button('Mở lại',()=>restoreDraft(d)),button('Tải xuống',()=>download('notes-draft.json',d)),button('Bỏ bản này',async()=>{if(active?.key===d.key&&active.dirty)throw Error('ACTIVE_DRAFT');if(confirm('Bỏ phần nội dung chưa đồng bộ này?')){await vault.remove(d.key);await drafts();}}));$('draft-list').append(row);}
  }catch{status('Thiết bị không lưu được bản nháp. Hãy tải bản đang soạn xuống trước khi đóng.');}
 }
 function makeSession(note,restored){const s=new SyncDraft({note,restored,scope,vault,send:payload=>api(shared?.route??'notes-save',{method:'POST',data:payload}),onChange:displayState});sessions.set(note.id,s);return s;}
 async function hold(){if(active?.dirty)await active.persist();}
-async function restoreDraft(d){await hold();const old=sessions.get(d.note.id);if(old?.dirty){status('Note này đang có một bản nháp mở. Hãy tải hoặc xử lý bản đó trước.');return;}active=makeSession(d.note,d);await active.persist();fill();$('editor').scrollIntoView({block:'start',behavior:'smooth'});status('Đã mở bản sao của nháp; bản nháp gốc vẫn được giữ.');}
+async function restoreDraft(d){openSequence++;await hold();const old=sessions.get(d.note.id);if(old?.dirty){status('Note này đang có một bản nháp mở. Hãy tải hoặc xử lý bản đó trước.');return;}active=makeSession(d.note,d);await active.persist();fill();$('editor').scrollIntoView({block:'start',behavior:'smooth'});status('Đã mở lại nội dung chưa đồng bộ.');}
 function visibleNotes(){if(inTrash)return trashNotes;const q=$('search').value.toLocaleLowerCase('vi');return sortNotes(notes,sortMode,noteOrder).filter(n=>(inTrash||!folder||n.folder===folder)&&[n.title,n.text,n.folder].some(v=>String(v??'').toLocaleLowerCase('vi').includes(q)));}
 function selectionUI(){$('sort-mode').disabled=organizing;$('select-mode').disabled=organizing;$('cancel-select').disabled=organizing;$('sort-mode').value=sortMode;$('sort-mode').hidden=inTrash;for(const id of ['move-label','move-folder','bulk-move'])$(id).hidden=inTrash||!!shared;$('bulk-move').disabled=!selected.size||organizing;for(const id of ['order-up','order-down']){$(id).hidden=inTrash||!!shared||sortMode!=='custom';$(id).disabled=!selected.size||organizing;}$('sort-mode').querySelector('[value=custom]').disabled=!!shared;$('bulk-toolbar').hidden=!selecting;$('bulk-delete').hidden=inTrash;$('bulk-restore').hidden=!inTrash;$('bulk-restore').disabled=!selected.size;$('cancel-select').hidden=inTrash;$('new').hidden=inTrash||!!shared&&(!canEdit||shared.kind==='note');$('select-mode').hidden=inTrash||!!shared;$('select-mode').setAttribute('aria-pressed',String(selecting));$('selected-count').textContent=selected.size+' Note đã chọn';$('bulk-delete').disabled=organizing||!selected.size;}
 function render(){
@@ -48,22 +60,22 @@ function render(){
  if(!shared)$('folder-list').append(button('Thùng rác',showTrash));
  $('folders').replaceChildren(...folders.map(f=>new Option(f,f)));const destination=$('move-folder').value;$('move-folder').replaceChildren(new Option('Chưa phân loại',''),...folders.map(f=>new Option(f,f)));if(folders.includes(destination))$('move-folder').value=destination;const current=$('manage-folder').value;$('manage-folder').replaceChildren(new Option('Chọn thư mục…',''),...folders.map(f=>new Option(f,f)));if(folders.includes(current))$('manage-folder').value=current;
 }
-async function refresh(){
- if(!authenticated&&!shared)return;if(refreshing){refreshQueued=true;return;}refreshing=true;busy(true);
+async function refresh({background=false,security=false}={}){
+ if(!authenticated&&!shared)return;if(background&&!security&&(backgroundBlocked()||active?.dirty))return;if(refreshing){if(!background)refreshQueued=true;return;}refreshing=true;if(!background)busy(true);
  try{
-  if(inTrash){trashNotes=(await api('trash',{query:'&q='+encodeURIComponent($('search').value)})).notes;render();status('Đã tải Thùng rác.');return;}
-  if(shared?.route==='shared-note'){const n=await api(shared.route);notes=[n];folders=[];shared.permission=n.permission;canEdit=n.permission==='edit';if(!active||!active.dirty)active=makeSession(n);}
-  else{const result=await api(shared?.route??'notes',{query:shared?'':'&includeFolders=1'});notes=result.notes;if(!shared){noteOrder=result.order??[];orderRevision=result.orderRevision;}folders=shared?[result.folder]:result.folders;if(shared){shared.permission=result.permission;shared.folder=result.folder;canEdit=result.permission==='edit';$('new').hidden=inTrash||!canEdit;}}
-  await cacheList();render();if(shared&&active&&(shared.route==='shared-note'||!canEdit))fill();await drafts();status(navigator.onLine?'Đã tải danh sách Notes.':'Đang ngoại tuyến.');
- }catch(e){fail(e);}finally{refreshing=false;busy(false);if(refreshQueued){refreshQueued=false;queueMicrotask(refresh);}}
+  if(inTrash){trashNotes=(await api('trash',{query:'&q='+encodeURIComponent($('search').value),background,security})).notes;render();status('Đã tải Thùng rác.');return;}
+  if(shared?.route==='shared-note'){const n=await api(shared.route,{background,security});notes=[n];folders=[];shared.permission=n.permission;canEdit=n.permission==='edit';if(!active||!active.dirty)active=makeSession(n);}
+  else{const result=await api(shared?.route??'notes',{query:shared?'':'&includeFolders=1',background,security});notes=result.notes;if(!shared){noteOrder=result.order??[];orderRevision=result.orderRevision;}folders=shared?[result.folder]:result.folders;if(shared){shared.permission=result.permission;shared.folder=result.folder;canEdit=result.permission==='edit';$('new').hidden=inTrash||!canEdit;}}
+  await cacheList();render();if(shared&&active&&(!active.dirty||!canEdit)&&(shared.route==='shared-note'||!canEdit))fill();await drafts();if(!background)status(navigator.onLine?'Đã tải danh sách Notes.':'Đang ngoại tuyến.');
+ }catch(e){if(!background||[401,403].includes(e.status))fail(e);}finally{refreshing=false;if(!background)busy(false);if(refreshQueued){refreshQueued=false;queueMicrotask(refresh);}}
 }
-async function showTrash(){await hold();clearTimeout(timer);inTrash=true;trashSelection.clear();$('search').setAttribute('aria-label','Tìm trong Thùng rác, gồm nội dung và checklist');selecting=true;selected.clear();$('editor').hidden=true;await refresh();}
-async function openTrash(id){await hold();const n=await api('trash',{query:'&id='+encodeURIComponent(id)});active=makeSession(n);fill();}
+async function showTrash(){openSequence++;await hold();clearTimeout(timer);inTrash=true;trashSelection.clear();$('search').setAttribute('aria-label','Tìm trong Thùng rác, gồm nội dung và checklist');selecting=true;selected.clear();$('editor').hidden=true;await refresh();}
+async function openTrash(id){const request=++openSequence;await hold();const n=await api('trash',{query:'&id='+encodeURIComponent(id)});if(request!==openSequence)return;active=makeSession(n);fill();}
 $('bulk-restore').addEventListener('click',async()=>{const targets=[...trashSelection.values()].filter(n=>selected.has(n.id));let restored=0;busy(true);try{for(const n of targets){try{await api('trash',{method:'POST',data:{action:'restore',id:n.id,revision:n.revision}});selected.delete(n.id);trashSelection.delete(n.id);contentCache.delete(n.id);restored++;}catch(e){fail(e);}}$('editor').hidden=true;await refresh();status('Đã khôi phục '+restored+'/'+targets.length+' Note.');}finally{busy(false);}});
-async function openNote(id){await hold();if(sessions.get(id)?.dirty){active=sessions.get(id);fill();return;}
+async function openNote(id){const request=++openSequence;await hold();if(request!==openSequence)return;if(sessions.get(id)?.dirty){active=sessions.get(id);fill();return;}
  const cached=!shared?contentCache.get(id):null;const row=notes.find(n=>n.id===id);
- if(reusableNote(cached,row)){const session=makeSession(cached);active=session;fill();status('Bản trên thiết bị · đang kiểm tra cập nhật…');const n=await api('notes',{query:'&id='+encodeURIComponent(id)+'&revision='+encodeURIComponent(cached.revision)});if(!n.notModified){contentCache.set(id,clone(n));if(active===session&&!session.dirty&&session.version===0){active=makeSession(n);fill();}}return;}
- const n=await api(shared?.route??'notes',{query:'&id='+encodeURIComponent(id)});if(!shared&&cacheScope){contentCache.set(id,clone(n));}active=makeSession(n);fill();$('editor').scrollIntoView({block:'start',behavior:'smooth'});
+ if(reusableNote(cached,row)){const session=makeSession(cached);active=session;fill();status('Đang kiểm tra cập nhật…');const n=await api('notes',{query:'&id='+encodeURIComponent(id)+'&revision='+encodeURIComponent(cached.revision)});if(!n.notModified){contentCache.set(id,clone(n));if(request===openSequence&&active===session&&!session.dirty&&session.version===0){active=makeSession(n);fill();}}return;}
+ const n=await api(shared?.route??'notes',{query:'&id='+encodeURIComponent(id)});if(request!==openSequence)return;if(!shared&&cacheScope){contentCache.set(id,clone(n));}active=makeSession(n);fill();$('editor').scrollIntoView({block:'start',behavior:'smooth'});
 }
 function fill(){const n=active.note;$('editor').hidden=false;$('title').value=n.title;$('text').value=n.text;$('folder').value=n.folder??'';$('pinned').checked=!!n.pinned;
  $('folder').disabled=inTrash||!!shared;$('pin-label').hidden=inTrash||!!shared;$('note-sharing').hidden=inTrash||!!shared;$('history').replaceChildren(new Option('Chọn bản trước…',''),...(n.history??[]).map((v,i)=>new Option(v.updatedAt??'Bản trước '+(i+1),String(i))));
@@ -81,13 +93,13 @@ async function save(s=active){
  if(!authenticated&&!shared){s.status='login-required';s.emit();return;}
  if(!navigator.onLine){s.status='error';s.emit();return;}
  const task=(async()=>{busy(true);try{
-  const result=await patientRetry(()=>{s.retryWait=false;return s.flush();},{canContinue:()=>!s.disposed&&canEdit&&navigator.onLine&&!['local-error','conflict'].includes(s.status),onWait:()=>{s.retryWait=true;displayState(s);status('Chưa xác nhận lưu · bản nháp đã giữ · đang chờ và tự thử lại…');}});
-  if(s.status==='conflict')status('Có xung đột · bản nháp được giữ, chưa ghi đè.');
-  if(result){const row={id:s.note.id,title:result.title,text:result.text.slice(0,100),folder:result.folder??shared?.folder??'',pinned:!!result.pinned,updatedAt:result.updatedAt,revision:result.revision};notes=notes.filter(n=>n.id!==row.id);notes.unshift(row);if(row.folder&&!folders.includes(row.folder))folders.push(row.folder);await cacheList();if(!shared&&cacheScope)contentCache.set(s.note.id,clone(result));render();await drafts();if(s.dirty&&s.status==='draft'&&active===s)schedule();if(active===s)status(s.dirty?'Đã lưu bản trước · đang giữ thay đổi mới.':'Đã xác nhận lưu trên máy chủ.');}
+  const result=await patientRetry(()=>{s.retryWait=false;return s.flush();},{canContinue:()=>!s.disposed&&canEdit&&navigator.onLine&&!['local-error','conflict'].includes(s.status),onWait:()=>{s.retryWait=true;displayState(s);status('Chưa đồng bộ · đang chờ và tự thử lại…');}});
+  if(s.status==='conflict')status('Có thay đổi ở phiên khác · nội dung của bạn vẫn được giữ.');
+  if(result){const row={id:s.note.id,title:result.title,text:result.text.slice(0,100),folder:result.folder??shared?.folder??'',pinned:!!result.pinned,updatedAt:result.updatedAt,revision:result.revision};notes=notes.filter(n=>n.id!==row.id);notes.unshift(row);if(row.folder&&!folders.includes(row.folder))folders.push(row.folder);await cacheList();if(!shared&&cacheScope)contentCache.set(s.note.id,clone(result));render();await drafts();if(s.dirty&&s.status==='draft'&&active===s)schedule();if(active===s)status(s.dirty?'Đã lưu bản trước · đang giữ thay đổi mới.':'Đã lưu.');}
  }catch(e){if(!e.cancelled)fail(e);}finally{s.retryWait=false;busy(false);}})();
  s.delivery=task;displayState(s);try{return await task;}finally{s.delivery=null;displayState(s);}
 }
-async function newNote(){await hold();const note=empty();if(shared){delete note.folder;delete note.pinned;}else note.folder=folder;active=makeSession(note);await active.edit({});fill();$('title').focus();await drafts();}
+async function newNote(){openSequence++;await hold();const note=empty();if(shared){delete note.folder;delete note.pinned;}else note.folder=folder;active=makeSession(note);await active.edit({});fill();$('title').focus();await drafts();}
 async function loadShares(kind,target){if(shared)return;const query=kind==='folder'?'&folder='+encodeURIComponent(target):'&noteId='+target;const r=await api('note-share',{query});if(kind==='note'&&active?.note.id!==target)return;const root=$(kind==='folder'?'all-shares':'share-list');root.replaceChildren();for(const l of r.links){const row=document.createElement('div');row.className='share-row';const label=document.createElement('span');label.textContent=l.revoked?'Đã thu hồi':l.permission==='edit'?'Đang chia sẻ · được sửa':'Đang chia sẻ · chỉ xem';row.append(label);if(!l.revoked)row.append(button('Thu hồi',async()=>{await api('note-share',{method:'POST',data:{action:'revoke',id:l.id,...(kind==='folder'?{folder:target}:{noteId:target})}});await loadShares(kind,target);}));root.append(row);}}
 async function createShare(kind,target){await hold();const r=await api('note-share',{method:'POST',data:{action:'create',permission:'edit',...(kind==='folder'?{folder:target}:{noteId:target})}});shareTarget={kind,target};$('share-url').value=location.origin+'/#'+kind+'='+r.token;$('share-result').hidden=false;await loadShares(kind,target);$('share-result').scrollIntoView({block:'nearest'});}
 async function boot(){
@@ -96,7 +108,7 @@ async function boot(){
  await localDrafts();
  try{const h=await api('health');if(!h.configured){status('Kho Notes đang chờ cấu hình kết nối. Chưa chuyển dữ liệu từ Homepage.');await localDrafts();return;}const state=await api('auth');authenticated=state.authenticated;$('login').hidden=authenticated;$('workspace').hidden=!authenticated;if(authenticated){await cacheAuth(state);status(notes.length?'Đang hiện danh sách trên thiết bị · đang đồng bộ…':'Đang tải Notes…');await refresh();}else{status('Nhập mật khẩu để mở Notes.');await localDrafts();}}catch(e){fail(e);await localDrafts();}
 }
-async function localDrafts(){try{const rows=await vault.list(scope);if(rows.length){$('workspace').hidden=false;$('login').hidden=false;await drafts();$('draft-panel').hidden=false;$('draft-toggle').setAttribute('aria-expanded','true');$('draft-panel').open=true;status('Chỉ đang mở bản nháp trên thiết bị. Mở khóa để kết nối và đồng bộ.');}}catch{}}
+async function localDrafts(){try{const rows=await vault.list(scope);if(rows.length){$('workspace').hidden=false;$('login').hidden=false;await drafts();status('Có nội dung chưa đồng bộ. Mở khóa để tiếp tục.');}}catch{}}
 $('login-form').addEventListener('submit',async e=>{e.preventDefault();try{await api('auth',{method:'POST',data:{password:$('password').value}});$('password').value='';authenticated=true;for(const s of sessions.values())s.disposed=false;$('login').hidden=true;$('workspace').hidden=false;await cacheAuth();await refresh();if(active?.dirty&&active.status!=='conflict')save();}catch(e){fail(e);}});
 $('new').addEventListener('click',()=>newNote().catch(fail));
 $('sort-mode').addEventListener('change',async()=>{sortMode=$('sort-mode').value;render();await cacheList();if(sortMode==='custom')status('Chọn một hoặc nhiều Note rồi dùng Lên / Xuống để đổi thứ tự.');});
@@ -109,7 +121,7 @@ $('select-all').addEventListener('click',()=>{for(const n of visibleNotes()){sel
 $('bulk-delete').addEventListener('click',async()=>{const targets=notes.filter(n=>selected.has(n.id));if(!targets.length)return;const savedDrafts=await vault.list(scope);if(targets.some(n=>savedDrafts.some(d=>d.note?.id===n.id))){status('Có Note đã chọn đang có bản nháp trên thiết bị. Hãy xử lý bản nháp trước khi xóa hàng loạt.');return;}if(!confirm('Xóa '+targets.length+' Note đã chọn?'))return;let done=0,skipped=0;busy(true);try{for(const n of targets){const session=sessions.get(n.id);if(session?.dirty||!n.revision){skipped++;continue;}try{await api('notes',{method:'POST',data:{action:'delete',id:n.id,revision:n.revision}});selected.delete(n.id);if(active?.note.id===n.id){active.dispose();active=null;$('editor').hidden=true;}sessions.delete(n.id);done++;}catch{skipped++;}}}finally{busy(false);await refresh();status('Đã xóa '+done+' Note; bỏ qua '+skipped+' Note chưa đồng bộ hoặc có xung đột.');}});let searchTimer;$('search').addEventListener('input',()=>{if(inTrash){clearTimeout(searchTimer);searchTimer=setTimeout(()=>refresh(),300);}else render();});
 for(const id of ['title','text','folder','pinned'])$(id).addEventListener('input',()=>changed({[id]:id==='pinned'?$(id).checked:$(id).value}));
 $('add-check').addEventListener('click',()=>{if(active.note.checklist.length>=200)return;active.note.checklist.push({id:crypto.randomUUID(),text:'',checked:false});changeChecklist();renderChecklist();});
-$('save').addEventListener('click',()=>{clearTimeout(timer);save();});$('close-editor').addEventListener('click',async()=>{try{await hold();$('editor').hidden=true;await drafts();}catch{status('Hãy Copy hoặc tải nháp trước khi đóng soạn thảo.');}});
+$('save').addEventListener('click',()=>{clearTimeout(timer);save();});$('close-editor').addEventListener('click',async()=>{openSequence++;try{await hold();$('editor').hidden=true;await drafts();}catch{status('Hãy Copy hoặc tải nháp trước khi đóng soạn thảo.');}});
 $('clear').addEventListener('click',()=>{undo={text:$('text').value,checklist:clone(active.note.checklist)};$('text').value='';active.note.checklist=[];$('undo').disabled=false;changed({text:'',checklist:[]});renderChecklist();});
 $('undo').addEventListener('click',()=>{if(!undo)return;$('text').value=undo.text;changed(undo);undo=null;$('undo').disabled=true;renderChecklist();});
 $('copy').addEventListener('click',async()=>{try{await navigator.clipboard.writeText([active.note.title,active.note.text,...active.note.checklist.map(x=>(x.checked?'☑ ':'☐ ')+x.text)].join('\n'));$('copy-status').textContent='Đã sao chép toàn bộ nội dung.';}catch{$('copy-status').textContent='Không sao chép được. Hãy chọn nội dung để sao chép thủ công.';}});
@@ -126,10 +138,26 @@ $('note-sharing').addEventListener('toggle',()=>{if($('note-sharing').open&&!inT
 $('share-folder').addEventListener('click',()=>{const f=$('manage-folder').value;if(f)createShare('folder',f).catch(fail);});$('share-note').addEventListener('click',()=>{if(active&&!active.dirty&&active.baseRevision)createShare('note',active.note.id).catch(fail);else status('Hãy lưu Note trước khi tạo link.');});
 $('copy-share').addEventListener('click',async()=>{try{await navigator.clipboard.writeText($('share-url').value);$('share-copy-status').textContent='Đã sao chép liên kết.';}catch{$('share-copy-status').textContent='Không sao chép được. Hãy chọn link trong ô.';}});
 $('backup').addEventListener('click',async()=>{try{await hold();status('Đang chuẩn bị bản backup…');download('hunghvt-notes-backup-'+new Date().toISOString().slice(0,10)+'.json',await api('backup',{long:true}));status('Đã tạo bản tải backup. Hãy lưu file vào nơi riêng.');}catch(e){fail(e);}});
-$('logout').addEventListener('click',async()=>{try{await hold();clearTimeout(timer);for(const s of sessions.values())s.dispose();await api('auth',{method:'DELETE'});authenticated=false;inTrash=false;trashNotes=[];trashSelection.clear();selected.clear();cacheScope=null;contentCache.clear();cacheState={notes:[],folders:[],content:{}};active=null;sessions.clear();notes=[];$('editor').hidden=true;$('workspace').hidden=true;$('login').hidden=false;status('Đã khóa. Bản nháp chưa đồng bộ vẫn nằm trên thiết bị.');}catch(e){fail(e);}});
+$('logout').addEventListener('click',async()=>{openSequence++;try{await hold();clearTimeout(timer);for(const s of sessions.values())s.dispose();await api('auth',{method:'DELETE'});authenticated=false;inTrash=false;trashNotes=[];trashSelection.clear();selected.clear();cacheScope=null;contentCache.clear();cacheState={notes:[],folders:[],content:{}};active=null;sessions.clear();notes=[];$('editor').hidden=true;$('workspace').hidden=true;$('login').hidden=false;status('Đã khóa. Bản nháp chưa đồng bộ vẫn nằm trên thiết bị.');}catch(e){fail(e);}});
 addEventListener('online',()=>{boot().then(()=>{if(active?.dirty&&active.status!=='conflict')save();});});addEventListener('offline',()=>status('Ngoại tuyến · tiếp tục gõ, bản nháp được giữ trên thiết bị.'));
 addEventListener('beforeunload',e=>{if(active?.dirty){e.preventDefault();e.returnValue='';}});addEventListener('pagehide',()=>{if(active?.dirty)active.persist().catch(()=>{});});
 addEventListener('hashchange',()=>location.reload());
-setInterval(()=>{if(!document.hidden&&(shared||!active?.dirty))refresh();},60000);
-document.addEventListener('visibilitychange',()=>{if(!document.hidden&&shared)refresh();});
+async function checkShareAccess(){
+ if(!shared||document.hidden||!navigator.onLine)return;const session=active,id=shared.kind==='folder'?session?.note.id:null;
+ try{
+  const result=await api(shared.route,{query:'&accessOnly=1'+(id?'&id='+encodeURIComponent(id):''),background:true,security:true});
+  if(result.permission!==shared.permission){shared.permission=result.permission;canEdit=result.permission==='edit';if(active)fill();}
+ }catch(e){
+  if([401,403].includes(e.status))fail(e);
+  else if(e.status===404&&active===session){await hold();if(active!==session)return;session?.dispose();active=null;$('editor').hidden=true;notes=notes.filter(n=>shared.kind==='folder'?n.id!==id:false);render();}
+ }
+}
+async function backgroundRefresh(){
+ if(document.hidden||!navigator.onLine)return;
+ if(shared&&(backgroundBlocked()||active?.dirty))return checkShareAccess();
+ return refresh({background:true});
+}
+function scheduleBackgroundRefresh(){setTimeout(async()=>{try{await backgroundRefresh();}finally{scheduleBackgroundRefresh();}},60000+Math.floor(Math.random()*10000));}
+scheduleBackgroundRefresh();
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&shared){if(backgroundBlocked()||active?.dirty)checkShareAccess();else refresh({background:true,security:true});}});
 boot();
