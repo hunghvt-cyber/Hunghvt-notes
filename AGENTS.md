@@ -13,7 +13,7 @@
 - Preserve revision checks, lock fencing, operation idempotency, live share checks
   and snapshot-bound restore. Never replace them with read-then-unconditional-write.
 - Always distinguish local simulation, old live evidence and new live qualification.
-- Keep the Android-TV-like reorder idea deferred until reliable operation.
+- User authorized sorting/custom order and bulk folder moves on 2026-10-19. Custom order uses owner-only independent orderRevision CAS; never invalidate content drafts just to reorder. Bulk move validates every source revision before one locked catalog commit, preserves immutable content, and blocks selected local drafts. No drag-only controls; Lên/Xuống must work on iPad.
 
 ## Current handoff 2026-10-19
 
