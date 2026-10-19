@@ -30,14 +30,14 @@
 - Cache is separate IndexedDB `hunghvt-notes-cache-v1`; never delete/migrate the draft DB implicitly. Obtain the HMAC cache identity only from a successful authenticated `auth` response. No persistent shared-link cache.
 - User removed private-device options on 2026-10-19. Persist list previews only; opened full content uses session memory automatically. Preserve legacy cache and every draft; never use legacy full-content disk cache. Cached revisions never bypass server CAS.
 - Revalidate cached opened notes; never replace an active dirty or edited session. Shared revocation is checked on API requests, visibility return and periodic refresh, not by cached authorization.
-- Only GET retries 423 (bounded jitter). Mutation retry remains SyncDraft's exact frozen operation protocol.
+- Foreground GET uses bounded patient retry for transient errors; background GET is single-attempt. Save retry remains SyncDraft's exact frozen operation protocol; never introduce blanket retries for other mutations.
 - Browser fixture tests must run on PRs before merging cache changes. Local browser availability is not evidence of production UI correctness.
 - Synchronized fixture bursts currently demonstrate root-lock contention, not 100-user readiness. Report 423 separately from successful latency; never quote fake-WebDAV latency as Koofr/Vercel performance.
-- Trash is owner-only, supports full text/checklist search and revision-checked restore. Retain immutable heads, revoke individual note links on restore, fall back to unfiled if the folder is gone. Never test deletion on real production notes.
+- Trash is owner-only, supports full text/checklist search and revision-checked restore. Retain immutable heads until explicitly confirmed permanent deletion; revoke individual note links on restore and fall back to unfiled if the folder is gone. Never test deletion on real production notes.
 
-## Trial performance branch, 2026-10-20
+## Historical trial performance branch, 2026-10-20 (superseded by release below)
 
-- `perf/reduce-lock-cycles-20261020` is trial-only; user explicitly forbids production deployment.
+- Initially `perf/reduce-lock-cycles-20261020` was trial-only. The later explicit production authorization below supersedes that restriction; do not treat this historical section as a current release ban.
 - Consolidated shared operations and inline save responses retain the root lock and catalog schema.
 - Fresh fixture counts reduce successful list/open/save lock cycles to one, but 60-call burst still has 59 BUSY responses. Do not claim 10-editor/50-reader readiness.
 - See `docs/PERFORMANCE-STEP1-20261020.md`; require browser CI and real-provider qualification before any later release.
@@ -57,3 +57,19 @@
   production observations; never interpret simulated 40-second latency as a live measure.
 - User authorized foreground-priority/background reduction and quieter draft UI. Per-tab request lane prioritizes queued writes/reads over optional polls; background reads are single-attempt and coalesced. Shared accessOnly checks must retain live capability/scope/membership under a lease; no cached authorization shortcut. Recovery stays collapsed/hidden when empty, with all durable draft records and frozen operations preserved. Do not turn Đã lưu into an optimistic status.
 - User requested permanent trash deletion. Expose it only for selected owner trash rows with confirmation. Never invoke it automatically or test it against real notes. Preserve exact revision/operation binding, durable pre-DELETE journal, per-note basename allowlist, root-token fencing, verified absence, resumable batches and erased-ID resurrection guard. Block restore and backup of partial purges; preserve local drafts and old external backups. See docs/RELEASE-20261020.md.
+
+## Current production checkpoint — 2026-10-20
+
+- Source `9f504aa7266b2930f8fa233da7ad619bf7e8e13e`, deployment
+  `dpl_Ekqfjjmry38BQvYkGWw2BH5MnS6U`, READY at hunghvt-notes.vercel.app,
+  project `prj_c4sEp6nB4msWTsPiGoALSuVutVTK`, region fra1. Rechecked via Vercel
+  metadata during documentation update. A newer docs-only commit is not a deployment.
+- UI uses Chọn tất cả / Bỏ chọn tất cả in normal selection and Trash. Select all
+  stays scoped to the current folder/search list; do not broaden a destructive target
+  just because the label no longer says “đang hiển thị”.
+- README.md and docs/RELEASE.md are current entry points. Old lab readiness claims,
+  test counts, no-permanent-delete statements and old Blob rollback instructions
+  in historical files are not the current release state.
+- Last explicitly verified CI checkpoint is 1f1f763 (127 Node / 17 simulated load /
+  11 browser scenarios). Later follow-ups were syntax/diff reviewed only by request;
+  do not claim current-source live load/purge/iPad qualification.

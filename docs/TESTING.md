@@ -1,5 +1,9 @@
 # Kiểm thử và bằng chứng
 
+Các mục dưới lưu bằng chứng theo từng thời điểm. Xem [RELEASE.md](RELEASE.md)
+để biết checkpoint CI gần nhất và giới hạn kiểm chứng của mã đang chạy;
+không áp dụng kết quả cũ cho các commit mới hơn.
+
 ## Sau khi tách
 
 `npm test` dùng WebDAV giả lập: backend/HTTP adapter, lock hết hạn, lỗi kết nối,

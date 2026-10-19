@@ -1,6 +1,8 @@
 # Triển khai thử và rollback
 
-**Bản phát hành tối thiểu ngày 18/10/2026:** xem [RELEASE.md](RELEASE.md).
+**Trạng thái production và hướng dẫn hiện hành:** xem [RELEASE.md](RELEASE.md).
+Phần dưới là hồ sơ triển khai thử ngày 17–18/10/2026, không phải quy trình
+phát hành hiện hành.
 Project live mới là hunghvt-notes, không phải lab bên dưới. Các hướng dẫn dưới
 đây giữ lại cho benchmark synthetic và không được dùng để trỏ Preview vào root thật.
 

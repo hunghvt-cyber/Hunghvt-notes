@@ -1,83 +1,91 @@
 # Hunghvt Notes
 
-Project Notes độc lập có bản giao diện tối thiểu và backend Koofr.
-Production Notes độc lập: https://hunghvt-notes.vercel.app/ (backend Koofr). Không đưa dữ liệu thật vào GitHub.
-Xem [hồ sơ phát hành](docs/RELEASE.md).
+Ứng dụng ghi chú độc lập: **https://hunghvt-notes.vercel.app/**.
+Dữ liệu lưu trên **Koofr WebDAV**, ứng dụng chạy trên **Vercel**.
+Nhánh phát hành là **`release/minimal-notes`**, không tự suy đoán `main` là production.
 
-Notes cũ tại Homepage đã nghỉ hoạt động; không dùng Blob làm backend Notes hiện hành. Repo này không chứa báo cáo NAS,
-backup Actions, cấu hình Google/rclone hay dữ liệu Notes thật; không kết nối tự động
-với deployment production. Không chuyển repo backup thành public.
+## Trạng thái đã xác minh — 20/10/2026
 
-## Chạy kiểm thử
+- Production **READY**, source `9f504aa7266b2930f8fa233da7ad619bf7e8e13e`.
+- Deployment `dpl_Ekqfjjmry38BQvYkGWw2BH5MnS6U`, project `hunghvt-notes`, region `fra1`.
+- [Trạng thái phát hành và bàn giao hiện tại](docs/RELEASE.md).
+- [Chi tiết triển khai ngày 20/10](docs/RELEASE-20261020.md).
+
+Đây là mốc production đã đối chiếu qua Vercel; commit tài liệu mới hơn không có
+nghĩa mã ứng dụng mới đã được triển khai. Repo không tự động gắn với production.
+Không đưa secret, Notes thật, backup riêng tư hoặc cấu hình tài khoản vào GitHub.
+Homepage Notes cũ đã nghỉ; Notes hiện tại không dùng Blob và không chạy trên NAS.
+
+## Tính năng hiện tại
+
+- Note, checklist, ghim, thư mục, lịch sử; copy, xóa nội dung và hoàn tác.
+- Chia sẻ note/thư mục để xem hoặc sửa, không tự hết hạn; có thu hồi link.
+- Sắp xếp cập nhật mới/cũ, tiêu đề A–Z/Z–A hoặc tùy chỉnh bằng Lên/Xuống.
+- Chọn nhiều, **Chọn tất cả**, **Bỏ chọn tất cả**; di chuyển theo nhóm.
+  Chọn tất cả áp dụng cho danh sách trong thư mục/kết quả tìm kiếm hiện tại.
+- Thùng rác riêng, tìm cả nội dung/checklist, xem chỉ đọc và **Khôi phục đã chọn**.
+- **Xóa vĩnh viễn đã chọn** chỉ trong Thùng rác, cần xác nhận. Xóa gián đoạn có
+  thể tiếp tục; không tự xóa Notes thật để kiểm thử. Bản backup cũ và cơ chế lưu
+  rác riêng của Koofr không bị nút này xóa theo.
+- Tải backup JSON; chưa được coi là backup có thể phục hồi nếu chưa kiểm chứng riêng.
+
+Khôi phục đưa note về thư mục cũ nếu còn, nếu không về Chưa phân loại; link chia sẻ
+riêng của note bị thu hồi. Di chuyển nhóm kiểm tra revision của toàn nhóm và chặn
+nếu có nội dung chưa đồng bộ; không tự ghi đè xung đột.
+
+## Tốc độ, đồng bộ và nội dung chưa lưu
+
+Danh sách/đoạn xem trước được hiện từ cache sau xác thực rồi đối chiếu máy chủ.
+Nội dung đầy đủ đã mở chỉ giữ trong bộ nhớ phiên; không có chế độ Thiết bị riêng.
+Trang chia sẻ không có cache nội dung lâu dài. Cache không thay thế backup hoặc CAS.
+
+Trong mỗi tab, lượt lưu được ưu tiên trước lượt đọc đang chờ, rồi đến tải nền.
+Yêu cầu GET trùng được gộp trong lúc đang chạy. Tải nền bỏ qua lúc bận, ẩn tab hoặc
+ngoại tuyến; không tạo chuỗi retry dài. Link chia sẻ vẫn kiểm tra quyền trên máy chủ,
+khi quay lại tab và theo nhịp nền khoảng 60–70 giây. Khi đang soạn/lưu, dùng kiểm
+tra quyền gọn thay vì tải lại toàn bộ nội dung. Danh sách link chia sẻ của chủ chỉ
+tải khi mở mục Chia sẻ Note.
+
+Lượt đọc/lưu chính có retry lệch nhịp, cửa sổ khoảng 120 giây, tối đa 32 lần thử.
+Lưu chỉ gửi lại đúng operation ID/payload/revision đã giữ, không ghi đè vô điều kiện.
+Trạng thái ngắn: **Đang lưu / Đã lưu / Chưa đồng bộ**. Chỉ báo Đã lưu sau xác nhận
+phù hợp từ máy chủ. Bảng khôi phục không tự bung; nút ẩn khi không có nội dung chờ.
+Dữ liệu chưa đồng bộ vẫn được giữ trong IndexedDB riêng, không tự xóa bản nháp cũ.
+
+Koofr vẫn là nguồn dữ liệu chính. Khóa toàn kho vẫn là điểm tranh chấp giữa nhiều
+phiên; chưa xác nhận tải thực tế 10 người sửa + 50 người đọc. Thời gian khoảng
+40 giây từng báo là mô phỏng dồn tải, không phải số đo Koofr/Vercel thật.
+
+## Kiểm chứng và công cụ
 
 Node.js 24:
 
 ```sh
 npm ci --ignore-scripts --no-audit --no-fund
 npm test
+npm run test:browser
+node scripts/retry-load.mjs --patient
 ```
 
-Các test trên dùng backend WebDAV giả lập, không gọi Koofr hay Google.
-CI tự chạy trên push/PR, runner chuẩn ubuntu-24.04, không cần secret.
+Browser suite cần Chromium (`npx playwright install chromium`). Các lệnh trên dùng
+fixture/WebDAV giả, không phải phép đo tải production. CI tự chạy khi push/PR.
 
-Hiện có 90 tests mô phỏng và 6 tình huống Chromium thực. Chạy browser suite:
-`npx playwright install chromium` rồi `npm run test:browser`. Kết quả phân biệt
-rõ với các bài live Koofr tại docs/results.
+Mốc `1f1f763` đã có CI đạt **127 kiểm thử Node, 17 kịch bản tải mô phỏng và
+11 kịch bản trình duyệt**. Các thay đổi sau đó được triển khai theo yêu cầu người
+dùng dừng kiểm thử thủ công thêm; đã kiểm tra cú pháp/diff. Không gán bằng chứng CI
+của mốc cũ cho toàn bộ source mới. Không chạy lại benchmark hoặc thao tác xóa trên
+Notes thật khi chỉ cập nhật tài liệu.
 
-Live qualification ngày 17/10/2026 đã đạt: 100 Notes, 51 stages, restore 104
-records đúng byte; reliability đạt 13 lỗi transport và 100 cặp ghi đồng thời
-qua hai preview. [Bằng chứng và giới hạn phép đo](docs/TESTING.md).
-Đạt các gate backend này để tiếp tục tích hợp UI Preview; chưa production-ready.
+## Tài liệu và phạm vi
 
-## Cấu trúc
+- [Quy tắc bảo trì cho AI](AGENTS.md).
+- [Kiến trúc](docs/ARCHITECTURE.md), [triển khai](docs/DEPLOYMENT.md), [bằng chứng kiểm thử](docs/TESTING.md).
+- [Phân tích hiệu năng](docs/PERFORMANCE-20261019.md), [retry và loading](docs/PERFORMANCE-STEP4-PATIENT-20261020.md).
+- [Hồ sơ phát hành hiện tại](docs/RELEASE.md) ưu tiên hơn tài liệu lab/lịch sử khi xác định production.
 
-- `lib/`: Note, checklist, folder, ACL, revision, chống ghi đè và restore.
-- `api/app.js`: API live, khóa project/namespace/origin, mặc định đóng khi thiếu secret.
-- `api/preview.js`: owner/share API thử nghiệm, mặc định đóng.
-- `api/bench.js`: fixture qua GitHub OIDC, chỉ namespace giả lập của run đó.
-- `test/`: CRUD, concurrent writers, thu hồi, hết hạn lock, lỗi mạng và restore.
-- `scripts/`: hai suite thật qua Vercel; không có endpoint mặc định.
-- `public/`: giao diện Notes, IndexedDB drafts và engine đồng bộ có idempotency.
-- [Kiến trúc và rủi ro](docs/ARCHITECTURE.md).
-- [Triển khai thử, secrets, backup và rollback](docs/DEPLOYMENT.md).
-- [Bằng chứng và giới hạn kiểm thử](docs/TESTING.md).
-- [Ý tưởng sắp xếp bằng phím mũi tên](docs/NOTES-IDEAS.md).
+`lib/` chứa lưu trữ/ACL/khóa/backup; `api/app.js` là API live; `public/` là giao diện;
+`test/` và `scripts/` chứa fixture/công cụ có ranh giới namespace. `api/preview.js`
+và `api/bench.js` không được trỏ vào kho production để thử nghiệm.
 
-## Phạm vi lần tách repo
-
-Mã backend được chọn lọc từ prototype riêng trước đó, source commit
-`8e4d4af37de24cd30bc6b6603593626299ca5c3c`. Đây là lịch sử Git mới,
-không import lịch sử, secret hoặc artifacts của repo backup. Giữ 74 test của lab,
-bổ sung test ranh giới repo, driver, nháp/giao diện và lọc bằng chứng; danh tính OIDC được kiểm
-theo định dạng immutable có owner/repository ID dành cho repo mới.
-Không mang 11 test conformance cũ phụ thuộc parser cấu hình backup sang đây.
-
-Mã phát hành dùng nhánh release/minimal-notes và project Vercel hunghvt-notes
-riêng. Kho mới đã được khởi tạo trống; cấu hình tài khoản và smoke test production
-còn phải hoàn tất. Workflow benchmark vẫn chỉ chạy với marker, có hạn thử nghiệm.
-
-## Bàn giao giao diện Notes (19/10/2026)
-
-- Nguồn phát hành: nhánh `release/minimal-notes`, production `https://hunghvt-notes.vercel.app/`. `main` không được tự suy đoán là nguồn production; xác minh Vercel trước khi công bố phát hành.
-- PR #3: chọn nhiều Note, chọn tất cả Note đang hiển thị, xóa hàng loạt sau xác nhận; kiểm tra `revision` từng Note và bỏ qua xung đột. Trước khi xóa, chặn toàn bộ nếu bất kỳ Note được chọn có bản nháp lưu cục bộ; không tự xóa nháp. Nút Làm mới bị loại bỏ; đồng bộ nền vẫn chạy. Tải backup JSON nằm trong mục Sao lưu. Trạng thái/loading dính ở đầu màn hình khi cuộn.
-- Xóa hàng loạt là thao tác thay đổi dữ liệu thật **chỉ khi người dùng bấm xác nhận**; CI/smoke không được gọi xóa trên Koofr production. Luôn kiểm tra quyền truy cập, bản nháp, xung đột và kết quả từng Note.
-- CI `Notes simulation` chạy trên dữ liệu giả; CI xanh không đồng nghĩa Vercel đã triển khai. Sau merge cần đối chiếu commit production, kiểm tra UI và smoke không phá hủy dữ liệu.
-- Không chỉnh NAS, Homepage, GAS, Supabase, Tapo, backup hoặc kho Notes thật khi bảo trì giao diện.
-
-### Tải nhanh và dữ liệu trên thiết bị
-
-Danh sách và thư mục được đọc từ cùng một catalog dưới một khóa WebDAV. Sau khi xác thực đúng kho, ứng dụng hiện danh sách đã lưu trên thiết bị rồi đồng bộ máy chủ. Tiêu đề, đoạn xem trước và thư mục có thể tồn tại trong IndexedDB của trình duyệt sau khi khóa ứng dụng.
-
-Không có lựa chọn chế độ thiết bị. Nội dung Notes đã mở chỉ được giữ trong bộ nhớ của phiên, tự kiểm tra revision khi mở lại; không ghi thêm nội dung đầy đủ vào cache lâu dài. Cache nội dung từ phiên bản cũ được giữ nguyên nhưng không dùng. Bản nháp vẫn được lưu trên thiết bị để phục hồi. Cache không phải backup, không thay thế xác nhận lưu của máy chủ. Khóa ứng dụng không mã hóa dữ liệu trong hồ sơ trình duyệt; người có quyền truy cập hồ sơ thiết bị có thể đọc cache và bản nháp.
-
-Trang chia sẻ không dùng cache lâu dài; quyền được kiểm tra lại trên máy chủ. Thu hồi link không thể xóa nội dung người nhận đã đọc hoặc sao chép; trang đang mở kiểm tra lại khi quay về tab và mỗi phút. Chưa có bằng chứng đáp ứng 100 người đồng thời. Xem `docs/PERFORMANCE-20261019.md`.
-
-### Thùng rác
-
-Thùng rác là mục riêng trong danh sách thư mục. Tìm kiếm trong mục này gồm tiêu đề, nội dung đầy đủ, checklist và tên thư mục gốc. Tick một hoặc nhiều Note rồi bấm **Khôi phục đã chọn**. Có thể mở nội dung chỉ đọc trước khi khôi phục. Note trở về thư mục cũ nếu còn, nếu không về Chưa phân loại. Link chia sẻ riêng của Note bị thu hồi khi khôi phục; tạo link mới khi cần. Không xóa vĩnh viễn hoặc tự dọn rác.
-
-### Sắp xếp và di chuyển
-
-Menu **Sắp xếp**: cập nhật mới/cũ, tiêu đề A–Z/Z–A, hoặc **Tùy chỉnh**. Kiểu tự động ưu tiên Note đã ghim; Tùy chỉnh theo đúng thứ tự đã đặt. Chọn nhiều Note rồi dùng **Lên / Xuống** để đổi vị trí trong kiểu Tùy chỉnh, kể cả khi lọc theo thư mục/tìm kiếm. Thứ tự tùy chỉnh đồng bộ qua Koofr; kiểu xem lưu riêng theo thiết bị và đúng kho.
-
-Trong chế độ chọn nhiều, chọn **Chuyển đến** rồi **Di chuyển** để chuyển cả nhóm sang thư mục có sẵn hoặc Chưa phân loại. Chặn thao tác nếu nhóm có bản nháp; kiểm tra revision của toàn bộ nhóm trước khi thay đổi, không di chuyển một phần khi có xung đột. Nội dung/checklist/lịch sử giữ nguyên. Thay thư mục sẽ thay quyền nhìn thấy qua link chia sẻ thư mục tương ứng. Trang chia sẻ không có quyền di chuyển hoặc sắp xếp kho của chủ.
+Bảo trì repo này không bao gồm Homepage, NAS, Tapo, báo cáo GAS/Drive, Supabase,
+Gemini, chi tiêu hoặc kho backup. Không dùng cấu hình rclone/backup để lấy credential.

@@ -1,10 +1,57 @@
-# Trạng thái phát hành hiện tại — 19/10/2026
+# Trạng thái phát hành hiện tại — 20/10/2026
 
-Production: https://hunghvt-notes.vercel.app/ ; source **release/minimal-notes**, không phải main. Koofr là nguồn dữ liệu chính. Homepage Notes cũ đã nghỉ; không dùng URL cũ hay Blob để rollback các thay đổi mới. Backup tải xuống phải kiểm chứng riêng; không có đồng bộ ngược tự động sang Blob.
+## Production đã đối chiếu
 
-Bản 0ea57f7 đã READY trước lượt thêm sắp xếp/di chuyển. Có cache danh sách sau xác thực, bộ nhớ phiên cho Note đã mở, bản nháp IndexedDB, Thùng rác tìm toàn văn/checklist và tick khôi phục. Không có chế độ Thiết bị riêng. Xem README/AGENTS hiện tại và PR triển khai mới nhất để xác định source cuối.
+| Mục | Giá trị |
+| --- | --- |
+| URL | https://hunghvt-notes.vercel.app/ |
+| Repository / nhánh | hunghvt-cyber/Hunghvt-notes / `release/minimal-notes` |
+| Source production | `9f504aa7266b2930f8fa233da7ad619bf7e8e13e` |
+| Deployment | `dpl_Ekqfjjmry38BQvYkGWw2BH5MnS6U` — READY |
+| Project | `hunghvt-notes` — `prj_c4sEp6nB4msWTsPiGoALSuVutVTK` |
+| Team | `team_gCsQcRiaCja0GafKj8JZLINI` |
+| Region / dữ liệu | `fra1` / Koofr WebDAV |
 
-Sắp xếp/di chuyển chỉ phát hành sau Node và Chromium CI. Giữ Koofr lock, idempotency, revision và kiểm quyền chia sẻ. Kiểm thử bằng fixture; không xóa hoặc di chuyển Note thật để smoke test. Chưa chứng nhận 50–100 người đồng thời; xem docs/PERFORMANCE-20261019.md.
+Mốc trên được kiểm tra lại qua metadata Vercel lúc cập nhật tài liệu. Không tự suy
+đoán source từ `main`, CI xanh hoặc commit tài liệu mới. Repo không tự động gắn với
+production; thay đổi tài liệu lần này không yêu cầu deploy hoặc thay đổi dữ liệu.
+Homepage Notes cũ đã nghỉ; không dùng Blob hay URL cũ để rollback.
+
+## Các mốc mới
+
+| Source | Nội dung |
+| --- | --- |
+| `06b1709` (merge PR #9) | Giảm vòng khóa dư, đọc nội dung ngoài hai snapshot ngắn, loading và retry lệch nhịp |
+| `9f380b9` | Chỉ đọc danh sách link khi mở Chia sẻ Note |
+| `9f4c914` | Ưu tiên lưu/mở trước tải nền, gộp GET, kiểm tra quyền chia sẻ gọn; bảng khôi phục thu gọn |
+| `c4fc2d3` | Xóa vĩnh viễn đã chọn trong Thùng rác, xác nhận và tiếp tục khi gián đoạn |
+| `9f504aa` | Hai nút Chọn tất cả / Bỏ chọn tất cả, bỏ chữ “đang hiển thị” |
+
+Chi tiết giao thức, ranh giới xóa và hạn chế: [RELEASE-20261020.md](RELEASE-20261020.md).
+
+## Phân biệt bằng chứng
+
+- CI tại `1f1f763` (run `39294852089`) đã đạt 127 kiểm thử Node, 17 mô phỏng tải,
+  11 kịch bản Chromium. Đây là fixture, không phải 60 người thật hay Safari/iPad thật.
+- Người dùng sau đó cho phép deploy ngay và yêu cầu dừng kiểm thử thêm. Các follow-up
+  mới được kiểm tra cú pháp/diff; CI push tự động vẫn cấu hình, nhưng không dùng kết
+  quả cũ để chứng nhận các tính năng mới.
+- Đã xác minh source/alias/READY của production. Chưa đo lại tốc độ Koofr thực tế,
+  chưa chứng nhận 10 người sửa + 50 người đọc, chưa chạy xóa thật để kiểm chứng purge.
+- Không đọc/ghi/xóa Notes thật khi cập nhật tài liệu. Bảo trì giao diện không cho phép
+  tự bấm xóa vĩnh viễn hay thay đổi các hệ thống bên ngoài repo này.
+
+## Quyết định hiện hành
+
+Giữ Koofr + Vercel, không thêm NAS/database/Blob làm backend Notes. Ưu tiên đọc và
+lưu thành công, giữ nội dung chưa đồng bộ, không báo Đã lưu sớm và không tự ghi đè
+xung đột. Nhịp nền phải nhường việc chính nhưng không bỏ kiểm tra quyền chia sẻ.
+Đừng chạy thêm load benchmark nếu người dùng chưa yêu cầu lại.
+
+Hướng còn lại: giảm yêu cầu thừa dựa trên thời gian thao tác thực tế trong log đã
+lược dữ liệu riêng tư; giữ khóa/fencing/CAS/ACL. Không khẳng định animation hay retry
+đã loại bỏ nút thắt khóa toàn kho. Không mở rộng phạm vi sang NAS/Homepage/GAS/
+Supabase/chi tiêu/Gemini khi bảo trì Notes.
 
 ## Hồ sơ lịch sử ngày 18/10 — không phải hướng dẫn rollback hiện hành
 
