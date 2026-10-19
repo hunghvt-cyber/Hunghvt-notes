@@ -1,10 +1,10 @@
 # Hunghvt Notes
 
 Project Notes độc lập có bản giao diện tối thiểu và backend Koofr.
-Bản dùng thật đang chờ runtime secrets trên Vercel và smoke test sau cấu hình.
+Production Notes độc lập: https://hunghvt-notes.vercel.app/ (backend Koofr). Không đưa dữ liệu thật vào GitHub.
 Xem [hồ sơ phát hành](docs/RELEASE.md).
 
-Notes cũ ở Homepage vẫn dùng Vercel Blob, chưa tự nhập sang kho mới. Repo này không chứa báo cáo NAS,
+Notes cũ tại Homepage đã nghỉ hoạt động; không dùng Blob làm backend Notes hiện hành. Repo này không chứa báo cáo NAS,
 backup Actions, cấu hình Google/rclone hay dữ liệu Notes thật; không kết nối tự động
 với deployment production. Không chuyển repo backup thành public.
 
@@ -55,3 +55,11 @@ Không mang 11 test conformance cũ phụ thuộc parser cấu hình backup sang
 Mã phát hành dùng nhánh release/minimal-notes và project Vercel hunghvt-notes
 riêng. Kho mới đã được khởi tạo trống; cấu hình tài khoản và smoke test production
 còn phải hoàn tất. Workflow benchmark vẫn chỉ chạy với marker, có hạn thử nghiệm.
+
+## Bàn giao giao diện Notes (19/10/2026)
+
+- Nguồn phát hành: nhánh `release/minimal-notes`, production `https://hunghvt-notes.vercel.app/`. `main` không được tự suy đoán là nguồn production; xác minh Vercel trước khi công bố phát hành.
+- PR #3: chọn nhiều Note, chọn tất cả Note đang hiển thị, xóa hàng loạt sau xác nhận; kiểm tra `revision` từng Note và bỏ qua xung đột. Trước khi xóa, chặn toàn bộ nếu bất kỳ Note được chọn có bản nháp lưu cục bộ; không tự xóa nháp. Nút Làm mới bị loại bỏ; đồng bộ nền vẫn chạy. Tải backup JSON nằm trong mục Sao lưu. Trạng thái/loading dính ở đầu màn hình khi cuộn.
+- Xóa hàng loạt là thao tác thay đổi dữ liệu thật **chỉ khi người dùng bấm xác nhận**; CI/smoke không được gọi xóa trên Koofr production. Luôn kiểm tra quyền truy cập, bản nháp, xung đột và kết quả từng Note.
+- CI `Notes simulation` chạy trên dữ liệu giả; CI xanh không đồng nghĩa Vercel đã triển khai. Sau merge cần đối chiếu commit production, kiểm tra UI và smoke không phá hủy dữ liệu.
+- Không chỉnh NAS, Homepage, GAS, Supabase, Tapo, backup hoặc kho Notes thật khi bảo trì giao diện.
