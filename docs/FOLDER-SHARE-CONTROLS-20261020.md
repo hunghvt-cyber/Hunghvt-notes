@@ -4,7 +4,7 @@
 
 - Thư mục có ít nhất một link chưa thu hồi hiện dấu 🔗 bên cạnh tên trên thanh thư mục.
 - Bấm 🔗 để mở danh sách link và Thu hồi từng link. Có thể mở lại từ Quản lý thư mục → chọn thư mục → Quản lý chia sẻ, kể cả sau tải lại trang.
-- Thu hồi hết link thì dấu biến mất. Bảng quản lý vẫn liệt kê các link đã thu hồi. Mở quản lý không tạo link mới; link bí mật chỉ được hiển thị ngay sau khi tạo và không thể khôi phục từ hash lưu trữ.
+- Thu hồi hết link thì dấu biến mất. Bảng quản lý vẫn liệt kê các link đã thu hồi. Mở quản lý không tạo link mới. Bản bổ sung sao chép link lưu bản mã hóa cho link mới, cho phép chủ Notes xem/copy lại sau reload. Link cũ chỉ có hash thì không khôi phục được; có nút Tạo link mới cùng quyền, giữ link cũ hoạt động. Xem SHARE-LINK-COPY-20261020.md.
 - Trạng thái lấy từ sharedFolders trong cùng snapshot owner bootstrap, không thêm request cho từng thư mục; không lưu trạng thái quyền vào cache ngoại tuyến. Không trả ID/token/hash chia sẻ trong bootstrap. API shared không trả danh sách sharedFolders.
 - Giữ nguyên ACL dưới khóa và bảo vệ bản nháp. Rời bảng quản lý không sửa hoặc xóa dữ liệu ghi chú. Thu hồi chỉ ảnh hưởng link được bấm, không tự thu hồi các link khác.
 
