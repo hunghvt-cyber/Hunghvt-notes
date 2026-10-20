@@ -113,3 +113,31 @@ test('owner bootstrap includes active folder share markers in one snapshot witho
  assert.equal((await call(s,'notes',{query:'&includeFolders=1'})).status,401);
  const fresh=await share('view'),publicList=await call(s,'shared-folder',{cap:fresh.body.token});assert.equal(publicList.status,200);assert.equal(publicList.body.sharedFolders,undefined);
 });
+
+test('owner can retrieve new share links across requests; copies are encrypted, private, and removed on revoke',async()=>{
+ const s=setup();await s.init();const session=await owner(s),folder='Copy links',noteId=randomUUID();
+ await call(s,'notes-save',{method:'POST',session,data:{action:'save',clientOpId:noteId,title:'Synthetic copy',text:'Private',folder}});
+ for(const data of [{folder},{noteId}]){
+  const made=await call(s,'note-share',{method:'POST',session,data:{action:'create',permission:'view',...data}});assert.equal(made.status,200);
+  const query=data.folder?'&folder='+encodeURIComponent(folder):'&noteId='+noteId;
+  assert.equal((await call(s,'note-share',{query})).status,401);
+  assert.equal((await call(s,'note-share',{cap:made.body.token,query})).status,401);
+  const links=await call(s,'note-share',{session,query});assert.equal(links.status,200);assert.equal(links.body.links[0].token,made.body.token);assert.equal(links.body.links[0].permission,'view');assert.equal(links.body.links[0].tokenBox,undefined);
+  const cat=await s.makeStore({user:'fake',password:'synthetic-secret',namespace:s.cfg.KOOFR_NOTES_NAMESPACE}).capture();assert.ok(cat.shares[made.body.id].tokenBox);assert.ok(!JSON.stringify(cat).includes(made.body.token));
+  const shared=await call(s,data.folder?'shared-folder':'shared-note',{cap:made.body.token});assert.equal(shared.status,200);assert.ok(!JSON.stringify(shared.body).includes(made.body.token));assert.ok(!JSON.stringify(shared.body).includes('tokenBox'));
+  assert.ok(!JSON.stringify(s.logs).includes(made.body.token));assert.ok(!JSON.stringify(s.logs).includes(cat.shares[made.body.id].tokenBox));
+  await call(s,'note-share',{method:'POST',session,data:{action:'revoke',id:made.body.id,...data}});
+  const revoked=await call(s,'note-share',{session,query});assert.equal(revoked.body.links[0].token,undefined);assert.equal(revoked.body.links[0].revoked,true);
+  const after=await s.makeStore({user:'fake',password:'synthetic-secret',namespace:s.cfg.KOOFR_NOTES_NAMESPACE}).capture();assert.equal(after.shares[made.body.id].tokenBox,undefined);
+  assert.equal((await call(s,data.folder?'shared-folder':'shared-note',{cap:made.body.token})).status,403);
+ }
+});
+
+test('legacy links remain valid without a recoverable copy, and replacement preserves requested permission',async()=>{
+ const s=setup();await s.init();const session=await owner(s),store=s.makeStore({user:'fake',password:'synthetic-secret',namespace:s.cfg.KOOFR_NOTES_NAMESPACE}),folder='Legacy folder';await store.createFolder(folder);
+ const legacy=await store.share('folder',folder,'view'),query='&folder='+encodeURIComponent(folder);
+ const links=await call(s,'note-share',{session,query});assert.equal(links.body.links[0].token,undefined);assert.equal(links.body.links[0].revoked,false);
+ const fresh=await call(s,'note-share',{method:'POST',session,data:{action:'create',folder,permission:'view'}});assert.equal(fresh.status,200);
+ const listed=await call(s,'note-share',{session,query});assert.equal(listed.body.links.length,2);assert.equal(listed.body.links.find(l=>l.id===fresh.body.id).token,fresh.body.token);
+ for(const token of [legacy.token,fresh.body.token]){const r=await call(s,'shared-folder',{cap:token});assert.equal(r.status,200);assert.equal(r.body.permission,'view');}
+});
