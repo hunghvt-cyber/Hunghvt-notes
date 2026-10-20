@@ -45,6 +45,30 @@ test('public note/folder edit and view scopes reject cross-scope access, pin/mov
  const f=await call(s,'note-share',{method:'POST',session,data:{action:'create',folder:'Shared folder'}});const made=await call(s,'shared-folder',{method:'POST',cap:f.body.token,data:{action:'save',clientOpId:randomUUID(),title:'Folder created',text:'Unicode 日本語'}});assert.equal(made.status,200);
  const listed=await call(s,'shared-folder',{cap:f.body.token});assert.equal(listed.body.notes.length,2);assert.ok(listed.body.notes.every(x=>x.folder==='Shared folder'));
 });
+test('empty folder shares allow scoped creation and keep view/revocation/deletion guards',async()=>{
+ const s=setup();await s.init();const session=await owner(s),folder='Thư mục trống 😀';
+ const post=(route,data,cap)=>call(s,route,{method:'POST',data,...(cap?{cap}:{session})});
+ assert.equal((await post('folders',{action:'create',folder})).status,200);
+ const edit=await post('note-share',{action:'create',folder});
+ assert.equal(edit.status,200,JSON.stringify(edit.body));
+ const view=await post('note-share',{action:'create',folder,permission:'view'});
+ assert.equal(view.status,200);
+ const empty=await call(s,'shared-folder',{cap:edit.body.token});
+ assert.equal(empty.status,200);assert.equal(empty.body.folder,folder);assert.deepEqual(empty.body.notes,[]);
+ assert.equal((await call(s,'note-share',{session,query:'&folder='+encodeURIComponent(folder)})).body.links.length,2);
+ const note={action:'save',clientOpId:randomUUID(),title:'First shared note',text:'Created in empty folder'};
+ assert.equal((await post('shared-folder',note,view.body.token)).status,403);
+ assert.equal((await post('shared-folder',{...note,folder:'Gia đình'},edit.body.token)).status,403);
+ const saved=await post('shared-folder',note,edit.body.token);
+ assert.equal(saved.status,200);assert.equal((await call(s,'notes',{session,query:'&id='+saved.body.id})).body.folder,folder);
+ assert.equal((await post('notes',{action:'folderDelete',folder})).status,409);
+ for(const link of [edit,view])assert.equal((await post('note-share',{action:'revoke',folder,id:link.body.id})).status,200);
+ assert.equal((await call(s,'shared-folder',{cap:edit.body.token})).status,403);
+ assert.equal((await post('shared-folder',note,edit.body.token)).status,403);
+ assert.equal((await post('notes',{action:'folderDelete',folder})).status,200);
+ assert.equal((await post('note-share',{action:'create',folder})).status,404);
+ assert.equal((await post('note-share',{action:'create',folder:'Missing folder'})).status,404);
+});
 test('login rate limit is durable across handlers; no process-only IP limiter',async()=>{
  const s=setup();await s.init();for(let i=0;i<5;i++)assert.equal((await call(s,'auth',{method:'POST',data:{password:'wrong'}})).status,401);
  const next=await call(s,'auth',{method:'POST',data:{password:s.cfg.PREVIEW_PORTAL_PASSWORD}});assert.equal(next.status,429);assert.equal(next.r.headers.get('retry-after'),'900');

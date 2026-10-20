@@ -38,7 +38,7 @@ test('shared scope, revocation and membership are checked inside the operation i
  const denied=await call('shared-folder',{data});assert.equal(denied.status,403);assert.equal(denied.calls.some(x=>x.method==='PUT'),false);
  assert.equal((await call('shared-folder')).status,403);
  const fresh=await store.get(id);await store.moveNotes([{id,revision:fresh.revision}],'',randomUUID());
- const folder=await store.share('folder','Shared','edit').catch(()=>null);assert.equal(folder,null);
+ const folder=await store.share('folder','Shared','edit');assert.deepEqual((await store.readShared('folder',null,{token:folder.token})).notes,[]);await assert.rejects(store.get(id,{token:folder.token}),e=>e.status===404);
  const n=await call('shared-note',{token:single.token});assert.equal(n.status,200);assert.equal(n.body.text,'saved');
 });
 
