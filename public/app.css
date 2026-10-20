@@ -7,3 +7,5 @@
 #sort-mode,#move-folder{width:auto;max-width:100%}#bulk-toolbar label{margin:0}.toolbar select{min-height:42px}
 
 @media(prefers-reduced-motion:reduce){#sync-progress{animation:none;background:#197690}}
+
+.list-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.list-heading h2{margin:0}.list-heading #sort-toggle{min-height:36px;padding:5px 10px}.list-heading #sort-toggle[aria-expanded=true]{background:#d6eaf1;border-color:#197690}#sort-mode:not([hidden]){display:block;width:min(100%,280px);margin:8px 0 12px auto}
