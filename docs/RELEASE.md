@@ -1,3 +1,28 @@
+# Hồ sơ phát hành Notes
+
+## Alias production đã đối chiếu 22/10/2026
+
+| Mục | Giá trị |
+| --- | --- |
+| URL | https://hunghvt-notes.vercel.app/ |
+| Nhánh | `release/minimal-notes`; main không phải source release |
+| Source | `09bf7dd4a955d715680b2a7cf758705b04be9875` (merge PR #13) |
+| Deployment | `dpl_7Fv3KcsC2HYJCMBsS1Joct2rpGXL`, READY, production, alias khớp |
+| Project / region | `hunghvt-notes` / `fra1` |
+| Phạm vi kiểm | Đọc metadata Vercel và source; không đọc/ghi/xóa Notes thật |
+
+Các cập nhật sau mốc `9f504aa`: [dấu chia sẻ/thao tác thư mục](FOLDER-SHARE-CONTROLS-20261020.md),
+[copy lại link](SHARE-LINK-COPY-20261020.md), UX copy/thu hồi ở PR #12,
+ẩn link Homepage trong shared view ở [PR #13](https://github.com/hunghvt-cyber/Hunghvt-notes/pull/13).
+Xem từng hồ sơ để biết CI fixture và smoke có giới hạn; không áp số test cũ cho source mới.
+Koofr vẫn là nguồn thật, IndexedDB giữ nháp; không fallback Blob/NAS hoặc tự phục hồi
+bằng cache. Đọc [AGENTS](../AGENTS.md) trước bảo trì.
+
+## Các mốc trước — bằng chứng lịch sử, không phải source hiện tại
+
+Phần dưới giữ nguyên hồ sơ trước đó. Khi xác định alias hiện tại, dùng bảng trên.
+Không chạy lại provision, migration hoặc rollback Blob theo các bước cũ.
+
 # Trạng thái phát hành hiện tại — 20/10/2026
 
 ## Production đã đối chiếu

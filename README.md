@@ -4,10 +4,11 @@
 Dữ liệu lưu trên **Koofr WebDAV**, ứng dụng chạy trên **Vercel**.
 Nhánh phát hành là **`release/minimal-notes`**, không tự suy đoán `main` là production.
 
-## Trạng thái đã xác minh — 20/10/2026
+## Trạng thái đã đối chiếu — 22/10/2026
 
-- Production **READY**, source `9f504aa7266b2930f8fa233da7ad619bf7e8e13e`.
-- Deployment `dpl_Ekqfjjmry38BQvYkGWw2BH5MnS6U`, project `hunghvt-notes`, region `fra1`.
+- Alias production **READY**, source `09bf7dd4a955d715680b2a7cf758705b04be9875`, nhánh `release/minimal-notes`.
+- Deployment `dpl_7Fv3KcsC2HYJCMBsS1Joct2rpGXL`, project `hunghvt-notes`, region `fra1`.
+- Lần này chỉ đọc metadata/source, không xác minh ghi/sao chép/thu hồi trên Notes thật.
 - [Trạng thái phát hành và bàn giao hiện tại](docs/RELEASE.md).
 - [Chi tiết triển khai ngày 20/10](docs/RELEASE-20261020.md).
 
@@ -20,6 +21,7 @@ Homepage Notes cũ đã nghỉ; Notes hiện tại không dùng Blob và không 
 
 - Note, checklist, ghim, thư mục, lịch sử; copy, xóa nội dung và hoàn tác.
 - Chia sẻ note/thư mục để xem hoặc sửa, không tự hết hạn; có thu hồi link.
+- Dấu 🔗 ở thư mục có link, quản lý/copy lại link; [chi tiết và bằng chứng](docs/SHARE-LINK-COPY-20261020.md). Trang được chia sẻ ẩn link về Homepage theo source PR #13.
 - Sắp xếp cập nhật mới/cũ, tiêu đề A–Z/Z–A hoặc tùy chỉnh bằng Lên/Xuống.
 - Chọn nhiều, **Chọn tất cả**, **Bỏ chọn tất cả**; di chuyển theo nhóm.
   Chọn tất cả áp dụng cho danh sách trong thư mục/kết quả tìm kiếm hiện tại.
@@ -70,11 +72,13 @@ node scripts/retry-load.mjs --patient
 Browser suite cần Chromium (`npx playwright install chromium`). Các lệnh trên dùng
 fixture/WebDAV giả, không phải phép đo tải production. CI tự chạy khi push/PR.
 
-Mốc `1f1f763` đã có CI đạt **127 kiểm thử Node, 17 kịch bản tải mô phỏng và
-11 kịch bản trình duyệt**. Các thay đổi sau đó được triển khai theo yêu cầu người
-dùng dừng kiểm thử thủ công thêm; đã kiểm tra cú pháp/diff. Không gán bằng chứng CI
-của mốc cũ cho toàn bộ source mới. Không chạy lại benchmark hoặc thao tác xóa trên
-Notes thật khi chỉ cập nhật tài liệu.
+Mốc `1f1f763` đạt 127 kiểm thử Node, 17 mô phỏng tải và 11 kịch bản trình duyệt.
+Các follow-up hiệu năng/xóa rác ban đầu được kiểm tra cú pháp/diff theo yêu cầu
+người dùng dừng benchmark. Các đợt chia sẻ sau đó có CI riêng: hồ sơ copy link
+20/10 ghi 133 Node và 13 Chromium fixture scenarios tại source feature `28cf4ef`.
+[Bằng chứng và phạm vi](docs/SHARE-LINK-COPY-20261020.md). Không dùng bất kỳ mốc
+CI cũ nào để chứng nhận toàn bộ source `09bf7dd`, tải Koofr thật hay Safari/iPad.
+Không chạy benchmark hoặc xóa Notes thật khi chỉ cập nhật tài liệu.
 
 ## Tài liệu và phạm vi
 

@@ -1,3 +1,10 @@
+> Current entry point verified 2026-10-22: [docs/RELEASE.md](docs/RELEASE.md).
+> Vercel production alias is READY at `09bf7dd4a955d715680b2a7cf758705b04be9875`,
+> deployment `dpl_7Fv3KcsC2HYJCMBsS1Joct2rpGXL`, release/minimal-notes.
+> Source/deployment checkpoints below are historical; latest metadata inspection
+> does not certify real-data writes, purge, iPad UI or current-source load.
+> Preserve every draft, CAS/fencing/ACL boundary and the existing Koofr namespace.
+
 # Notes safety boundaries
 
 - User authorized the minimal live Notes release on 2026-10-18, preserving Blob.
