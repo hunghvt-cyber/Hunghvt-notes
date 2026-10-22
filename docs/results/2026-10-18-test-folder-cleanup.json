@@ -1,0 +1,14 @@
+{
+  "date": "2026-10-18",
+  "kind": "NOTES_TEST_CLEANUP_DONE",
+  "source": "7849e266a25934d643b9f99f4d6a7467c328d723",
+  "run": 39083763589,
+  "verified": true,
+  "removed": 39,
+  "remaining": 0,
+  "productionRootPresent": true,
+  "otherFolderNamesUnchanged": true,
+  "trashPurgeCalled": false,
+  "allDeleteStatuses204": true,
+  "scope": "exact 39 synthetic folders in scripts/test-folder-cleanup-targets.json"
+}

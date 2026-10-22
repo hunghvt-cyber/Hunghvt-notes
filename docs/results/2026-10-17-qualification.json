@@ -1,0 +1,543 @@
+{
+  "kind": "NOTES_SYNTHETIC_QUALIFICATION",
+  "at": "2026-10-17",
+  "runId": "39045843870",
+  "runUrl": "https://github.com/hunghvt-cyber/Hunghvt-notes/actions/runs/39045843870",
+  "jobId": "117434276889",
+  "deployedCode": "f7ce12b21994283473454cadd3a076f9ed4c0b1d",
+  "driverCode": "9b5599a6ced863c00c4a286f8538897d16cc9734",
+  "scope": "GitHub runner -> one isolated Vercel preview -> synthetic Koofr namespaces; timings below are store-operation timings inside Vercel, not iPad end-to-end latency",
+  "passed": true,
+  "completed": true,
+  "verifiedOriginalNotes": 100,
+  "restore": {
+    "stored": 104,
+    "active": 100,
+    "byteExact": 104
+  },
+  "standaloneHttpSmoke": {
+    "healthStatus": 200,
+    "configured": false,
+    "ownerStatus": 503
+  },
+  "metrics": {
+    "save-note": {
+      "attempted": 39,
+      "successful": {
+        "n": 22,
+        "p50": 1722.4703820000286,
+        "p95": 2985.331565999979,
+        "max": 3724.337323999993
+      },
+      "committedOnly": {
+        "n": 20,
+        "p50": 1781.2967770000105,
+        "p95": 2985.331565999979,
+        "max": 3724.337323999993
+      },
+      "codes": {
+        "OK": 22,
+        "REVISION_CONFLICT": 5,
+        "READ_ONLY_SHARE": 2,
+        "OP_ID_REUSE": 1,
+        "INVALID_CHECKLIST": 1,
+        "NOTE_DELETED": 1,
+        "NOTE_SHARE_CANNOT_CREATE": 1,
+        "SHARE_CANNOT_MOVE": 2,
+        "CAPABILITY_DENIED": 2,
+        "NOTE_OUTSIDE_SHARE": 2
+      }
+    },
+    "list-notes": {
+      "attempted": 14,
+      "successful": {
+        "n": 10,
+        "p50": 199.06379099999322,
+        "p95": 1013.3221820000035,
+        "max": 1013.3221820000035
+      },
+      "committedOnly": {
+        "n": 0,
+        "p50": null,
+        "p95": null,
+        "max": null
+      },
+      "codes": {
+        "OK": 10,
+        "CAPABILITY_DENIED": 3,
+        "RESTORE_INCOMPLETE": 1
+      }
+    },
+    "get-note": {
+      "attempted": 43,
+      "successful": {
+        "n": 33,
+        "p50": 367.12594399997033,
+        "p95": 1567.1419730000198,
+        "max": 2133.470327999996
+      },
+      "committedOnly": {
+        "n": 0,
+        "p50": null,
+        "p95": null,
+        "max": null
+      },
+      "codes": {
+        "OK": 33,
+        "NOTE_NOT_FOUND": 3,
+        "NOTE_OUTSIDE_SHARE": 3,
+        "CAPABILITY_DENIED": 4
+      }
+    },
+    "create-share": {
+      "attempted": 11,
+      "successful": {
+        "n": 10,
+        "p50": 1232.0679269999964,
+        "p95": 3567.933764000016,
+        "max": 3567.933764000016
+      },
+      "committedOnly": {
+        "n": 10,
+        "p50": 1232.0679269999964,
+        "p95": 3567.933764000016,
+        "max": 3567.933764000016
+      },
+      "codes": {
+        "OK": 10,
+        "SHARE_TARGET_MISSING": 1
+      }
+    },
+    "revoke-share": {
+      "attempted": 7,
+      "successful": {
+        "n": 7,
+        "p50": 873.997675999999,
+        "p95": 1880.2149119999958,
+        "max": 1880.2149119999958
+      },
+      "committedOnly": {
+        "n": 7,
+        "p50": 873.997675999999,
+        "p95": 1880.2149119999958,
+        "max": 1880.2149119999958
+      },
+      "codes": {
+        "OK": 7
+      }
+    },
+    "seed-batch": {
+      "attempted": 17,
+      "successful": {
+        "n": 17,
+        "p50": 9592.659831999976,
+        "p95": 16858.271624999994,
+        "max": 16858.271624999994
+      },
+      "committedOnly": {
+        "n": 17,
+        "p50": 9592.659831999976,
+        "p95": 16858.271624999994,
+        "max": 16858.271624999994
+      },
+      "codes": {
+        "OK": 17
+      }
+    },
+    "restore-batch": {
+      "attempted": 18,
+      "successful": {
+        "n": 18,
+        "p50": 6540.262257999973,
+        "p95": 22471.86600899999,
+        "max": 22471.86600899999
+      },
+      "committedOnly": {
+        "n": 17,
+        "p50": 6994.036584000045,
+        "p95": 22471.86600899999,
+        "max": 22471.86600899999
+      },
+      "codes": {
+        "OK": 18
+      }
+    }
+  },
+  "stages": [
+    {
+      "stage": "restore-empty",
+      "passed": true,
+      "checks": {
+        "emptyRestoreCompleteAndReplayReadOnly": true
+      }
+    },
+    {
+      "stage": "restore-marker-loss",
+      "passed": true,
+      "checks": {
+        "initializationResumesAfterFault": true
+      }
+    },
+    {
+      "stage": "restore-catalog-loss",
+      "passed": true,
+      "checks": {
+        "initializationResumesAfterFault": true
+      }
+    },
+    {
+      "stage": "restore-catalog-verify-loss",
+      "passed": true,
+      "checks": {
+        "initializationResumesAfterFault": true
+      }
+    },
+    {
+      "stage": "restore-unowned",
+      "passed": true,
+      "checks": {
+        "unownedTargetPreserved": true
+      }
+    },
+    {
+      "stage": "restore-mkcol-loss",
+      "passed": true,
+      "checks": {
+        "unmarkedAmbiguousRootFailsClosed": true,
+        "newTargetRecoveryVerified": true
+      }
+    },
+    {
+      "stage": "restore-partial",
+      "passed": true,
+      "checks": {
+        "partialResumeAndPostRestoreEditPreserved": true
+      }
+    },
+    {
+      "stage": "api-owner",
+      "passed": true,
+      "checks": {
+        "uuidLargeUnicodeCrudIdempotency": true,
+        "originRevisionAndDelta": true
+      }
+    },
+    {
+      "stage": "api-sharing",
+      "passed": true,
+      "checks": {
+        "noteFolderShareViewEditAndRevoke": true,
+        "noPrivilegeEscalationOrRevokedReplay": true
+      }
+    },
+    {
+      "stage": "prepare-browser-preview",
+      "passed": true,
+      "checks": {
+        "freshSyntheticPreviewRoot": true
+      }
+    },
+    {
+      "stage": "init",
+      "passed": true,
+      "checks": {
+        "freshIsolatedStore": true
+      }
+    },
+    {
+      "stage": "seed",
+      "passed": true,
+      "checks": {
+        "chunkCommitted": true
+      }
+    },
+    {
+      "stage": "seed",
+      "passed": true,
+      "checks": {
+        "chunkCommitted": true
+      }
+    },
+    {
+      "stage": "seed",
+      "passed": true,
+      "checks": {
+        "chunkCommitted": true
+      }
+    },
+    {
+      "stage": "seed",
+      "passed": true,
+      "checks": {
+        "chunkCommitted": true
+      }
+    },
+    {
+      "stage": "seed",
+      "passed": true,
+      "checks": {
+        "chunkCommitted": true
+      }
+    },
+    {
+      "stage": "seed",
+      "passed": true,
+      "checks": {
+        "chunkCommitted": true
+      }
+    },
+    {
+      "stage": "seed",
+      "passed": true,
+      "checks": {
+        "chunkCommitted": true
+      }
+    },
+    {
+      "stage": "seed",
+      "passed": true,
+      "checks": {
+        "chunkCommitted": true
+      }
+    },
+    {
+      "stage": "seed",
+      "passed": true,
+      "checks": {
+        "chunkCommitted": true
+      }
+    },
+    {
+      "stage": "seed",
+      "passed": true,
+      "checks": {
+        "chunkCommitted": true
+      }
+    },
+    {
+      "stage": "verify",
+      "passed": true,
+      "checks": {
+        "unicodeChecklistFolderVerified": true
+      }
+    },
+    {
+      "stage": "verify",
+      "passed": true,
+      "checks": {
+        "unicodeChecklistFolderVerified": true
+      }
+    },
+    {
+      "stage": "verify",
+      "passed": true,
+      "checks": {
+        "unicodeChecklistFolderVerified": true
+      }
+    },
+    {
+      "stage": "verify",
+      "passed": true,
+      "checks": {
+        "unicodeChecklistFolderVerified": true
+      }
+    },
+    {
+      "stage": "verify",
+      "passed": true,
+      "checks": {
+        "unicodeChecklistFolderVerified": true
+      }
+    },
+    {
+      "stage": "verify",
+      "passed": true,
+      "checks": {
+        "unicodeChecklistFolderVerified": true
+      }
+    },
+    {
+      "stage": "verify",
+      "passed": true,
+      "checks": {
+        "unicodeChecklistFolderVerified": true
+      }
+    },
+    {
+      "stage": "verify",
+      "passed": true,
+      "checks": {
+        "unicodeChecklistFolderVerified": true
+      }
+    },
+    {
+      "stage": "verify",
+      "passed": true,
+      "checks": {
+        "unicodeChecklistFolderVerified": true
+      }
+    },
+    {
+      "stage": "verify",
+      "passed": true,
+      "checks": {
+        "unicodeChecklistFolderVerified": true
+      }
+    },
+    {
+      "stage": "owner",
+      "passed": true,
+      "checks": {
+        "crudChecklistIdempotency": true,
+        "deletedCannotResurrect": true,
+        "folderDeleteAndUnfile": true
+      }
+    },
+    {
+      "stage": "history",
+      "passed": true,
+      "checks": {
+        "historyFiveVersions": true
+      }
+    },
+    {
+      "stage": "note-share",
+      "passed": true,
+      "checks": {
+        "liveNoteShareEdit": true,
+        "readOnlyAndCrossNoteDenied": true,
+        "revokeAndFreshToken": true,
+        "revokedRetryDeniedBeforeReceipt": true
+      }
+    },
+    {
+      "stage": "folder-share",
+      "passed": true,
+      "checks": {
+        "folderWorkspaceCreateEditIsolation": true,
+        "movedNoteLosesFolderAccess": true,
+        "sharedFolderDeleteGuard": true,
+        "folderRevokeAndRenew": true
+      }
+    },
+    {
+      "stage": "concurrency",
+      "passed": true,
+      "checks": {
+        "sameBaseOneWinner": true
+      }
+    },
+    {
+      "stage": "revoke-expiry",
+      "passed": true,
+      "checks": {
+        "expiredCollectionMemberFenced": true,
+        "revokeWinsPausedWriter": true,
+        "orphanRevisionIgnored": true
+      }
+    },
+    {
+      "stage": "export",
+      "passed": true,
+      "checks": {
+        "fullSnapshotDurable": true
+      }
+    },
+    {
+      "stage": "restore-init",
+      "passed": true,
+      "checks": {
+        "partialRestoreHidden": true,
+        "newEpochAndRevokedLinks": true
+      }
+    },
+    {
+      "stage": "restore-chunk",
+      "passed": true,
+      "checks": {
+        "restoreChunkVerified": true
+      }
+    },
+    {
+      "stage": "restore-chunk",
+      "passed": true,
+      "checks": {
+        "restoreChunkVerified": true
+      }
+    },
+    {
+      "stage": "restore-chunk",
+      "passed": true,
+      "checks": {
+        "restoreChunkVerified": true
+      }
+    },
+    {
+      "stage": "restore-chunk",
+      "passed": true,
+      "checks": {
+        "interruptedRestoreNotPublished": true,
+        "restoreChunkVerified": true
+      }
+    },
+    {
+      "stage": "restore-chunk",
+      "passed": true,
+      "checks": {
+        "restoreChunkVerified": true
+      }
+    },
+    {
+      "stage": "restore-chunk",
+      "passed": true,
+      "checks": {
+        "restoreChunkVerified": true
+      }
+    },
+    {
+      "stage": "restore-chunk",
+      "passed": true,
+      "checks": {
+        "restoreChunkVerified": true
+      }
+    },
+    {
+      "stage": "restore-chunk",
+      "passed": true,
+      "checks": {
+        "restoreChunkVerified": true
+      }
+    },
+    {
+      "stage": "restore-chunk",
+      "passed": true,
+      "checks": {
+        "restoreChunkVerified": true
+      }
+    },
+    {
+      "stage": "restore-chunk",
+      "passed": true,
+      "checks": {
+        "restoreChunkVerified": true
+      }
+    },
+    {
+      "stage": "restore-chunk",
+      "passed": true,
+      "checks": {
+        "restoreChunkVerified": true
+      }
+    },
+    {
+      "stage": "restore-verify",
+      "passed": true,
+      "checks": {
+        "fullRestoreByteExact": true,
+        "restoreOldLinksAndRevisionsDenied": true,
+        "corruptRecordRejected": true
+      }
+    }
+  ],
+  "errors": []
+}

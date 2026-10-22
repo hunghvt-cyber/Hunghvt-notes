@@ -1,0 +1,30 @@
+name: Provision Notes live store
+on:
+  push:
+    branches: [release/minimal-notes]
+permissions:
+  contents: read
+jobs:
+  provision:
+    if: contains(github.event.head_commit.message, '[notes-provision]')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    concurrency:
+      group: notes-live-provision
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npm test
+      - name: Create the exact new Notes store; never adopt an existing unmarked folder
+        env:
+          NOTES_PROVISION: CREATE_FRESH_NOTES_STORE
+          NOTES_DATA_NAMESPACE: Hunghvt-Notes-Data-78cd53a3-e871-40e5-bf04-5e70ac20901e
+          KOOFR_WEBDAV_USER: ${{ secrets.KOOFR_WEBDAV_USER }}
+          KOOFR_WEBDAV_APP_PASSWORD: ${{ secrets.KOOFR_WEBDAV_APP_PASSWORD }}
+        run: node scripts/provision-notes.mjs
