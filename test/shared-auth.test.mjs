@@ -7,7 +7,7 @@ import {randomUUID} from 'node:crypto';
 test('shared service fails closed, never redirects/falls back, propagates rate limit and rejects malformed versions',async()=>{
  const env=()=>({VERCEL_ENV:'production',NOTES_AUTH_SERVICE_KEY:'a'.repeat(64)});
  for(const response of [new Response('{}',{status:503}),Response.json({version:'bad'}),Response.json({version:randomUUID(),valid:'yes'})]){
-  const p=createSharedAuth({env,request:async(url,opts)=>{assert.equal(url,'https://homepage-nas.vercel.app/api/notes-auth');assert.equal(opts.redirect,'error');return response;}});
+  const p=createSharedAuth({env,request:async(url,opts)=>{assert.equal(url,'https://homepage-nas.vercel.app/api/auth?service=notes');assert.equal(opts.redirect,'error');return response;}});
   await assert.rejects(p.verify('fake','test'),/SHARED_AUTH_UNAVAILABLE/);
  }
  await assert.rejects(createSharedAuth({env,request:async()=>new Response('',{status:429})}).current(),e=>e.status===429);
