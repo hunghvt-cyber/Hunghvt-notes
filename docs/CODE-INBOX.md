@@ -43,3 +43,8 @@ Agent dùng quyền GitHub đã kết nối để update file envelope; không c
 - Live export run `40282545032` SUCCESS: OIDC thật → Vercel → Koofr thật. API trả status 200/verified true; hash readback khớp nguyên source GitHub (15.922 byte UTF-8). Không ghi code gốc, payload rõ hoặc credential vào repo Notes public.
 - Ghi chú được tạo trong **Code từ GitHub**, tên **OFFICE v2 — code mới nhất (bản thử)**. Mã v2 vẫn chưa được chứng nhận chạy đúng trên Windows/SSO thật; kết quả xuất Notes không thay thế kiểm thử AHK.
 - README và tài liệu có thể mới hơn source runtime, không đồng nghĩa redeploy. Không sửa hoặc xóa ghi chú sẵn có để kiểm thử.
+
+
+## Gửi lại ghi chú đã xóa mềm — 26/10/2026
+
+Theo yêu cầu gửi lại code sau khi lỡ xóa: status của hai slot managed trả deleted/revision/hash nếu còn trong Thùng rác. Save chỉ khôi phục khi payload ghi rõ restoreDeleted:true và revision khớp. Không hồi sinh note đã purge/đang purge, không khôi phục note ngoài scope hay tự khôi phục mọi lần save. Kiểm tra thư mục/chia sẻ vẫn chạy dưới khóa. Không cấp thao tác xóa mới. Đã bổ sung fixture cho trạng thái xóa, yêu cầu bật cờ rõ ràng, revision sai và khôi phục đúng.
