@@ -4,6 +4,11 @@
 Dữ liệu lưu trên **Koofr WebDAV**, ứng dụng chạy trên **Vercel**.
 Nhánh phát hành là **`release/minimal-notes`**, không tự suy đoán `main` là production.
 
+
+## Kết nối code vào Notes — 26/10/2026
+
+Đã triển khai [Code Inbox](docs/CODE-INBOX.md): GitHub OIDC ngắn hạn + envelope mã hóa, chỉ tạo/cập nhật hai ghi chú code managed trong thư mục **Code từ GitHub**, giữ CAS/khóa/idempotency. Không cần mật khẩu UI cho tác vụ này. PR #14, runtime source `a258ffc5`, production `dpl_2rdgnmV8TFDZp6HvzaaumLrFMHF7` READY. Live export code v2 đã xác nhận lưu/hash khớp. Không thay đổi kết nối GAS/NAS hoặc dữ liệu ghi chú cũ. Chi tiết checkpoint cũ bên dưới là lịch sử trước inbox.
+
 ## Trạng thái đã đối chiếu — 22/10/2026
 
 - Alias production **READY**, source `09bf7dd4a955d715680b2a7cf758705b04be9875`, nhánh `release/minimal-notes`.
