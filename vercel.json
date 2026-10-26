@@ -12,6 +12,9 @@
     {"key":"Cache-Control","value":"no-store"}
   ]}],
   "functions": {
+    "api/inbox.js": {
+      "maxDuration": 120
+    },
     "api/app.js": {
       "maxDuration": 120
     },
@@ -23,3 +26,4 @@
     }
   }
 }
+
