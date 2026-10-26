@@ -1,9 +1,10 @@
-# Notes — quyết định dùng chung nguồn mật khẩu
+# Notes — dùng chung nguồn mật khẩu Homepage
+**ĐÃ TRIỂN KHAI PRODUCTION ngày 26/10/2026.**
 
-Ngày 26/10/2026, người dùng đã đồng ý để **Homepage quản lý mật khẩu chung**, Notes xác thực qua dịch vụ Homepage, giữ session secret/cookie riêng. Đổi mật khẩu chung sẽ thu hồi phiên cũ của cả hai ứng dụng; cách revalidate version và thời gian thu hồi cần thiết kế/kiểm thử. **Chưa làm SSO.** Không thêm GAS/database/dịch vụ mới.
+Notes dùng mật khẩu Homepage hiện tại, qua service xác thực server-to-server; người dùng vẫn mở khóa riêng trên mỗi trang, không SSO. NOTES_AUTH_MODE=homepage-v1; NOTES_PASSWORD cũ không dùng trong mode này, không fallback tự động. Cookie/session secret Notes vẫn riêng.
 
-**Trạng thái: đã duyệt hướng làm, CHƯA TRIỂN KHAI.** NOTES_PASSWORD vẫn là nguồn mật khẩu Notes hiện tại. Đợt này chỉ sửa tài liệu, không đổi code/secret/dữ liệu hoặc cấu hình xác thực.
+Phiên owner Notes kiểm tra password version Homepage mỗi request; đổi pass tại Homepage làm phiên cũ bị từ chối ở lần kiểm tra tiếp theo. Shared links và Code Inbox không phụ thuộc nguồn mật khẩu owner. Bản nháp/CAS/ACL/khóa/dữ liệu Koofr giữ nguyên.
 
-Nguồn quyết định đầy đủ: [Homepage — Shared Password Decision](https://github.com/hunghvt-cyber/Homepage-nas/blob/main/docs/SHARED-PASSWORD-DECISION-20261026.md).
+[Chi tiết cấu hình, rollback và bằng chứng](https://github.com/hunghvt-cyber/Homepage-nas/blob/main/docs/SHARED-PASSWORD-DECISION-20261026.md).
 
-Khi triển khai sau: giữ bản nháp, CAS/khóa/ACL và dữ liệu Koofr; xác thực server-to-server có giới hạn thử, không log mật khẩu, không chia sẻ session secret, không fallback âm thầm sang mật khẩu cũ. Phân biệt mật khẩu không khớp và phiên hết hạn trong UI. Code Inbox GitHub OIDC tiếp tục độc lập. Không triển khai chỉ dựa vào chữ “đã duyệt” trong tài liệu này; đối chiếu code/config hiện tại và phạm vi yêu cầu tiếp theo.
+Source Notes 0c8c0761c2625ae2be747e448a7259f974dccb34; deployment dpl_EESNjsEpJkd2N7V45rkJ28mn3kwf READY. Local 139 Node PASS; CI Node/Chromium 40287414406 success trước sửa URL canonical. Live GET auth qua nguồn Homepage trả 200/authenticated:false; chưa nhập/đổi mật khẩu người dùng để nghiệm thu live. Không làm SSO hoặc thay mật khẩu hiện tại.
