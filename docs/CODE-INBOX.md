@@ -32,3 +32,14 @@ Agent dùng quyền GitHub đã kết nối để update file envelope; không c
 ## Kiểm chứng
 
 137/137 Node tests đạt trên fixture: OIDC sai key/issuer/audience/ref/repo/workflow/thời hạn; envelope sửa/hết hạn; không auth không chạm kho; Unicode/hash; CAS/replay; note ngoài scope giữ nguyên; chặn ghi vào folder chia sẻ. Đây không phải live Koofr evidence. Kết quả deployment/live publish được ghi bổ sung sau khi chạy thật.
+
+
+## Phát hành và xuất code thật — 26/10/2026
+
+- PR #14 đã merge; source runtime `a258ffc5ca309d16c71c7f0e1a6348efea8fb7e1`.
+- Vercel Production READY: `dpl_2rdgnmV8TFDZp6HvzaaumLrFMHF7`, alias `hunghvt-notes.vercel.app`, project `prj_c4sEp6nB4msWTsPiGoALSuVutVTK`, fra1.
+- CI feature source `87d1729`: run `40282238105` và `40282242605`, Node và Chromium fixture jobs SUCCESS. Local Node 137/137; local Chromium không tải được do mạng, dùng kết quả CI. Không có benchmark tải Koofr mới.
+- Health production 200/configured true; GET inbox 405 đúng thiết kế chỉ POST.
+- Live export run `40282545032` SUCCESS: OIDC thật → Vercel → Koofr thật. API trả status 200/verified true; hash readback khớp nguyên source GitHub (15.922 byte UTF-8). Không ghi code gốc, payload rõ hoặc credential vào repo Notes public.
+- Ghi chú được tạo trong **Code từ GitHub**, tên **OFFICE v2 — code mới nhất (bản thử)**. Mã v2 vẫn chưa được chứng nhận chạy đúng trên Windows/SSO thật; kết quả xuất Notes không thay thế kiểm thử AHK.
+- README và tài liệu có thể mới hơn source runtime, không đồng nghĩa redeploy. Không sửa hoặc xóa ghi chú sẵn có để kiểm thử.
