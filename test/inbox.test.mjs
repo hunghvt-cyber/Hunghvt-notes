@@ -36,6 +36,12 @@ test('no config/auth, cross-origin, invalid envelope or slot can access storage'
  assert.equal(calls,0);
  assert.equal((await createInboxHandler({env:()=>({}),makeStore:()=>{throw Error();}})(req({}))).status,503);
 });
+test('write freeze rejects Code Inbox before token verification or storage access',async()=>{
+ let authCalls=0,storeCalls=0;
+ const frozen=createInboxHandler({env:()=>({NOTES_INBOX_ENABLED:'github-oidc-v1',VERCEL_ENV:'production',NOTES_INBOX_PRIVATE_KEY:privateKey,NOTES_WRITES_FROZEN:'true'}),config:()=>({origin:'https://notes.example'}),authorize:async()=>{authCalls++;return {};},makeStore:()=>{storeCalls++;throw Error();}});
+ const r=await frozen(new Request('https://notes.example/api/inbox',{method:'POST',headers:{Authorization:'Bearer synthetic','Content-Type':'application/json'},body:'{}'}));
+ assert.equal(r.status,503);assert.equal((await r.json()).code,'NOTES_WRITES_FROZEN');assert.equal(authCalls,0);assert.equal(storeCalls,0);
+});
 test('inbox only upserts managed notes with exact CAS, replay and hash readback; cannot share/delete/list',async()=>{
  const b=backend(),cfg={origin:'https://notes.example',user:'fake',password:'fake',namespace:'Hunghvt-Notes-Data-'+randomUUID()};
  const s=b.makeStore(cfg);await s.init();const other=randomUUID();await s.save(other,{title:'Existing',text:'untouched'},null,randomUUID());

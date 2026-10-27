@@ -19,6 +19,15 @@ test('preview defaults closed, refuses production/project/namespace config; no s
 test('owner read experiment config is explicit and Preview-only',()=>{
  const s=setup();assert.equal(previewConfig(s.cfg).ownerReadExperiment,false);s.cfg.NOTES_OWNER_READ_EXPERIMENT='enabled';assert.equal(previewConfig(s.cfg).ownerReadExperiment,true);s.cfg.VERCEL_ENV='production';assert.throws(()=>previewConfig(s.cfg),/PREVIEW_DISABLED/);
 });
+test('write freeze blocks owner, share and login mutations before storage while retaining reads and logout',async()=>{
+ const s=setup();await s.init();const session=await owner(s);s.cfg.NOTES_WRITES_FROZEN='true';
+ assert.equal((await call(s,'notes',{session})).status,200);
+ const before=s.b.requests.length;
+ for(const [route,data] of [['notes-save',{action:'save',clientOpId:randomUUID(),revision:null,title:'x',text:'x'}],['note-share',{action:'create',noteId:randomUUID(),permission:'view'}],['auth',{password:s.cfg.PREVIEW_PORTAL_PASSWORD}]]){
+  const r=await call(s,route,{method:'POST',session,data});assert.equal(r.status,503);assert.equal(r.body.code,'NOTES_WRITES_FROZEN');
+ }
+ assert.equal(s.b.requests.length,before);assert.equal((await call(s,'auth',{method:'DELETE',session})).status,200);
+});
 test('session login, Origin/JSON checks, tamper, logout and password rotation keep owner API private',async()=>{
  const s=setup();await s.init();const session=await owner(s);assert.equal((await call(s,'notes',{session})).status,200);
  assert.equal((await call(s,'notes-save',{method:'POST',session,origin:'https://attacker.example',data:{action:'save'}})).status,403);
