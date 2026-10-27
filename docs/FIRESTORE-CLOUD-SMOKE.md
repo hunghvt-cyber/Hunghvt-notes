@@ -3,8 +3,9 @@
 Cloud Shell is not part of the current test path. The runner is prepared to use
 the existing dedicated project `notes-lab-56f0f` and its existing `(default)`
 Firestore database directly from the NAS. It requires Node 24 and a separate
-Google user ADC identity with `roles/datastore.user`. The current shell has no
-ADC file, so no Cloud Firestore request has yet been made.
+Google user ADC identity with `roles/datastore.user`. The isolated ADC file is present and a real Cloud Firestore smoke completed
+with PASS on 2026-10-27. The earlier statement below about missing ADC is
+historical and superseded by the result section.
 
 The ARM64 Google Cloud CLI 590.0.1 is installed privately at
 `/home/admin/.local/opt/notes-google-cloud-cli`. Its archive SHA-256 was checked

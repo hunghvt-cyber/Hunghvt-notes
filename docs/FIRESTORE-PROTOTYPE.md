@@ -1,4 +1,11 @@
-# Firestore prototype — not selected for production
+# Firestore compatibility prototype — historical
+
+This prototype note predates the native repository, real Firestore smoke, and
+direct Vercel Preview OIDC deployment. Git linking is not required for the
+verified direct Preview path. Current evidence and Production blockers are in
+[FIRESTORE-NATIVE.md](FIRESTORE-NATIVE.md) and
+[FIRESTORE-PRODUCTION-MIGRATION-REVIEW.md](FIRESTORE-PRODUCTION-MIGRATION-REVIEW.md).
+The historical resource observations below describe an earlier NAS state.
 
 ## Scope and current state
 

@@ -2,7 +2,9 @@
 
 Status: local design/prototype on `codex/notes-firestore-native-20261027`.
 This repository is not selected by `api/app.js`; Koofr remains the live store.
-No emulator or Cloud Firestore request was made from this prototype.
+This document records the initial prototype stage. It is superseded by the
+completed Firestore repository and smoke described in [FIRESTORE-NATIVE.md](FIRESTORE-NATIVE.md):
+the real cloud smoke passed on 2026-10-27, while Koofr remains Production.
 
 ## Why a native repository
 

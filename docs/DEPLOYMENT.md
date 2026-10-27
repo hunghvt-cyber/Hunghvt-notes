@@ -6,6 +6,11 @@ phát hành hiện hành.
 Project live mới là hunghvt-notes, không phải lab bên dưới. Các hướng dẫn dưới
 đây giữ lại cho benchmark synthetic và không được dùng để trỏ Preview vào root thật.
 
+**Bổ sung 2026-10-27:** Vercel Preview hiện đã được deploy trực tiếp từ checkout
+đã xác minh, không liên kết Git. Preview OIDC tới GCP và Notes tổng hợp đã chạy
+thành công; điều đó không cấu hình hay xác nhận Production. Xem
+[FIRESTORE-NATIVE.md](FIRESTORE-NATIVE.md).
+
 ## Trạng thái an toàn sau khi tách
 
 Đợt kiểm thử trên nhánh `split/notes-standalone` có workflow riêng

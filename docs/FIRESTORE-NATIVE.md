@@ -2,11 +2,19 @@
 
 ## Current runtime state
 
+**Superseding status 2026-10-27:** Koofr remains the Production backend. A direct
+Vercel Preview deployment from the verified checkout succeeded without linking
+Git; its synthetic Notes flow passed and Vercel Preview OIDC → GCP STS/Firestore
+was verified. This proves the Preview path only, not Production identity or real
+Notes data. The NAS ADC smoke against `notes-lab-56f0f/(default)` also passed.
+See [Production migration review](FIRESTORE-PRODUCTION-MIGRATION-REVIEW.md).
+
 The live release still uses Koofr. The native store is selected only when
 `NOTES_BACKEND=firestore-native-v1` is explicitly present. Production selection
 also requires `NOTES_FIRESTORE_PRODUCTION_REVIEW=approved-v1`; that value is not
 set by this branch or in production. The isolated test project is
-`notes-lab-56f0f`; no Notes data or production credentials have been read.
+`notes-lab-56f0f`; no real Notes data has been read. Production credentials are
+Vercel Secrets and are not retrievable through the CLI.
 
 `FirestoreNativeStore` implements the API store contract, and both the Notes API
 and Code Inbox use the same async store factory. Session cookies, cache identity,
@@ -98,34 +106,43 @@ them. The CLI defaults to validation/dry-run; remote import/export and rollback
 require `--apply`. Snapshot input files must already have mode `0600`, live
 outside the repo, and are never included in diagnostic output.
 
-Examples after an explicit reviewed snapshot is available:
+Examples after a Production GCP project and snapshot have been reviewed. Set
+`GOOGLE_CLOUD_PROJECT` and `NOTES_MIGRATION_PROJECT_ID` to the same exact
+approved project ID; the CLI refuses to run if either differs.
 
 ```sh
 node scripts/firestore-migration.mjs verify --snapshot /secure/path/notes-backup.json
-node scripts/firestore-migration.mjs import --snapshot /secure/path/notes-backup.json --project notes-lab-56f0f --vault migration-preview --apply
-node scripts/firestore-migration.mjs export --project notes-lab-56f0f --vault migration-preview --output /secure/path/firestore-backup.json --apply
-node scripts/firestore-migration.mjs rollback --snapshot /secure/path/firestore-backup.json --namespace Hunghvt-Notes-Rollback-UUID --apply
+GOOGLE_CLOUD_PROJECT="$NOTES_MIGRATION_PROJECT_ID" node scripts/firestore-migration.mjs import --snapshot /secure/path/notes-backup.json --project "$NOTES_MIGRATION_PROJECT_ID" --vault notes-production --apply
+GOOGLE_CLOUD_PROJECT="$NOTES_MIGRATION_PROJECT_ID" node scripts/firestore-migration.mjs export --project "$NOTES_MIGRATION_PROJECT_ID" --vault notes-production --output /secure/path/firestore-backup.json --apply
+node scripts/firestore-migration.mjs rollback --snapshot /secure/path/firestore-backup.json --namespace "$NOTES_DATA_NAMESPACE" --expected-catalog-sha256 "$NOTES_KOOFR_BASELINE_CATALOG_SHA256" --apply
 ```
 
-The rollback command restores to a *new Koofr namespace*, never the active one.
-It uses the dedicated Notes WebDAV variables only when deliberately invoked.
-The explicit rollback policy rebases receipt/order revisions to the fresh epoch
-and preserves capability hashes/permissions. The token-box is dropped because
-it is namespace-bound; recipients who already have a link retain access, while
-the owner cannot recover that old URL from the rollback copy and can still
-revoke it or issue a replacement. The original Koofr root remains intact until a
-separate reviewed switch; local drafts keep their previous revision and remain
-available for safe conflict/rebase handling.
+Rollback now restores the latest Firestore snapshot into the original Koofr
+namespace under the root lock, guarded by the exact pre-cutover catalog hash and
+epoch. It writes any missing immutable records and publishes one new catalog;
+it never deletes Koofr files. This preserves namespace-bound token-box values and
+share URLs, note revision/history, receipts and post-cutover edits. If Koofr was
+modified after the recorded baseline, rollback stops before publishing. This is
+fixture-tested only; it has not run against real Koofr. Browser drafts remain
+on-device and use the unchanged namespace/revision CAS contract.
 
-The current Notes backup endpoint has a 2 MB cap. The CLI can validate/import
-larger local snapshots up to its 50 MB input guard, but producing a larger
-source snapshot from Koofr needs a dedicated streaming export path before a
-large production dataset is migrated. This has not been inferred from real
-Notes data and remains a review gate.
+The interactive/API backup endpoint retains its 2 MB cap and takes a collection
+lock. Production migration instead has the new GET-only
+`scripts/koofr-readonly-snapshot.mjs`: it reads the catalog before/after, checks
+every immutable record hash and ID, retries once if the catalog changed, and
+writes only a private local snapshot. It does not lock or write to Koofr and has
+no 2 MB cap. `scripts/firestore-migration.mjs` accepts snapshots up to 50 MB. If
+the real snapshot exceeds 50 MB, extend/test the importer before migration. The
+real Notes size/count/hash have not been read because Vercel Production Secrets
+are write-only through the CLI; see [Production migration review](FIRESTORE-PRODUCTION-MIGRATION-REVIEW.md).
 
 ## Google authentication paths
 
 ### NAS one-off test
+
+The ADC authorization was completed in the isolated Notes gcloud home. A fresh
+ADC token successfully listed the test database and the authenticated Firestore
+smoke passed on 2026-10-27; no further sign-in is needed for that test project.
 
 The NAS has a private Google Cloud CLI 590.0.1 install for Linux ARM64 under
 `/home/admin/.local/opt/notes-google-cloud-cli`; its official archive SHA-256 was
@@ -179,11 +196,13 @@ NAS smoke does not configure Vercel trust or deploy Notes. See the official
   revocation, chunk hashes, Code Inbox share guards, bounded/resumable folder
   deletion, and snapshot/restore including history, revision, shares and
   idempotency. These are simulation evidence, not Cloud Firestore proof.
-- The Cloud smoke requires the one-time NAS ADC sign-in described above. Until
-  it passes, cloud transaction behavior, IAM access and latency remain
-  unverified.
-- No Koofr production read/write, Vercel deployment, billing change or real
-  Notes migration is included in this branch.
+- The isolated NAS ADC Firestore smoke completed with PASS. It proves the test
+  project only; Production WIF, Production IAM, source snapshot size and cutover
+  remain unverified.
+- A direct Preview deployment from the verified source commit succeeded without
+  Git linking. It used deployment-only synthetic configuration; Preview OIDC/STS
+  and synthetic Notes flows passed. No Production deployment/backend switch,
+  Koofr production read, billing change, or real Notes migration occurred.
 
 ## Gemini advisory
 
