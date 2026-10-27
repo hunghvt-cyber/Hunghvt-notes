@@ -53,7 +53,7 @@ is killed before cleanup, rerun this exact command after the same project is
 selected, replacing `RUN_ID` with the UUID from the `START` line:
 
 ```sh
-npm run test:firestore:cloud -- --cleanup "$GOOGLE_CLOUD_PROJECT" RUN_ID
+set -eu; WORK=/tmp/notes-firestore-cloud-smoke; ARCH="$(uname -m)"; case "$ARCH" in x86_64) NODE_ARCH=x64 ;; aarch64|arm64) NODE_ARCH=arm64 ;; *) exit 2 ;; esac; NODE="$WORK/node-v24.22.1-linux-${NODE_ARCH}/bin/node"; PROJECT="$(gcloud config get-value project 2>/dev/null)"; GOOGLE_CLOUD_PROJECT="$PROJECT" GCLOUD_PROJECT="$PROJECT" "$NODE" "$WORK/node-v24.22.1-linux-${NODE_ARCH}/lib/node_modules/npm/bin/npm-cli.js" run test:firestore:cloud -- --cleanup "$PROJECT" RUN_ID
 ```
 
 Cleanup mode only addresses `notes/{RUN_ID}`, `shares/{RUN_ID_WITHOUT_DASHES}`,
