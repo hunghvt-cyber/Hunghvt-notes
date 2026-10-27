@@ -130,3 +130,61 @@ Official references: [Vercel GCP OIDC](https://vercel.com/docs/oidc/gcp),
 [Firestore per-database IAM conditions](https://docs.cloud.google.com/firestore/native/docs/manage-databases),
 [Firestore server-library IAM](https://docs.cloud.google.com/firestore/docs/security/iam),
 [Vercel Environment Secrets](https://vercel.com/docs/cli/env).
+
+## Verified status update — 2026-10-27
+
+This section supersedes the earlier project-selection, identity, and “no real
+snapshot” statements above. The owner selected the existing `notes-lab-56f0f`
+project for eventual Notes data; no additional project or billing change is
+needed. Its `(default)` database is Firestore Native.
+
+The Preview service account's project-level Firestore role and exact Preview
+impersonation grant were removed, and its `vercel-notes-preview` pool was
+disabled. Two real requests from the old Preview runtime identity were denied
+after propagation. The original project and service-account policies were
+inspected; no inherited grant to that Preview identity was found. Do not
+re-enable this identity for Notes.
+
+A separate `notes-production-firestore` service account and
+`vercel-notes-production` pool/provider now use issuer
+`https://oidc.vercel.com/hunghvt`, audience `https://vercel.com/hunghvt`, and
+the exact subject `owner:hunghvt:project:hunghvt-notes:environment:production`.
+Only that subject can impersonate the account. `roles/datastore.user` is
+conditioned on `projects/notes-lab-56f0f/databases/(default)`. There are no
+user-managed service-account keys. A staged Production runtime made an
+authenticated read of a synthetic nonexistent probe document successfully;
+the request confirmed Vercel OIDC → STS → Firestore, without writing a Notes
+document.
+
+A temporary exporter ran only on an SSO-protected staged Production deployment
+with the existing Koofr runtime Secrets. Unauthenticated access redirected to
+Vercel protection, authenticated health reported `koofr-v1`, and POST was
+rejected with 405. The endpoint exposed only health, catalog/record reads,
+identity check, and final source-stability verification; it had no write route
+or background job. Its GET-only run verified each record ID/hash and the same
+catalog hash before and after export. The private snapshot is stored outside
+Git, under a 0700 directory, as a 0600 gzip file; its raw JSON is 1,829,423
+bytes, below the 50,000,000-byte migration limit. The migration verifier
+returned `VALID` with fingerprint
+`5d652b5743f3d79735a1df1f917ff378649a89a767e80073934a9e78192235b5`.
+Counts and content remain in the private NAS state, not this public repository.
+
+The exporter routes and all three temporary staged deployments were removed
+after verification. The two existing Production aliases still resolve to
+their original deployment IDs (`dpl_CQ27eV3fHP5ebfTTEhci86PxwA41` and
+`dpl_7rdKgAjtDKryMVMApjyQHj2ZMY9B`). The live backend remains Koofr; no Notes
+data has been imported into Firestore and writes were never frozen.
+
+The migration CLI now verifies `.json.gz` directly with a 50 MB expanded-size
+limit. Its native Firestore export can use that same 50 MB limit while the
+existing app backup route retains its 2 MB cap. This permits rollback to export
+the post-cutover Firestore state, including later edits, and restore it into the
+original Koofr namespace against the recorded pre-cutover catalog hash. Do not
+roll back from the pre-cutover snapshot: capture the current Firestore state
+first, preserve namespace/session settings, and fail closed if Koofr's catalog
+changed outside the approved write freeze.
+
+At the cutover review, capture a fresh final Koofr snapshot after writes are
+frozen, verify it, import and compare it in the chosen vault, then switch only
+the Production backend configuration. No production switch, Firestore import,
+or write freeze has been performed in this preparation.
