@@ -11,6 +11,12 @@ test('production config binds project, exact namespace and origin; preview canno
  assert.equal(appConfig(env).cookieName,'__Host-hunghvt-notes');
  for(const patch of [{NOTES_MODE:''},{VERCEL_PROJECT_ID:'homepage'},{NOTES_DATA_NAMESPACE:'backup'},{VERCEL_ENV:'preview',VERCEL_URL:'preview.example'},{NOTES_PASSWORD:''},{KOOFR_NOTES_APP_PASSWORD:''}])assert.throws(()=>appConfig({...env,...patch}));
 });
+test('synthetic Firestore smoke accepts only an isolated production vault and uses its deployment origin',()=>{
+ const env={NOTES_MODE:'live-v1',NOTES_PROJECT_ID:productionProject,VERCEL_PROJECT_ID:productionProject,VERCEL_ENV:'production',VERCEL_URL:'staged.vercel.app',NOTES_BASE_URL:'https://notes.example',NOTES_DATA_NAMESPACE:input().namespace,NOTES_SESSION_PASSWORD:randomUUID()+randomUUID(),NOTES_PASSWORD:'synthetic-password',NOTES_BACKEND:'firestore-native-v1',NOTES_FIRESTORE_PRODUCTION_REVIEW:'approved-v1',NOTES_FIRESTORE_PROJECT_ID:'notes-lab-56f0f',NOTES_FIRESTORE_VAULT_ID:'notes-cutover-smoke-'+randomUUID(),NOTES_SYNTHETIC_FIRESTORE_SMOKE:'firestore-v1'};
+ const cfg=appConfig(env);assert.equal(cfg.origin,'https://staged.vercel.app');assert.equal(cfg.vaultId,env.NOTES_FIRESTORE_VAULT_ID);assert.equal(cfg.sharedAuth,false);
+ assert.equal(appConfig({...env,NOTES_FIRESTORE_VAULT_ID:'notes-production'}).origin,'https://notes.example');
+ assert.equal(appConfig({...env,NOTES_SYNTHETIC_FIRESTORE_SMOKE:'disabled'}).origin,'https://notes.example');
+});
 test('provisioning is empty, replay-safe, and never adopts a root without its marker',async()=>{
  const b=backend(),i=input(),s=b.makeStore(i);await provisionStore(s);await s.save(randomUUID(),{title:'giữ nguyên',text:'Nội dung 😀'},null,randomUUID());const before=await s.capture();assert.equal((await provisionStore(s)).replay,true);assert.deepEqual(await s.capture(),before);
  const x=b.makeStore(input());await x.dav().call('unowned','MKCOL',undefined,{},true);await assert.rejects(provisionStore(x),/PROVISION_UNOWNED_ROOT/);
