@@ -197,7 +197,7 @@ a streaming snapshot export before migration. No production data size was read.
 The source-integrity review was correct: remote commit `6dc6d18` contained a
 truncated `lib/firestore-native-repository.mjs`; inspection also found the
 published `package-lock.json` was clipped. Both full files were restored from
-verified local versions. Candidate [commit `082824c`](https://github.com/hunghvt-cyber/Hunghvt-notes/commit/082824c51f305a9c94ecdea6aafb9a479a4ccf5e)
+verified local versions. Candidate [commit `082824c`](https://github.com/hunghvt-cyber/web-notes/commit/082824c51f305a9c94ecdea6aafb9a479a4ccf5e)
 is now remote HEAD of the same safe branch.
 
 From a fresh checkout of that exact commit on Node 24.22.1: syntax check passed,

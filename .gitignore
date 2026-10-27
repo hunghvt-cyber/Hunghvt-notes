@@ -2,8 +2,12 @@ node_modules/
 .vercel/
 .env*
 !.env.preview.example
+!.env.production.example
 *.local.json
 *.local.log
+*.local.png
 *.gz
 *.zip
 coverage/
+# A generated Code Inbox request may contain user-supplied source or note text.
+.notes-inbox/request.json

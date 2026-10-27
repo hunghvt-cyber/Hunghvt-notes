@@ -1,0 +1,38 @@
+{
+  "kind": "production-browser-smoke",
+  "date": "2026-10-18",
+  "source": "34be6a30a1ea6865081937cd8ac71b6d867ce299",
+  "deployment": "dpl_BNPiGYePB3ecjsZF6Uo8BcGiNZjy",
+  "target": "production",
+  "url": "https://hunghvt-notes.vercel.app/",
+  "storage": "real Koofr WebDAV, dedicated live namespace",
+  "verifiedDeploymentFiles": 21,
+  "checks": {
+    "configuredHealth": true,
+    "unauthenticatedNotes401": true,
+    "unauthenticatedBackup401": true,
+    "benchmark404": true,
+    "secureOwnerLogin": true,
+    "createAndSaveUnicode": true,
+    "reloadReadback": true,
+    "checklistUpdate": true,
+    "folderCreateAndAssign": true,
+    "sharedReadAndEdit": true,
+    "ownerReadbackAfterSharedEdit": true,
+    "revokedShareRead403": true,
+    "downloadSnapshot": true,
+    "snapshotHashAndContentsVerified": true,
+    "testNoteSoftDelete": true,
+    "testFolderCleanupAfterBusyRetry": true
+  },
+  "snapshot": {"bytes": 3929, "entries": 1, "active": 1, "history": 2},
+  "serverDurationsMs": {"ownerSaves": [3025, 6447, 7400], "sharedSave": 4042},
+  "transient": {"folderDeleteBusy423": 1, "manualRetrySucceeded": true},
+  "limitations": [
+    "Small smoke, not latency percentiles or iPad Safari certification",
+    "No Blob data migration or reverse sync",
+    "No new production fault injection or full restore in this smoke",
+    "No automatic backup schedule or full offline app shell"
+  ],
+  "preserved": ["Homepage deployment", "private Vercel Blob", "NAS reports", "other backup workloads"]
+}

@@ -1,0 +1,90 @@
+{
+  "kind": "IN_PROCESS_SIMULATED_WEBDAV_NOT_KOOFR_CAPACITY",
+  "results": [
+    {
+      "users": 50,
+      "editors": 0,
+      "allResponsesP50Ms": 10.446798000000001,
+      "allResponsesP95Ms": 16.785802999999987,
+      "successful": {
+        "n": 1,
+        "p50Ms": 22.136583,
+        "p95Ms": 22.136583
+      },
+      "statuses": {
+        "200": 1,
+        "423": 49
+      },
+      "webdavRequests": 52,
+      "lockAttempts": 50
+    },
+    {
+      "users": 50,
+      "editors": 5,
+      "allResponsesP50Ms": 10.617655999999997,
+      "allResponsesP95Ms": 12.671768,
+      "successful": {
+        "n": 1,
+        "p50Ms": 12.526838999999995,
+        "p95Ms": 12.526838999999995
+      },
+      "statuses": {
+        "200": 1,
+        "423": 49
+      },
+      "webdavRequests": 52,
+      "lockAttempts": 50
+    },
+    {
+      "users": 60,
+      "editors": 10,
+      "allResponsesP50Ms": 6.703765000000004,
+      "allResponsesP95Ms": 8.668222,
+      "successful": {
+        "n": 1,
+        "p50Ms": 7.818407999999977,
+        "p95Ms": 7.818407999999977
+      },
+      "statuses": {
+        "200": 1,
+        "423": 59
+      },
+      "webdavRequests": 62,
+      "lockAttempts": 60
+    },
+    {
+      "users": 100,
+      "editors": 0,
+      "allResponsesP50Ms": 8.766369999999995,
+      "allResponsesP95Ms": 11.450313999999992,
+      "successful": {
+        "n": 1,
+        "p50Ms": 11.933323999999999,
+        "p95Ms": 11.933323999999999
+      },
+      "statuses": {
+        "200": 1,
+        "423": 99
+      },
+      "webdavRequests": 102,
+      "lockAttempts": 100
+    },
+    {
+      "users": 100,
+      "editors": 10,
+      "allResponsesP50Ms": 9.383241999999996,
+      "allResponsesP95Ms": 11.04026399999998,
+      "successful": {
+        "n": 1,
+        "p50Ms": 10.886032,
+        "p95Ms": 10.886032
+      },
+      "statuses": {
+        "200": 1,
+        "423": 99
+      },
+      "webdavRequests": 102,
+      "lockAttempts": 100
+    }
+  ]
+}

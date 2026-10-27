@@ -1,0 +1,37 @@
+{
+  "framework": null,
+  "buildCommand": "mkdir -p public",
+  "outputDirectory": "public",
+  "regions": [
+    "fra1"
+  ],
+  "headers": [{"source":"/(.*)","headers":[
+    {"key":"X-Content-Type-Options","value":"nosniff"},
+    {"key":"Referrer-Policy","value":"no-referrer"},
+    {"key":"Content-Security-Policy","value":"default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'"},
+    {"key":"Cache-Control","value":"no-store"}
+  ]}],
+  "functions": {
+    "api/inbox.js": {
+      "maxDuration": 120
+    },
+    "api/app.js": {
+      "maxDuration": 120
+    },
+    "api/bench.js": {
+      "maxDuration": 120
+    },
+    "api/preview.js": {
+      "maxDuration": 120
+    },
+    "api/migration-rollback.js": {
+      "maxDuration": 120
+    }
+  },
+  "git": {
+    "deploymentEnabled": {
+      "codex/notes-firestore-cloudshell-20261027": false
+    }
+  }
+}
+

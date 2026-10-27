@@ -8,7 +8,7 @@ Production được báo cáo ở https://hunghvt-notes.vercel.app, deployment d
 Mọi Notes hiện có trên Firestore, kể cả thùng rác và lịch sử, đều phải giữ. “Notes cũ” ở yêu cầu dọn được hiểu là bản nguồn Koofr/Blob đã được thay thế và thành phần hệ thống cũ, không phải note cũ theo ngày tạo hoặc note trong thùng rác Firestore.
 
 ## Phương án đã duyệt
-- GitHub Actions trong hunghvt-cyber/Hunghvt-notes, lịch 03:30 Asia/Ho_Chi_Minh mỗi ngày (cron UTC 30 20 * * *), thêm workflow_dispatch.
+- GitHub Actions trong repo canonical `hunghvt-cyber/web-notes` (ID `1423348828`), lịch 03:30 Asia/Ho_Chi_Minh mỗi ngày (cron UTC 30 20 * * *), thêm workflow_dispatch. Tên cũ `Hunghvt-notes` trả redirect.
 - Không tạo tác vụ nhắc việc ChatGPT; đây là lịch backup của hệ thống, không phụ thuộc NAS bật/tắt.
 - Snapshot đầy đủ note active/trash, history, folder/order, shares/revocation/token-box, receipts, erased/purge tombstones và metadata khôi phục cần thiết.
 - JSON gzip kèm SHA-256 và manifest có schema version, capturedAt UTC, calendar date Asia/Ho_Chi_Minh, counts, source fingerprint.
@@ -49,7 +49,7 @@ Người dùng cho phép dọn kho Notes cũ/hệ thống cũ; không cần hỏ
 - Source/history hữu ích có thể giữ trong Git và đánh dấu lịch sử; không force-push/xóa lịch sử, không reset worktree bẩn. Gỡ route sống/thành phần runtime đã nghỉ, không xóa code còn dùng cho backup/restore.
 
 ## Phân chia repo và bàn giao
-Hunghvt-notes là nguồn chính về Notes: cập nhật README, AGENTS, release/deployment, backup runbook, restore và cleanup manifest. main trước đây chỉ có .gitignore: hợp nhất code production đã kiểm chứng và workflow vào default branch khi triển khai, không mặc định source main hiện đã là production. Kiểm tra tác dụng push/CI trước thay đổi; không liên kết Git/Vercel hoặc vô tình deploy app khi chỉ sắp xếp tài liệu.
+`hunghvt-cyber/web-notes` là nguồn chính về Notes. Remote `main` hiện là `4f95351c9846dab43f85b839a11ea0be2ed81a08`; local candidate `186479392acf793caf628831075d98405231562b` / tree `04f3183c5b29165014985d1b992c88e2ef0d0c73` chưa push được do thiếu credential Git local. Không diễn giải điều này thành thiếu quyền GitHub. Hợp nhất source production đã kiểm chứng và workflow vào default branch sau khi canonical OIDC/WIF claims được xác minh. Vercel vẫn không liên kết Git; push không tự deploy app.
 
 ai-nas-lab chỉ chứa Codex/Gemini/API wrapper/key-group/retry và bài học phối hợp AI có thể dùng lại. Tài liệu Notes đã được chuyển sang docs/history/ai-nas-lab ở repo Notes, giữ lịch sử commit cũ. Bằng chứng dọn NAS chung đưa về repo NAS AIO phù hợp; không tiếp tục tích lũy vào ai-nas-lab.
 
@@ -57,3 +57,15 @@ Codex điều phối và thực hiện, tự gọi Gemini tối đa 2 lượt/ba
 
 ## Kết quả cần báo
 Commit source đã test/push khớp hash; Actions run và schedule; bản Koofr tải lại đã verify; restore comparison; danh sách exact thành phần cũ đã dọn/còn giữ và lý do; trạng thái các domain/backend sau dọn. Nếu thiếu quyền, báo đúng một bước tối thiểu cần người dùng, tiếp tục phần độc lập.
+
+## Nhật ký triển khai 27/10/2026
+
+- Đã đối chiếu checkout `main` với source đã kiểm chứng ở `97c84e74d2e21ceb3a72b36dd16e6d9505a8e742`; code app/test sẽ được hợp nhất nguyên tree, đồng thời giữ tài liệu mới trên main. Project Vercel vẫn không liên kết Git.
+- Đã kiểm tra Koofr request file được tạo trong source: nội dung đó được giữ local/ignore và không đưa vào main. Code Inbox API/runtime và workflow không bị xóa.
+- Đã kiểm tra WIF/Firestore provision bằng ADC hiện hành: ADC có quyền IAM cần cho hai identity riêng. Đã tạo pool/provider/service account backup và restore không có key JSON. Provider condition giới hạn repository, branch `main`, và đúng file workflow. Project IAM condition giới hạn Firestore database `(default)`; backup dùng `roles/datastore.viewer`, restore dùng `roles/datastore.user`. Restore identity chỉ dành cho qualification và phải bị thu hồi sau lần restore đạt.
+- Workflow backup/restore, manifest/hash/readback, fail-closed retention, Node 24 tests và runbook được bổ sung trong source. Trước khi có run thật, không được coi đây là backup đã thành công; không được dọn Koofr namespace hoặc legacy deployment.
+- Thiếu credential WebDAV riêng cho backup. Chỉ cần thêm GitHub Actions Secret `NOTES_BACKUP_KOOFR_CREDENTIAL` qua link trong [runbook](NOTES-BACKUP-RUNBOOK.md); không tái sử dụng credential Notes Production hay dịch vụ khác. Sau khi có secret, lịch tự chạy lúc 03:30 VN. Restore qualification dùng workflow manual riêng.
+- Kiểm kê Vercel hiện tại: canonical `hunghvt-notes.vercel.app` trỏ deployment mới `dpl_SrEHLu6jv6tjTUEPR7F25sxdsFZ1`; alias phụ `hunghvt-notes-hunghvt.vercel.app` vẫn gắn deployment cũ `dpl_7rdKgAjtDKryMVMApjyQHj2ZMY9B` (immutable URL `hunghvt-notes-de329dlyt-hunghvt.vercel.app`). Chưa thay alias/xóa deployment trước khi backup và restore đạt.
+- Gemini phản biện nguy cơ retention rỗng/hỏng, thiếu dry-run gate và size-drop. Đã áp dụng fail-closed: chỉ manifest/snapshot hợp cặp, giải nén/hash/count/fingerprint hợp lệ mới được xét; nghi snapshot rỗng/giảm >90% thì dừng prune; chỉ xóa exact object trong thư mục có marker sở hữu. Nhận định của Gemini rằng Firestore không hỗ trợ transaction đọc đa tài liệu không phù hợp transaction/export trong source hiện có; kiểm tra folder-delete/purge và version hash thay vì áp dụng pause ghi hàng ngày.
+
+Nguồn chính thức tham khảo: [Google WIF cho pipeline](https://docs.cloud.google.com/iam/docs/workload-identity-federation-with-deployment-pipelines), [Firestore IAM theo database](https://firebase.google.com/docs/firestore/enterprise/create-databases), [GitHub OIDC claims](https://docs.github.com/en/actions/reference/security/oidc), [Koofr WebDAV và mật khẩu ứng dụng riêng](https://app.koofr.net/help/webdav).

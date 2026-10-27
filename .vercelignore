@@ -1,0 +1,13 @@
+.git
+node_modules
+.notes-inbox
+.notes-inbox/**
+.vercel
+.env
+.env.*.local
+*.local.json
+*.local.log
+*.local.png
+*.gz
+*.zip
+coverage

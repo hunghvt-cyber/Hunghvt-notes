@@ -1,17 +1,20 @@
 # Hunghvt Notes
 
-Ứng dụng ghi chú tại **https://hunghvt-notes.vercel.app/**, giao diện tự thiết kế, backend hiện hành **Firestore** theo hồ sơ cutover ngày 27/10/2026.
+Ứng dụng Notes tại **https://hunghvt-notes.vercel.app/**. Giao diện tự thiết kế; backend Production đã chuyển sang Firestore theo hồ sơ cutover ngày 27/10/2026.
 
 - [Vận hành và trạng thái hiện tại](docs/OPERATIONS.md).
-- [Backup định kỳ và dọn hệ thống cũ — người dùng đã duyệt](docs/BACKUP-AND-LEGACY-CLEANUP-20261027.md).
+- [Backup định kỳ và dọn hệ thống cũ — phạm vi đã duyệt](docs/BACKUP-AND-LEGACY-CLEANUP-20261027.md).
 - [Bằng chứng cutover và parity](docs/history/ai-nas-lab/notes-firestore-production-cutover-20261027.md).
-- [Lịch sử nghiên cứu/bàn giao chuyển từ ai-nas-lab](docs/history/ai-nas-lab/README.md).
+- [Firestore native repository](docs/FIRESTORE-NATIVE.md), [Code Inbox](docs/CODE-INBOX.md), [kiểm thử](docs/TESTING.md), [chi tiết backup/restore](docs/NOTES-BACKUP-RUNBOOK.md).
+- [Lịch sử nghiên cứu/bàn giao đã chuyển từ ai-nas-lab](docs/history/ai-nas-lab/README.md).
 - [Quy tắc tiếp quản](AGENTS.md).
 
 ## Source và triển khai
-Source production được báo cáo ở branch [codex/notes-production-cutover-20261027](https://github.com/hunghvt-cyber/Hunghvt-notes/tree/codex/notes-production-cutover-20261027), commit 97c84e74d2e21ceb3a72b36dd16e6d9505a8e742. main trước đây chỉ có .gitignore; lượt cập nhật này đưa tài liệu Notes về đúng repo, không tự đổi source/deployment. Khi hợp nhất code phải kiểm tree và CI, không reset worktree chưa lưu hoặc mặc định một branch khác đã deploy.
 
-## Backup và dọn hệ thống
-Phương án đã duyệt: GitHub Actions 03:30 giờ Việt Nam mỗi ngày, snapshot gzip + SHA-256 vào Koofr riêng tư; giữ 14 bản ngày, 8 bản tuần và 6 bản tháng. Đây là **yêu cầu triển khai**, chưa phải chứng nhận đã chạy. Chỉ dọn hệ thống Notes cũ sau khi backup đã được tải lại kiểm hash và restore thử đầy đủ.
+Repo canonical là [`hunghvt-cyber/web-notes`](https://github.com/hunghvt-cyber/web-notes), repository ID `1423348828`; tên cũ `Hunghvt-notes` chuyển hướng. `main` tại `4f95351c9846dab43f85b839a11ea0be2ed81a08` là baseline remote đã đối chiếu trước khi tích hợp. Candidate backup/source đã xác minh có tree `04f3183c5b29165014985d1b992c88e2ef0d0c73`. Vercel không liên kết tự deploy với Git; việc cập nhật GitHub không tự triển khai hoặc đổi alias Production. Deployment Production được ghi trong [runbook](docs/OPERATIONS.md). Mọi thay đổi runtime vẫn cần quy trình triển khai riêng.
 
-Giữ nguyên Notes Firestore, lịch sử, thùng rác, draft và quyền chia sẻ. Không commit credential, nội dung ghi chú, snapshot hoặc log riêng tư vào repo công khai.
+## Backup
+
+Candidate workflow được cấu hình chạy 03:30 giờ Việt Nam mỗi ngày (UTC `30 20 * * *`), gửi snapshot gzip tới thư mục Koofr backup riêng, kiểm tra tải lại/hash/parity trước retention. Chính sách giữ 14 ngày, 8 tuần, 6 tháng; baseline bảo vệ nằm ngoài retention tự động. Chưa đưa schedule lên default branch; chưa ghi nhận run thật hay restore qualification. Xem [runbook backup/restore](docs/OPERATIONS.md#backup-và-khôi-phục). Không coi source workflow hoặc kiểm thử fixture là bằng chứng backup cloud đã chạy.
+
+Không commit credential, nội dung Notes, snapshot hoặc log riêng tư vào repo công khai. Không xóa Firestore, lịch sử, thùng rác, share hoặc draft khi dọn backend cũ.

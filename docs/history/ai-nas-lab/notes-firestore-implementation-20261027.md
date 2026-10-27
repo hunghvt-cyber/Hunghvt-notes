@@ -4,8 +4,8 @@
 
 The user-provided test project is `notes-lab-56f0f`. This work prepared and
 pushed the native Firestore integration to the isolated Hunghvt-notes branch
-[`codex/notes-firestore-cloudshell-20261027`](https://github.com/hunghvt-cyber/Hunghvt-notes/tree/codex/notes-firestore-cloudshell-20261027),
-commit [`4ef6be2`](https://github.com/hunghvt-cyber/Hunghvt-notes/commit/4ef6be251dde9692f18b0b0f7364b7acebc5d5d4).
+[`codex/notes-firestore-cloudshell-20261027`](https://github.com/hunghvt-cyber/web-notes/tree/codex/notes-firestore-cloudshell-20261027),
+commit [`4ef6be2`](https://github.com/hunghvt-cyber/web-notes/commit/4ef6be251dde9692f18b0b0f7364b7acebc5d5d4).
 The `release/minimal-notes` branch and Vercel deployments were not changed.
 Koofr remains the selected production backend.
 
