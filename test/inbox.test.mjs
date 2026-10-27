@@ -48,6 +48,14 @@ test('inbox only upserts managed notes with exact CAS, replay and hash readback;
  assert.equal((await request({...payload,clientOpId:randomUUID()})).status,409);
  const status=await request({action:'status',slot:'office-v2'});assert.equal(status.body.revision,first.body.revision);
  const next=await request({...payload,text:'next',revision:first.body.revision,clientOpId:randomUUID()});assert.equal(next.status,200);
+ // Excel export must create a separate note, never overwrite Office code/config.
+ const excel=await request({...payload,slot:'excel-to-txt',title:'Excel qua txt',text:'Excel-only code',revision:null,clientOpId:randomUUID()});
+ assert.equal(excel.status,200);assert.equal(excel.body.verified,true);
+ assert.notEqual(excel.body.id,inboxId('office-v2'));assert.notEqual(excel.body.id,inboxId('office-v2-config'));
+ assert.equal((await s.get(inboxId('office-v2'))).text,'next');
+ assert.equal((await s.get(excel.body.id)).title,'Excel qua txt');
+ assert.equal((await s.get(excel.body.id)).text,'Excel-only code');
+ assert.equal((await request({...payload,slot:'excel-to-txt',revision:null,clientOpId:randomUUID()})).status,409);
  assert.equal((await request({action:'delete',slot:'office-v2'})).status,400);
  assert.equal((await s.get(other)).text,'untouched');
  const n=await s.get(inboxId('office-v2'));assert.equal(n.folder,inboxFolder);
@@ -58,3 +66,4 @@ test('inbox only upserts managed notes with exact CAS, replay and hash readback;
  const restored=await request({...payload,restoreDeleted:true,revision:deleted.body.revision,clientOpId:randomUUID()});assert.equal(restored.status,200);assert.equal((await s.get(n.id)).text,payload.text);
  await s.share('folder',inboxFolder,'view');assert.equal((await request({...payload,revision:restored.body.revision,clientOpId:randomUUID()})).status,403);
 });
+
