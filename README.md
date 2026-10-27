@@ -1,8 +1,10 @@
 # Hunghvt Notes
 
-For the native Firestore prototype's isolated Cloud Shell smoke test, see
-[docs/FIRESTORE-CLOUD-SMOKE.md](docs/FIRESTORE-CLOUD-SMOKE.md). It requires an
-existing dedicated non-production project/database and does not enable billing.
+For the native Firestore backend implementation, guarded runtime selection,
+NAS/Vercel authentication, migration comparison, backup/restore and rollback, see
+[docs/FIRESTORE-NATIVE.md](docs/FIRESTORE-NATIVE.md). The isolated cloud smoke
+runner is documented in [docs/FIRESTORE-CLOUD-SMOKE.md](docs/FIRESTORE-CLOUD-SMOKE.md).
+Koofr remains the active backend until a separately reviewed migration.
 
 Ứng dụng ghi chú độc lập: **https://hunghvt-notes.vercel.app/**.
 Dữ liệu lưu trên **Koofr WebDAV**, ứng dụng chạy trên **Vercel**.

@@ -1,72 +1,48 @@
-# Firestore Cloud Shell smoke test
+# Firestore smoke from the NAS
 
-This is a one-off synthetic test of the native repository. It does not create a
-Google project/database, enable billing, touch Notes data, deploy the app, or
-write credentials into the repository. It creates one random note and share in
-an already existing Firestore database, checks read/CAS/share/revocation, then
-deletes exactly those generated paths.
+Cloud Shell is not part of the current test path. The runner is prepared to use
+the existing dedicated project `notes-lab-56f0f` and its existing `(default)`
+Firestore database directly from the NAS. It requires Node 24 and a separate
+Google user ADC identity with `roles/datastore.user`. The current shell has no
+ADC file, so no Cloud Firestore request has yet been made.
 
-## Before opening Cloud Shell
+The ARM64 Google Cloud CLI 590.0.1 is installed privately at
+`/home/admin/.local/opt/notes-google-cloud-cli`. Its archive SHA-256 was checked
+against Google's published Linux Arm checksum. The wrapper
+`/home/admin/bin/notes-gcloud` fixes `HOME` and `CLOUDSDK_CONFIG` to
+`/home/admin/.local/state/notes-gcloud-home`; it does not modify shell profiles,
+service environment, or any existing Google credentials.
 
-Use a **dedicated non-production Google Cloud project** with an existing
-Cloud Firestore Native database named `(default)`. The signed-in user needs
-`roles/datastore.user`. That role grants project-level read/write; do not use a
-project containing production Notes. If no isolated project/database is
-available, stop. This smoke script never provisions one and never enables
-billing.
-
-On the phone/iPad:
-
-1. Sign into [Google Cloud Console](https://console.cloud.google.com/) and use
-   the project selector to choose that existing non-production project.
-2. Open [Cloud Shell](https://shell.cloud.google.com/?show=terminal), accept the
-   authorization dialog if shown, and confirm the shell shows the same project.
-3. Paste the single command below. It clones this public branch into `/tmp`,
-   installs the locked dependencies without lifecycle scripts, and runs the
-   probe. It prints only the selected project, random run ID, durations,
-   transaction callback attempts and estimated logical document counts. No note
-   text, capability, OAuth token or credential is printed.
+The single interactive authorization action is:
 
 ```sh
-set -eu; WORK=/tmp/notes-firestore-cloud-smoke; ARCH="$(uname -m)"; case "$ARCH" in x86_64) NODE_ARCH=x64 ;; aarch64|arm64) NODE_ARCH=arm64 ;; *) echo "Unsupported Cloud Shell architecture: $ARCH" >&2; exit 2 ;; esac; mkdir -p "$WORK"; cd "$WORK"; curl -fsSLO "https://nodejs.org/dist/v24.22.1/node-v24.22.1-linux-${NODE_ARCH}.tar.xz"; tar -xJf "node-v24.22.1-linux-${NODE_ARCH}.tar.xz"; NODE="$WORK/node-v24.22.1-linux-${NODE_ARCH}/bin/node"; "$NODE" --version; git clone --depth 1 --single-branch --branch codex/notes-firestore-cloudshell-20261027 https://github.com/hunghvt-cyber/Hunghvt-notes.git "$WORK/repo"; cd "$WORK/repo"; "$NODE" "$WORK/node-v24.22.1-linux-${NODE_ARCH}/lib/node_modules/npm/bin/npm-cli.js" ci --ignore-scripts --no-audit --no-fund; PROJECT="$(gcloud config get-value project 2>/dev/null)"; test -n "$PROJECT"; GOOGLE_CLOUD_PROJECT="$PROJECT" GCLOUD_PROJECT="$PROJECT" "$NODE" "$WORK/node-v24.22.1-linux-${NODE_ARCH}/lib/node_modules/npm/bin/npm-cli.js" run test:firestore:cloud -- "$PROJECT"
+/home/admin/bin/notes-gcloud auth application-default login --no-launch-browser --disable-quota-project
 ```
 
-The command downloads the official Node.js 24.22.1 Linux binary into `/tmp`
-without changing Cloud Shell's system Node. It gets the selected project from
-`gcloud config get-value project`. The runner refuses a project mismatch,
-refuses emulator mode, and requires Node 24. It uses
-Cloud Shell's signed-in identity through the Google client libraries; it does
-not accept API keys or service-account JSON.
+Open the displayed Google URL on the phone/iPad, sign in to the intended Google
+account, then enter Google's one-time code directly at the NAS terminal prompt.
+Do not send the code to Codex/chat. This writes only the isolated ADC file:
+`/home/admin/.local/state/notes-gcloud-home/.config/gcloud/application_default_credentials.json`.
+The login command does not enable billing or set a quota project. Google may
+require that the signed-in account already has project data access.
 
-The output's `wallMs` are real elapsed times from that one Cloud Shell region
-and test run. `transactionCallbackAttempts` counts actual SDK callback
-invocations (including automatic retries). `estimatedLogicalOps` is the
-expected document count for the tested one-version cases; it is not a billing
-export. The smoke cannot measure NAS-to-Google network latency or Vercel
-production latency.
+After the authorization step, Codex can run the prepared Node 24 smoke
+automatically. It is fixed to project `notes-lab-56f0f` and refuses a different
+selected project or an emulator endpoint. It creates two random vaults beneath
+`notesVaults/` for synthetic-only testing, verifies save/open/CAS, share/revoke,
+folder deletion, trash/restore/purge, and count/hash snapshot restore, then
+recursively deletes those two vaults. It emits no credential, note body,
+capability token, or private response. If interrupted, the non-secret run ID
+supports exact-vault cleanup through the same script.
 
-## If the shell is interrupted
+The local `npm test` fixtures are not cloud proof. Cloud latency and server-side
+transaction retry behavior become verified only after the runner returns
+`PASS`; no project/database provisioning or billing change is part of this test.
+For the separate Vercel identity setup, see [FIRESTORE-NATIVE.md](FIRESTORE-NATIVE.md).
 
-The first output line is a non-secret UUID `runId`. The normal `finally` path
-removes that run's note tree, share document and note access guard. If the shell
-is killed before cleanup, rerun this exact command after the same project is
-selected, replacing `RUN_ID` with the UUID from the `START` line:
+Official references:
 
-```sh
-set -eu; WORK=/tmp/notes-firestore-cloud-smoke; ARCH="$(uname -m)"; case "$ARCH" in x86_64) NODE_ARCH=x64 ;; aarch64|arm64) NODE_ARCH=arm64 ;; *) exit 2 ;; esac; NODE="$WORK/node-v24.22.1-linux-${NODE_ARCH}/bin/node"; PROJECT="$(gcloud config get-value project 2>/dev/null)"; GOOGLE_CLOUD_PROJECT="$PROJECT" GCLOUD_PROJECT="$PROJECT" "$NODE" "$WORK/node-v24.22.1-linux-${NODE_ARCH}/lib/node_modules/npm/bin/npm-cli.js" run test:firestore:cloud -- --cleanup "$PROJECT" RUN_ID
-```
-
-Cleanup mode only addresses `notes/{RUN_ID}`, `shares/{RUN_ID_WITHOUT_DASHES}`,
-and the derived note access-guard document. It does not enumerate a collection
-or delete other data. Do not use cleanup mode with an ID that was not printed by
-this smoke run.
-
-## Difference from production authentication
-
-This uses a human's short-lived Cloud Shell authorization for a one-off
-measurement. It does not need NAS credentials or Vercel configuration. Running
-from NAS instead requires Google Cloud CLI plus ADC or an external workload
-identity. Vercel production requires a separate Workload Identity Federation
-trust scoped to the Vercel project/environment and a dedicated service account;
-this smoke does not configure either path.
-
+- [Google Cloud CLI Linux Arm installation and checksum](https://docs.cloud.google.com/sdk/docs/install-sdk)
+- [ADC local development login](https://docs.cloud.google.com/docs/authentication/set-up-adc-local-dev-environment)
+- [Login with a browser on another device](https://docs.cloud.google.com/sdk/gcloud/reference/auth/application-default/login)
+- [Firestore IAM roles](https://docs.cloud.google.com/firestore/docs/security/iam)
