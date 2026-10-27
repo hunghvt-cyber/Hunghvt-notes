@@ -2,7 +2,7 @@
 
 ## Hiện hành
 Theo báo cáo Codex NAS và hồ sơ cutover được chuyển về repo này:
-- Repo GitHub canonical: `hunghvt-cyber/web-notes` (ID `1423348828`); tên `Hunghvt-notes` cũ chuyển hướng. Remote `main` được đọc trực tiếp ở `4f95351c9846dab43f85b839a11ea0be2ed81a08`.
+- Repo GitHub canonical: `hunghvt-cyber/web-notes` (ID `1423348828`); tên cũ chuyển hướng. `main` đã tích hợp PR #16 tại `7c3598a34691a7983e08208e55c97c34bf596f0c`, tree `035a07789aa235f0e1b79938688633c9c963984f`.
 - URL https://hunghvt-notes.vercel.app
 - Backend Firestore: notes-lab-56f0f / (default) / notes-production.
 - Deployment tại cutover: dpl_SrEHLu6jv6tjTUEPR7F25sxdsFZ1.
@@ -13,10 +13,10 @@ Theo báo cáo Codex NAS và hồ sơ cutover được chuyển về repo này:
 
 ## Backup
 Người dùng đã duyệt backup GitHub Actions 03:30 VN → Koofr private, 14 daily + 8 weekly + 6 monthly. Xem [nhiệm vụ backup và cleanup đã duyệt](BACKUP-AND-LEGACY-CLEANUP-20261027.md).
-Candidate local đã xác minh là `186479392acf793caf628831075d98405231562b`, tree `04f3183c5b29165014985d1b992c88e2ef0d0c73`; test offline 187/187 đạt trước cập nhật claim canonical. Push HTTPS chưa chạy được vì không có credential local; chưa kết luận thiếu quyền tài khoản. Workflow đang được cập nhật về canonical claim; WIF attribute condition và IAM binding live chưa đối chiếu được. Candidate chưa ở default branch; chưa có Actions run, Koofr readback hoặc restore qualification mới. Cần secret Koofr riêng `NOTES_BACKUP_KOOFR_CREDENTIAL`. Không dọn legacy trước đủ gate. Xem [runbook](NOTES-BACKUP-RUNBOOK.md).
+PR #16 đã đưa source/workflow lên `main`; GitHub CI [run 40601380216](https://github.com/hunghvt-cyber/web-notes/actions/runs/40601380216) thành công ở test và browser. Local suite 187/187 đạt sau cập nhật claims. Đây là CI, không phải backup. Workflow có lịch UTC `30 20 * * *` và `workflow_dispatch`; chưa có manual/cron backup run, Koofr readback/verification hoặc restore qualification. Source claims đã đổi sang canonical repo, nhưng WIF provider condition/IAM thực tế chưa được đọc lại sau rename (không có gcloud/ADC trong môi trường phiên này). Secret `NOTES_BACKUP_KOOFR_CREDENTIAL` chưa được xác minh. Giữ legacy cho tới khi backup + restore PASS. Xem [runbook](NOTES-BACKUP-RUNBOOK.md).
 
 ## Cleanup
-Dọn kho cũ và các đường ghi/deployment đã thay thế chỉ sau backup upload/readback/hash + restore parity PASS. Chưa xóa namespace Koofr hoặc runtime/domain cũ. Không xóa Firestore hiện hành, thùng rác hay draft. Kho backup mới và baseline trước cutover nằm ngoài retention. Kiểm tra domain phụ trong hồ sơ cutover, không để nó tiếp tục ghi vào Koofr cũ.
+Kiểm tra Vercel metadata ngày 28/10: `hunghvt-notes.vercel.app` → `dpl_SrEHLu6jv6tjTUEPR7F25sxdsFZ1` (READY, project `hunghvt-notes`); alias phụ `hunghvt-notes-hunghvt.vercel.app` → deployment cũ `dpl_7rdKgAjtDKryMVMApjyQHj2ZMY9B`, immutable URL `hunghvt-notes-de329dlyt-hunghvt.vercel.app`. Backend hiện hành vẫn là Firestore `notes-lab-56f0f/(default)/notes-production`; PR không deploy runtime. Chưa đổi alias hoặc xóa deployment. Không xóa legacy vì chưa có backup/readback/restore qualification. Exact Koofr legacy root chưa được xác minh; không đụng vào kho đó.
 
 ## Bằng chứng và cập nhật
 Mọi thay đổi Notes được ghi ở repo này. ai-nas-lab chỉ giữ thông tin phối hợp Codex/Gemini và công cụ AI.

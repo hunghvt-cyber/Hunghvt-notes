@@ -11,10 +11,10 @@
 
 ## Source và triển khai
 
-Repo canonical là [`hunghvt-cyber/web-notes`](https://github.com/hunghvt-cyber/web-notes), repository ID `1423348828`; tên cũ `Hunghvt-notes` chuyển hướng. `main` tại `4f95351c9846dab43f85b839a11ea0be2ed81a08` là baseline remote đã đối chiếu trước khi tích hợp. Candidate backup/source đã xác minh có tree `04f3183c5b29165014985d1b992c88e2ef0d0c73`. Vercel không liên kết tự deploy với Git; việc cập nhật GitHub không tự triển khai hoặc đổi alias Production. Deployment Production được ghi trong [runbook](docs/OPERATIONS.md). Mọi thay đổi runtime vẫn cần quy trình triển khai riêng.
+`hunghvt-cyber/web-notes` (repository ID `1423348828`) là repo canonical. PR #16 đã hợp nhất vào `main` tại commit `7c3598a34691a7983e08208e55c97c34bf596f0c`, tree `035a07789aa235f0e1b79938688633c9c963984f`. Candidate ban đầu `186479392acf793caf628831075d98405231562b` / tree `04f3183c5b29165014985d1b992c88e2ef0d0c73` đã được xác minh; tree cuối sau cập nhật claims là tree trên. GitHub CI [run 40601380216](https://github.com/hunghvt-cyber/web-notes/actions/runs/40601380216) đạt ở hai job test/browser. PR không deploy runtime Vercel.
 
 ## Backup
 
-Candidate workflow được cấu hình chạy 03:30 giờ Việt Nam mỗi ngày (UTC `30 20 * * *`), gửi snapshot gzip tới thư mục Koofr backup riêng, kiểm tra tải lại/hash/parity trước retention. Chính sách giữ 14 ngày, 8 tuần, 6 tháng; baseline bảo vệ nằm ngoài retention tự động. Chưa đưa schedule lên default branch; chưa ghi nhận run thật hay restore qualification. Xem [runbook backup/restore](docs/OPERATIONS.md#backup-và-khôi-phục). Không coi source workflow hoặc kiểm thử fixture là bằng chứng backup cloud đã chạy.
+Workflow backup đã ở `main`, lịch `30 20 * * *` UTC (03:30 Asia/Ho_Chi_Minh), có `workflow_dispatch`; next expected cron là 03:30 ngày 29/10/2026 giờ Việt Nam. Chưa có run backup thủ công hoặc theo cron, Koofr upload/readback/hash verification hay restore parity. GitHub CI không phải backup run. WIF/IAM cần được đọc lại theo canonical repo sau rename; workflow yêu cầu secret `NOTES_BACKUP_KOOFR_CREDENTIAL`. Xem [runbook](docs/NOTES-BACKUP-RUNBOOK.md).
 
 Không commit credential, nội dung Notes, snapshot hoặc log riêng tư vào repo công khai. Không xóa Firestore, lịch sử, thùng rác, share hoặc draft khi dọn backend cũ.
