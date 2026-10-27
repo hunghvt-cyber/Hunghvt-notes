@@ -16,7 +16,7 @@ function makeInboxEnvelope(payload,publicKey){
  const encrypted=publicEncrypt({key:publicKey,oaepHash:'sha256',padding:constants.RSA_PKCS1_OAEP_PADDING},key);
  return {v:1,key:encrypted.toString('base64url'),iv:iv.toString('base64url'),tag:cipher.getAuthTag().toString('base64url'),data:data.toString('base64url'),expiresAt:Date.now()+60000};
 }
-export default async function handler(request){
+async function handler(request){
  if(request.method!=='POST')return reply(405,{code:'METHOD_NOT_ALLOWED'});
  const env=testEnvironment(process.env);if(!env||env.NOTES_WRITES_FROZEN==='true')return reply(404,{code:'NOT_FOUND'});
  let store,vaultCreated=false;
@@ -69,3 +69,5 @@ export default async function handler(request){
  }catch(error){const code=/^(?:SMOKE|FIRESTORE|VAULT|NOTES)_[A-Z0-9_]+$/.test(error?.message??'')?error.message:'SMOKE_RUNTIME_FAILED';return reply(503,{ok:false,code});}
  finally{if(vaultCreated)await store.repo.db.recursiveDelete(store.repo.vault()).catch(()=>{});await store?.close?.().catch(()=>{});}
 }
+export default {fetch:handler};
+export const POST=handler;
