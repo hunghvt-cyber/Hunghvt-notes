@@ -12,9 +12,9 @@ function testEnvironment(source){
 async function json(response){const value=await response.json();if(!response.ok)throw Error(`SMOKE_STEP_${response.status}_${String(value.code??'UNKNOWN').replace(/[^A-Z0-9_]/g,'').slice(0,48)}`);return {value,cookie:response.headers.get('set-cookie')};}
 function makeInboxEnvelope(payload,publicKey){
  const key=randomBytes(32),iv=randomBytes(12),cipher=createCipheriv('aes-256-gcm',key,iv);cipher.setAAD(Buffer.from(inboxAudience));
- const data=Buffer.concat([cipher.update(Buffer.from(JSON.stringify(payload))),cipher.final()]);
+ const data=Buffer.concat([cipher.update(Buffer.from(JSON.stringify({...payload,expiresAt:Date.now()+60000}))),cipher.final()]);
  const encrypted=publicEncrypt({key:publicKey,oaepHash:'sha256',padding:constants.RSA_PKCS1_OAEP_PADDING},key);
- return {v:1,key:encrypted.toString('base64url'),iv:iv.toString('base64url'),tag:cipher.getAuthTag().toString('base64url'),data:data.toString('base64url'),expiresAt:Date.now()+60000};
+ return {v:1,key:encrypted.toString('base64url'),iv:iv.toString('base64url'),tag:cipher.getAuthTag().toString('base64url'),data:data.toString('base64url')};
 }
 async function handler(request){
  if(request.method!=='POST')return reply(405,{code:'METHOD_NOT_ALLOWED'});
@@ -66,7 +66,7 @@ async function handler(request){
   const inboxResult=await json(inboxResponse);if(inboxResult.value.textHash!==textHash(payload.text)||inboxResult.value.verified!==true)throw Error('SMOKE_INBOX_FAILED');
   await store.repo.db.recursiveDelete(store.repo.vault());vaultCreated=false;
   return reply(200,{ok:true,checks:{login:true,list:true,open:true,save:true,idempotency:true,casConflict:true,folder:true,order:true,share:true,shareRevoke:true,trash:true,restore:true,codeInbox:true},syntheticVault:env.NOTES_FIRESTORE_VAULT_ID,syntheticVaultRemoved:true});
- }catch(error){const code=/^(?:SMOKE|FIRESTORE|VAULT|NOTES)_[A-Z0-9_]+$/.test(error?.message??'')?error.message:'SMOKE_RUNTIME_FAILED';return reply(503,{ok:false,code});}
+ }catch(error){const code=/^(?:SMOKE|FIRESTORE|VAULT|NOTES)_[A-Z0-9_]+$/.test(error?.message??'')?error.message:'SMOKE_RUNTIME_FAILED';let syntheticVaultRemoved=false;if(vaultCreated){try{await store.repo.db.recursiveDelete(store.repo.vault());vaultCreated=false;syntheticVaultRemoved=true;}catch{}}return reply(503,{ok:false,code,syntheticVault:env.NOTES_FIRESTORE_VAULT_ID,syntheticVaultRemoved});}
  finally{if(vaultCreated)await store.repo.db.recursiveDelete(store.repo.vault()).catch(()=>{});await store?.close?.().catch(()=>{});}
 }
 export default {fetch:handler};
