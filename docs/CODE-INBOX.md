@@ -5,7 +5,7 @@ Ngày 26/10/2026: người dùng yêu cầu kết nối xác thực riêng để
 ## Phạm vi
 
 - Endpoint production `POST /api/inbox`, đóng mặc định.
-- Chỉ nhận danh tính GitHub Actions của repo `hunghvt-cyber/Hunghvt-notes` (repository ID 1423348828, owner ID 252749231), push trên `release/minimal-notes`, workflow `.github/workflows/notes-inbox.yml`, audience `hunghvt-notes-code-inbox-v1`.
+- Chỉ nhận danh tính GitHub Actions của repo `hunghvt-cyber/web-notes` (repository ID 1423348828, owner ID 252749231), push trên `release/minimal-notes`, workflow `.github/workflows/notes-inbox.yml`, audience `hunghvt-notes-code-inbox-v1`.
 - GitHub ký token RS256 ngắn hạn, xác minh JWKS, issuer/audience/subject/ref/event/workflow/IDs/expiry trước khi đọc kho. Không có mật khẩu Notes hoặc Koofr trong Actions.
 - Ba slot cho phép: `office-v2`, `office-v2-config`, `excel-to-txt`. Chỉ ghi vào ba ID xác định trước trong thư mục **Code từ GitHub**. Không list/export nội dung ghi chú khác, xóa, khôi phục hoặc chia sẻ.
 - Ghi đè yêu cầu revision chính xác; replay dùng cùng clientOpId/payload. Không ghi đè vô điều kiện. Ghi chú đã chuyển thư mục/xóa hoặc đích đang chia sẻ bị chặn dưới cùng khóa lưu. Nội dung cũ vẫn có lịch sử như lưu Notes thông thường.

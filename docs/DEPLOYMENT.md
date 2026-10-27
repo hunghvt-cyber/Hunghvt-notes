@@ -44,7 +44,7 @@ Không kéo dài vô hạn. Trước đợt live mới phải review và đặt 
 Danh tính OIDC khóa owner ID `252749231`, repo ID `1423348828`, main,
 event workflow_dispatch và đúng file notes-live.yml (hoặc nhánh/workflow thử
 nghiệm giới hạn như mô tả ở đầu tài liệu). Repo mới dùng immutable subject:
-`repo:hunghvt-cyber@252749231/Hunghvt-notes@1423348828:ref:<ref>`.
+`repo:hunghvt-cyber@252749231/web-notes@1423348828:ref:<ref>`.
 Tham khảo [GitHub OIDC immutable subject](https://docs.github.com/en/actions/reference/security/oidc#immutable-subject-claims).
 Workflow dùng repository secrets, không environment context
 (đổi environment làm thay subject và phải review OIDC). Ai có quyền write repo

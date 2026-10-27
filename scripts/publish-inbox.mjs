@@ -1,7 +1,7 @@
 import {readFile,writeFile} from 'node:fs/promises';
 const endpoint='https://hunghvt-notes.vercel.app/api/inbox';
 const audience='hunghvt-notes-code-inbox-v1';
-if(process.env.GITHUB_REPOSITORY!=='hunghvt-cyber/Hunghvt-notes'||process.env.GITHUB_REF!=='refs/heads/release/minimal-notes'||process.env.GITHUB_EVENT_NAME!=='push')throw Error('WORKFLOW_CONTEXT_DENIED');
+if(process.env.GITHUB_REPOSITORY!=='hunghvt-cyber/web-notes'||process.env.GITHUB_REF!=='refs/heads/release/minimal-notes'||process.env.GITHUB_EVENT_NAME!=='push')throw Error('WORKFLOW_CONTEXT_DENIED');
 const body=await readFile('.notes-inbox/request.json','utf8');
 if(Buffer.byteLength(body)>310000)throw Error('ENVELOPE_TOO_LARGE');
 const url=new URL(process.env.ACTIONS_ID_TOKEN_REQUEST_URL);url.searchParams.set('audience',audience);

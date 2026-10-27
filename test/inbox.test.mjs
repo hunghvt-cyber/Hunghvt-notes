@@ -8,7 +8,7 @@ const pair=generateKeyPairSync('rsa',{modulusLength:2048});
 const privateKey=pair.privateKey.export({type:'pkcs8',format:'pem'}),publicKey=pair.publicKey.export({type:'spki',format:'pem'});
 const now=Date.now(),seconds=Math.floor(now/1000),ref='refs/heads/release/minimal-notes';
 function jwt(patch={},head={}){
- const c={iss:'https://token.actions.githubusercontent.com',aud:inboxAudience,sub:'repo:hunghvt-cyber@252749231/Hunghvt-notes@1423348828:ref:'+ref,repository:'hunghvt-cyber/Hunghvt-notes',repository_id:'1423348828',repository_owner_id:'252749231',ref,event_name:'push',workflow_ref:'hunghvt-cyber/Hunghvt-notes/.github/workflows/notes-inbox.yml@'+ref,iat:seconds,exp:seconds+300,run_id:'123',sha:'a'.repeat(40),...patch};
+ const c={iss:'https://token.actions.githubusercontent.com',aud:inboxAudience,sub:'repo:hunghvt-cyber@252749231/web-notes@1423348828:ref:'+ref,repository:'hunghvt-cyber/web-notes',repository_id:'1423348828',repository_owner_id:'252749231',ref,event_name:'push',workflow_ref:'hunghvt-cyber/web-notes/.github/workflows/notes-inbox.yml@'+ref,iat:seconds,exp:seconds+300,run_id:'123',sha:'a'.repeat(40),...patch};
  const p=[{alg:'RS256',kid:'test',...head},c].map(v=>Buffer.from(JSON.stringify(v)).toString('base64url')).join('.');return p+'.'+sign('RSA-SHA256',Buffer.from(p),pair.privateKey).toString('base64url');
 }
 const options={getKeys:async()=>[{...pair.publicKey.export({format:'jwk'}),kid:'test'}],now:seconds};
