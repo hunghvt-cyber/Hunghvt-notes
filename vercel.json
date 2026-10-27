@@ -24,13 +24,7 @@
     "api/preview.js": {
       "maxDuration": 120
     },
-    "api/migration-export.js": {
-      "maxDuration": 120
-    },
     "api/migration-rollback.js": {
-      "maxDuration": 120
-    },
-    "api/migration-smoke.js": {
       "maxDuration": 120
     }
   },
