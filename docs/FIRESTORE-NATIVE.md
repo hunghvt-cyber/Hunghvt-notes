@@ -161,6 +161,20 @@ NAS smoke does not configure Vercel trust or deploy Notes. See the official
 
 ## Verification evidence and limits
 
+- 2026-10-27: a real NAS smoke against project `notes-lab-56f0f`, database
+  `(default)`, completed with `PASS`. It verified isolated-vault init,
+  owner-save/open, known-revision read, CAS rejection, share/open/revoke,
+  folder delete/readback, trash/restore, count/hash snapshot restore, and purge.
+  The runner then deleted both synthetic vault roots; a separate authenticated
+  read confirmed both roots absent. One run only: observed end-to-end times
+  were about 1.35 s initialize, 0.38 s save, 0.40 s owner open, 0.95 s folder
+  delete, 1.06 s trash/restore, 2.02 s snapshot restore, and 2.06 s purge.
+  These include NAS/network/API overhead and are not a latency benchmark.
+- The first real attempts exposed two code defects that fixtures had missed:
+  first-save creation of a new folder referenced its timestamp before
+  initialization, and snapshot capture mistook a completed folder tombstone for
+  an in-progress deletion. Both were corrected and regression-tested. The full
+  offline Node 24 suite now passes 170/170.
 - Local Node 24 fixture tests exercise CAS, independent-note writes, share
   revocation, chunk hashes, Code Inbox share guards, bounded/resumable folder
   deletion, and snapshot/restore including history, revision, shares and

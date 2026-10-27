@@ -40,6 +40,18 @@ transaction retry behavior become verified only after the runner returns
 `PASS`; no project/database provisioning or billing change is part of this test.
 For the separate Vercel identity setup, see [FIRESTORE-NATIVE.md](FIRESTORE-NATIVE.md).
 
+## NAS result — 2026-10-27
+
+The prepared runner completed against the project's `(default)` Firestore
+database with `PASS`. All listed repository operations passed. It used random
+synthetic vault IDs and removed both roots; an independent read confirmed that
+neither root remained. One-run timings are recorded in `FIRESTORE-NATIVE.md`;
+they include network/API overhead and are not a performance benchmark. The first
+cloud attempts caught and led to fixes for new-folder first-save timestamp
+initialization and backup handling of deleted-folder tombstones. The final full
+offline suite passed 170/170. No production Notes data, Koofr writes, billing
+settings, or Vercel deployment were involved.
+
 Official references:
 
 - [Google Cloud CLI Linux Arm installation and checksum](https://docs.cloud.google.com/sdk/docs/install-sdk)

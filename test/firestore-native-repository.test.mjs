@@ -95,6 +95,14 @@ test('independent note creates can commit concurrently without a catalog documen
  assert.equal(db.rows.get(`notesVaults/test-vault/notes/${rid(2)}`).data.currentRevision,1);
 });
 
+test('first save creates a previously unseen folder with its metadata timestamp',async()=>{
+ const db=new FakeFirestore(),repo=await setup(db),id=rid(3);
+ const saved=await repo.save(id,{...note('folder test'),folder:'First Save Folder'},null,rid(103));
+ assert.equal(saved.revision,'0000000000000001:1');
+ const folder=db.rows.get(`notesVaults/test-vault/folders/${createHash('sha256').update('First Save Folder').digest('hex').slice(0,40)}`);
+ assert.equal(folder.data.state,'active');assert.equal(typeof folder.data.createdAt,'string');
+});
+
 test('same-note writes from one base revision are compare-and-swap, not last-writer-wins',async()=>{
  const db=new FakeFirestore(),repo=await setup(db),id=rid(6);
  await repo.save(id,note(),null,rid(109));
@@ -158,6 +166,7 @@ test('folder deletion is resumable in bounded transactions and preserves notes i
  const db=new FakeFirestore(),repo=await setup(db),id=rid(15);await repo.save(id,note(),null,rid(115));
  const result=await repo.deleteFolder('Inbox');assert.equal(result.deleted,true);assert.equal(result.notesAffected,1);
  const read=await repo.read(id);assert.equal(read.folder,'');assert.equal(read.text,'hello');
+ const backup=await repo.exportLegacySnapshot();assert.deepEqual(Object.keys(backup.data.catalog.folders),[]);
  assert.equal((await repo.deleteFolder('Inbox')).replay,true);
  await repo.createFolder('Inbox');const second=await repo.deleteFolder('Inbox');assert.equal(second.deleted,true);assert.equal(second.replay,undefined);
 });
