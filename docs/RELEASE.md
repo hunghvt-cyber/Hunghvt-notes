@@ -13,7 +13,7 @@
 
 Các cập nhật sau mốc `9f504aa`: [dấu chia sẻ/thao tác thư mục](FOLDER-SHARE-CONTROLS-20261020.md),
 [copy lại link](SHARE-LINK-COPY-20261020.md), UX copy/thu hồi ở PR #12,
-ẩn link Homepage trong shared view ở [PR #13](https://github.com/hunghvt-cyber/Hunghvt-notes/pull/13).
+ẩn link Homepage trong shared view ở [PR #13](https://github.com/hunghvt-cyber/web-notes/pull/13).
 Xem từng hồ sơ để biết CI fixture và smoke có giới hạn; không áp số test cũ cho source mới.
 Koofr vẫn là nguồn thật, IndexedDB giữ nháp; không fallback Blob/NAS hoặc tự phục hồi
 bằng cache. Đọc [AGENTS](../AGENTS.md) trước bảo trì.
@@ -30,7 +30,7 @@ Không chạy lại provision, migration hoặc rollback Blob theo các bước 
 | Mục | Giá trị |
 | --- | --- |
 | URL | https://hunghvt-notes.vercel.app/ |
-| Repository / nhánh | hunghvt-cyber/Hunghvt-notes / `release/minimal-notes` |
+| Repository / nhánh | hunghvt-cyber/web-notes / `release/minimal-notes` |
 | Source production | `9f504aa7266b2930f8fa233da7ad619bf7e8e13e` |
 | Deployment | `dpl_Ekqfjjmry38BQvYkGWw2BH5MnS6U` — READY |
 | Project | `hunghvt-notes` — `prj_c4sEp6nB4msWTsPiGoALSuVutVTK` |
@@ -153,8 +153,8 @@ NOTES_DATA_NAMESPACE. Không thay file catalog production bằng thao tác PUT t
 ## Gate phát hành
 
 Bằng chứng đã có ngày 18/10/2026: 90/90 unit/integration tests pass; 6/6 Chromium
-scenarios pass tại [run 39057457895](https://github.com/hunghvt-cyber/Hunghvt-notes/actions/runs/39057457895).
-Kho mới được khởi tạo thật tại [run 39057321414](https://github.com/hunghvt-cyber/Hunghvt-notes/actions/runs/39057321414),
+scenarios pass tại [run 39057457895](https://github.com/hunghvt-cyber/web-notes/actions/runs/39057457895).
+Kho mới được khởi tạo thật tại [run 39057321414](https://github.com/hunghvt-cyber/web-notes/actions/runs/39057321414),
 count 0, không migration dữ liệu cũ. JSON kết quả đã chọn lọc tại docs/results.
 
 Deployment đầu project riêng được Vercel gán target production:
