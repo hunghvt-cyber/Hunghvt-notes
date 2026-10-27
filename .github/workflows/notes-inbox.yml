@@ -1,0 +1,24 @@
+name: Notes authenticated code inbox
+on:
+  push:
+    branches: [release/minimal-notes]
+    paths: [.notes-inbox/request.json]
+permissions:
+  contents: read
+concurrency:
+  group: notes-code-inbox
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+          ref: ${{ github.sha }}
+      - name: Publish encrypted request using short-lived identity
+        run: node scripts/publish-inbox.mjs

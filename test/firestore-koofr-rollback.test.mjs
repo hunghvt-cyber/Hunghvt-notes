@@ -1,0 +1,32 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {randomUUID} from 'node:crypto';
+import {createFirestoreKoofrRollbackHandler} from '../lib/firestore-koofr-rollback.mjs';
+import {backend} from './helpers/collection.mjs';
+import {exportKoofrSnapshotReadOnly} from '../scripts/koofr-readonly-snapshot.mjs';
+import {compareSnapshots,inspectSnapshot} from '../lib/firestore-migration.mjs';
+import {hash} from '../lib/storage.mjs';
+import {rollbackSnapshotIntoExisting} from '../lib/store-backup.mjs';
+
+test('rollback route is disabled by default and preserves current Firestore snapshot behind freeze and exact-baseline guards',async()=>{
+ const namespace='Hunghvt-Notes-Data-'+randomUUID(),targetBackend=backend(),koofr=targetBackend.makeStore({origin:'https://dav.example',user:'synthetic',password:'synthetic',namespace});
+ await koofr.init();await koofr.seedBatch(0,1);const share=await koofr.share('note','00000000-0000-4000-8000-000000000000','view',undefined,{protectToken:()=> 'fixture-token-box'});
+ const baseline=await koofr.readCatalog(),baselineHash=hash(JSON.stringify(baseline)),firestoreBackend=backend();
+ for(const [key,value] of targetBackend.files)firestoreBackend.files.set(key,value);
+ const firestoreStore=firestoreBackend.makeStore({origin:'https://dav.example',user:'synthetic',password:'synthetic',namespace});
+ const old=await firestoreStore.get('00000000-0000-4000-8000-000000000000');await firestoreStore.save(0,{text:'post-cutover edit'},old.revision,randomUUID());
+ const current=JSON.parse((await exportKoofrSnapshotReadOnly(firestoreStore)).encoded);
+ const env={VERCEL_ENV:'production',NOTES_MIGRATION_ROLLBACK_ENABLED:'restore-firestore-to-koofr-v1',NOTES_WRITES_FROZEN:'true',NOTES_BACKEND:'firestore-native-v1',NOTES_BASE_URL:'https://notes.example',KOOFR_NOTES_USER:'synthetic',KOOFR_NOTES_APP_PASSWORD:'synthetic',NOTES_DATA_NAMESPACE:namespace};
+ let calls=0;
+ const handler=createFirestoreKoofrRollbackHandler({env:()=>env,config:()=>({origin:'https://notes.example',namespace,projectId:'notes-lab-56f0f',vaultId:'notes-production'}),makeFirestoreStore:async()=>({exportLegacySnapshot:async()=>current,close:async()=>{}}),makeKoofrStore:()=>koofr,rollback:async(...args)=>{calls++;return rollbackSnapshotIntoExisting(...args);},exportKoofr:exportKoofrSnapshotReadOnly,compare:compareSnapshots});
+ const disabled=createFirestoreKoofrRollbackHandler({env:()=>({...env,NOTES_MIGRATION_ROLLBACK_ENABLED:undefined}),makeFirestoreStore:()=>{throw Error('disabled route constructed store');}});
+ assert.equal((await disabled(new Request('https://stage.vercel.app/api/migration-rollback',{method:'POST'}))).status,404);
+ const body={action:'restore-current-firestore-to-original-koofr',namespace,expectedCatalogSha256:baselineHash};
+ const req=()=>new Request('https://stage.vercel.app/api/migration-rollback',{method:'POST',headers:{origin:'https://notes.example','content-type':'application/json'},body:JSON.stringify(body)});
+ const result=await handler(req());assert.equal(result.status,200);const report=await result.json();assert.equal(report.result,'ROLLBACK_VERIFIED');assert.equal(report.counts.notes,1);assert.equal(calls,1);
+ assert.equal((await koofr.get('00000000-0000-4000-8000-000000000000')).text,'post-cutover edit');assert.equal((await koofr.readCatalog()).shares[share.id].tokenBox,'fixture-token-box');
+ env.NOTES_WRITES_FROZEN='false';assert.equal((await handler(req())).status,503);assert.equal(calls,1);
+ env.NOTES_WRITES_FROZEN='true';const bad=new Request('https://stage.vercel.app/api/migration-rollback',{method:'POST',headers:{origin:'https://notes.example','content-type':'application/json'},body:JSON.stringify({...body,expectedCatalogSha256:'0'.repeat(64)})});
+ const stale=await handler(bad),staleBody=await stale.json();assert.equal(stale.status,409,JSON.stringify(staleBody));assert.equal(staleBody.code,'ROLLBACK_BASELINE_CHANGED');assert.equal(calls,2);
+ const verified=JSON.parse((await exportKoofrSnapshotReadOnly(koofr)).encoded);assert.equal(compareSnapshots(current,verified).match,true);assert.equal(inspectSnapshot(verified).counts.notes,1);
+});

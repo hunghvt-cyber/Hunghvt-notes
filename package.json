@@ -1,0 +1,27 @@
+{
+  "name": "hunghvt-notes",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "24.x"
+  },
+  "scripts": {
+    "test": "node scripts/test-offline.mjs",
+    "test:offline": "node scripts/test-offline.mjs",
+    "test:browser": "node scripts/browser-smoke.mjs",
+    "test:load": "node scripts/retry-load.mjs",
+    "test:firestore:emulator": "node scripts/firestore-emulator-smoke.mjs",
+    "test:firestore:cloud": "node scripts/firestore-cloud-smoke.mjs",
+    "firestore:migrate": "node scripts/firestore-migration.mjs",
+    "firestore:backup": "node scripts/firestore-backup-action.mjs"
+  },
+  "dependencies": {
+    "@google-cloud/firestore": "9.4.0",
+    "@vercel/oidc": "^4.0.4",
+    "google-auth-library": "^11.3.1",
+    "iron-session": "8.0.4"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.62.1"
+  }
+}

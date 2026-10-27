@@ -47,7 +47,7 @@ fail on a clean checkout. Neither file was repaired by deleting marker lines.
 Recovered the complete source from the local file used for the successful smoke,
 including the two real-smoke fixes. Restored the complete lockfile from the
 verified local tree. The repaired remote candidate is
-[`082824c`](https://github.com/hunghvt-cyber/Hunghvt-notes/commit/082824c51f305a9c94ecdea6aafb9a479a4ccf5e)
+[`082824c`](https://github.com/hunghvt-cyber/web-notes/commit/082824c51f305a9c94ecdea6aafb9a479a4ccf5e)
 on the same isolated branch. Its tree equals the tested local candidate tree.
 
 Verification was run from a fresh detached checkout of that exact commit using

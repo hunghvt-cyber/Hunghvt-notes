@@ -1,0 +1,2713 @@
+{
+  "kind": "SIMULATED_RETRY_LOAD_NOT_KOOFR_OR_VERCEL_BENCHMARK",
+  "policy": {
+    "GET": "actual apiClient: initial + 3 retries with seeded jitter",
+    "POST": "actual SyncDraft; app.js wrapper: initial + 3 exact retries after 4/8/16 seconds; terminal errors stop",
+    "patient": "--patient adds actual patientRetry to GET and SyncDraft delivery: up to 32 attempts within a 120s retry window with seeded jitter",
+    "clock": "virtual, fixed per-WebDAV-call delay; no real RTT/throughput/CPU/bandwidth/browser rendering model",
+    "sessions": "pre-opened editor sessions; 50 reader/10 editor tasks per round; synchronized or seeded 10s arrival spread; rounds are barrier-separated waves; later waves manually retry retained drafts with a fresh retry budget, not automatic continuous arrivals",
+    "vault": "in-memory DraftVault substitute; IndexedDB/browser behavior covered separately by browser CI"
+  },
+  "results": [
+    {
+      "kind": "VIRTUAL_TIME_FAKE_WEBDAV_NOT_LIVE_CAPACITY",
+      "rttMs": 20,
+      "sameNote": false,
+      "rounds": 1,
+      "seed": 219,
+      "arrivalSpreadMs": 0,
+      "patient": false,
+      "readers": 50,
+      "editors": 10,
+      "readerMix": "25 list + 25 content opens",
+      "virtualDurationMs": 28240,
+      "roles": {
+        "edit": {
+          "operations": 10,
+          "outcomes": {
+            "success": 3,
+            "busy": 7
+          },
+          "attempts": 37,
+          "successfulLatencyVirtualMs": {
+            "p50": 12220,
+            "p95": 28240
+          },
+          "allOutcomesP95VirtualMs": 28240
+        },
+        "list": {
+          "operations": 25,
+          "outcomes": {
+            "success": 19,
+            "busy": 6
+          },
+          "attempts": 79,
+          "successfulLatencyVirtualMs": {
+            "p50": 3185,
+            "p95": 5866
+          },
+          "allOutcomesP95VirtualMs": 5790
+        },
+        "open": {
+          "operations": 25,
+          "outcomes": {
+            "success": 4,
+            "busy": 21
+          },
+          "attempts": 97,
+          "successfulLatencyVirtualMs": {
+            "p50": 3661,
+            "p95": 5713
+          },
+          "allOutcomesP95VirtualMs": 5713
+        }
+      },
+      "perRound": [
+        {
+          "round": 0,
+          "edit": {
+            "operations": 10,
+            "outcomes": {
+              "success": 3,
+              "busy": 7
+            },
+            "attempts": 37,
+            "successfulLatencyVirtualMs": {
+              "p50": 12220,
+              "p95": 28240
+            },
+            "allOutcomesP95VirtualMs": 28240
+          },
+          "read": {
+            "operations": 50,
+            "outcomes": {
+              "success": 23,
+              "busy": 27
+            },
+            "attempts": 176,
+            "successfulLatencyVirtualMs": {
+              "p50": 3243,
+              "p95": 5790
+            },
+            "allOutcomesP95VirtualMs": 5767
+          }
+        }
+      ],
+      "http": {
+        "attempts": 213,
+        "statuses": {
+          "200": 26,
+          "423": 187
+        },
+        "lostAcknowledgements": 0
+      },
+      "webdav": {
+        "requests": 371,
+        "lockAttempts": 235
+      },
+      "final": {
+        "savedDrafts": 3,
+        "retainedDrafts": 7,
+        "conflicts": 0,
+        "acknowledgementsVerified": 3,
+        "uniqueCommittedOperations": 3,
+        "replayAcknowledgements": 0,
+        "uniqueFrozenOperations": 10
+      },
+      "retryWaits": {
+        "GET": 126,
+        "POST": [
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000
+        ]
+      },
+      "safety": "exact retry payloads, final acknowledged heads and retained drafts verified"
+    },
+    {
+      "kind": "VIRTUAL_TIME_FAKE_WEBDAV_NOT_LIVE_CAPACITY",
+      "rttMs": 20,
+      "sameNote": true,
+      "rounds": 1,
+      "seed": 219,
+      "arrivalSpreadMs": 0,
+      "patient": false,
+      "readers": 50,
+      "editors": 10,
+      "readerMix": "25 list + 25 content opens",
+      "virtualDurationMs": 28120,
+      "roles": {
+        "edit": {
+          "operations": 10,
+          "outcomes": {
+            "success": 1,
+            "conflict": 2,
+            "busy": 7
+          },
+          "attempts": 37,
+          "successfulLatencyVirtualMs": {
+            "p50": 4200,
+            "p95": 4200
+          },
+          "allOutcomesP95VirtualMs": 28120
+        },
+        "list": {
+          "operations": 25,
+          "outcomes": {
+            "success": 19,
+            "busy": 6
+          },
+          "attempts": 79,
+          "successfulLatencyVirtualMs": {
+            "p50": 3185,
+            "p95": 5866
+          },
+          "allOutcomesP95VirtualMs": 5790
+        },
+        "open": {
+          "operations": 25,
+          "outcomes": {
+            "success": 4,
+            "busy": 21
+          },
+          "attempts": 97,
+          "successfulLatencyVirtualMs": {
+            "p50": 3661,
+            "p95": 5713
+          },
+          "allOutcomesP95VirtualMs": 5713
+        }
+      },
+      "perRound": [
+        {
+          "round": 0,
+          "edit": {
+            "operations": 10,
+            "outcomes": {
+              "success": 1,
+              "conflict": 2,
+              "busy": 7
+            },
+            "attempts": 37,
+            "successfulLatencyVirtualMs": {
+              "p50": 4200,
+              "p95": 4200
+            },
+            "allOutcomesP95VirtualMs": 28120
+          },
+          "read": {
+            "operations": 50,
+            "outcomes": {
+              "success": 23,
+              "busy": 27
+            },
+            "attempts": 176,
+            "successfulLatencyVirtualMs": {
+              "p50": 3243,
+              "p95": 5790
+            },
+            "allOutcomesP95VirtualMs": 5767
+          }
+        }
+      ],
+      "http": {
+        "attempts": 213,
+        "statuses": {
+          "200": 24,
+          "409": 2,
+          "423": 187
+        },
+        "lostAcknowledgements": 0
+      },
+      "webdav": {
+        "requests": 359,
+        "lockAttempts": 235
+      },
+      "final": {
+        "savedDrafts": 1,
+        "retainedDrafts": 9,
+        "conflicts": 2,
+        "acknowledgementsVerified": 1,
+        "uniqueCommittedOperations": 1,
+        "replayAcknowledgements": 0,
+        "uniqueFrozenOperations": 10
+      },
+      "retryWaits": {
+        "GET": 126,
+        "POST": [
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000
+        ]
+      },
+      "safety": "exact retry payloads, final acknowledged heads and retained drafts verified"
+    },
+    {
+      "kind": "VIRTUAL_TIME_FAKE_WEBDAV_NOT_LIVE_CAPACITY",
+      "rttMs": 80,
+      "sameNote": false,
+      "rounds": 1,
+      "seed": 219,
+      "arrivalSpreadMs": 0,
+      "patient": false,
+      "readers": 50,
+      "editors": 10,
+      "readerMix": "25 list + 25 content opens",
+      "virtualDurationMs": 28960,
+      "roles": {
+        "edit": {
+          "operations": 10,
+          "outcomes": {
+            "success": 2,
+            "busy": 8
+          },
+          "attempts": 39,
+          "successfulLatencyVirtualMs": {
+            "p50": 12880,
+            "p95": 28960
+          },
+          "allOutcomesP95VirtualMs": 28960
+        },
+        "list": {
+          "operations": 25,
+          "outcomes": {
+            "success": 5,
+            "busy": 20
+          },
+          "attempts": 93,
+          "successfulLatencyVirtualMs": {
+            "p50": 3367,
+            "p95": 5261
+          },
+          "allOutcomesP95VirtualMs": 6066
+        },
+        "open": {
+          "operations": 25,
+          "outcomes": {
+            "success": 3,
+            "busy": 22
+          },
+          "attempts": 97,
+          "successfulLatencyVirtualMs": {
+            "p50": 4201,
+            "p95": 6521
+          },
+          "allOutcomesP95VirtualMs": 6153
+        }
+      },
+      "perRound": [
+        {
+          "round": 0,
+          "edit": {
+            "operations": 10,
+            "outcomes": {
+              "success": 2,
+              "busy": 8
+            },
+            "attempts": 39,
+            "successfulLatencyVirtualMs": {
+              "p50": 12880,
+              "p95": 28960
+            },
+            "allOutcomesP95VirtualMs": 28960
+          },
+          "read": {
+            "operations": 50,
+            "outcomes": {
+              "success": 8,
+              "busy": 42
+            },
+            "attempts": 190,
+            "successfulLatencyVirtualMs": {
+              "p50": 3367,
+              "p95": 6521
+            },
+            "allOutcomesP95VirtualMs": 6083
+          }
+        }
+      ],
+      "http": {
+        "attempts": 229,
+        "statuses": {
+          "200": 10,
+          "423": 219
+        },
+        "lostAcknowledgements": 0
+      },
+      "webdav": {
+        "requests": 305,
+        "lockAttempts": 240
+      },
+      "final": {
+        "savedDrafts": 2,
+        "retainedDrafts": 8,
+        "conflicts": 0,
+        "acknowledgementsVerified": 2,
+        "uniqueCommittedOperations": 2,
+        "replayAcknowledgements": 0,
+        "uniqueFrozenOperations": 10
+      },
+      "retryWaits": {
+        "GET": 140,
+        "POST": [
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000
+        ]
+      },
+      "safety": "exact retry payloads, final acknowledged heads and retained drafts verified"
+    },
+    {
+      "kind": "VIRTUAL_TIME_FAKE_WEBDAV_NOT_LIVE_CAPACITY",
+      "rttMs": 80,
+      "sameNote": true,
+      "rounds": 1,
+      "seed": 219,
+      "arrivalSpreadMs": 0,
+      "patient": false,
+      "readers": 50,
+      "editors": 10,
+      "readerMix": "25 list + 25 content opens",
+      "virtualDurationMs": 28480,
+      "roles": {
+        "edit": {
+          "operations": 10,
+          "outcomes": {
+            "success": 1,
+            "busy": 8,
+            "conflict": 1
+          },
+          "attempts": 39,
+          "successfulLatencyVirtualMs": {
+            "p50": 12880,
+            "p95": 12880
+          },
+          "allOutcomesP95VirtualMs": 28480
+        },
+        "list": {
+          "operations": 25,
+          "outcomes": {
+            "success": 5,
+            "busy": 20
+          },
+          "attempts": 93,
+          "successfulLatencyVirtualMs": {
+            "p50": 3367,
+            "p95": 5261
+          },
+          "allOutcomesP95VirtualMs": 6066
+        },
+        "open": {
+          "operations": 25,
+          "outcomes": {
+            "success": 3,
+            "busy": 22
+          },
+          "attempts": 97,
+          "successfulLatencyVirtualMs": {
+            "p50": 4201,
+            "p95": 6521
+          },
+          "allOutcomesP95VirtualMs": 6153
+        }
+      },
+      "perRound": [
+        {
+          "round": 0,
+          "edit": {
+            "operations": 10,
+            "outcomes": {
+              "success": 1,
+              "busy": 8,
+              "conflict": 1
+            },
+            "attempts": 39,
+            "successfulLatencyVirtualMs": {
+              "p50": 12880,
+              "p95": 12880
+            },
+            "allOutcomesP95VirtualMs": 28480
+          },
+          "read": {
+            "operations": 50,
+            "outcomes": {
+              "success": 8,
+              "busy": 42
+            },
+            "attempts": 190,
+            "successfulLatencyVirtualMs": {
+              "p50": 3367,
+              "p95": 6521
+            },
+            "allOutcomesP95VirtualMs": 6083
+          }
+        }
+      ],
+      "http": {
+        "attempts": 229,
+        "statuses": {
+          "200": 9,
+          "409": 1,
+          "423": 219
+        },
+        "lostAcknowledgements": 0
+      },
+      "webdav": {
+        "requests": 299,
+        "lockAttempts": 240
+      },
+      "final": {
+        "savedDrafts": 1,
+        "retainedDrafts": 9,
+        "conflicts": 1,
+        "acknowledgementsVerified": 1,
+        "uniqueCommittedOperations": 1,
+        "replayAcknowledgements": 0,
+        "uniqueFrozenOperations": 10
+      },
+      "retryWaits": {
+        "GET": 140,
+        "POST": [
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000
+        ]
+      },
+      "safety": "exact retry payloads, final acknowledged heads and retained drafts verified"
+    },
+    {
+      "kind": "VIRTUAL_TIME_FAKE_WEBDAV_NOT_LIVE_CAPACITY",
+      "rttMs": 200,
+      "sameNote": false,
+      "rounds": 1,
+      "seed": 219,
+      "arrivalSpreadMs": 0,
+      "patient": false,
+      "readers": 50,
+      "editors": 10,
+      "readerMix": "25 list + 25 content opens",
+      "virtualDurationMs": 30400,
+      "roles": {
+        "edit": {
+          "operations": 10,
+          "outcomes": {
+            "success": 2,
+            "busy": 8
+          },
+          "attempts": 39,
+          "successfulLatencyVirtualMs": {
+            "p50": 14200,
+            "p95": 30400
+          },
+          "allOutcomesP95VirtualMs": 30400
+        },
+        "list": {
+          "operations": 25,
+          "outcomes": {
+            "success": 3,
+            "busy": 22
+          },
+          "attempts": 97,
+          "successfulLatencyVirtualMs": {
+            "p50": 5981,
+            "p95": 6389
+          },
+          "allOutcomesP95VirtualMs": 6546
+        },
+        "open": {
+          "operations": 25,
+          "outcomes": {
+            "success": 3,
+            "busy": 22
+          },
+          "attempts": 97,
+          "successfulLatencyVirtualMs": {
+            "p50": 5281,
+            "p95": 7607
+          },
+          "allOutcomesP95VirtualMs": 6723
+        }
+      },
+      "perRound": [
+        {
+          "round": 0,
+          "edit": {
+            "operations": 10,
+            "outcomes": {
+              "success": 2,
+              "busy": 8
+            },
+            "attempts": 39,
+            "successfulLatencyVirtualMs": {
+              "p50": 14200,
+              "p95": 30400
+            },
+            "allOutcomesP95VirtualMs": 30400
+          },
+          "read": {
+            "operations": 50,
+            "outcomes": {
+              "success": 6,
+              "busy": 44
+            },
+            "attempts": 194,
+            "successfulLatencyVirtualMs": {
+              "p50": 5281,
+              "p95": 7607
+            },
+            "allOutcomesP95VirtualMs": 6688
+          }
+        }
+      ],
+      "http": {
+        "attempts": 233,
+        "statuses": {
+          "200": 8,
+          "423": 225
+        },
+        "lostAcknowledgements": 0
+      },
+      "webdav": {
+        "requests": 285,
+        "lockAttempts": 239
+      },
+      "final": {
+        "savedDrafts": 2,
+        "retainedDrafts": 8,
+        "conflicts": 0,
+        "acknowledgementsVerified": 2,
+        "uniqueCommittedOperations": 2,
+        "replayAcknowledgements": 0,
+        "uniqueFrozenOperations": 10
+      },
+      "retryWaits": {
+        "GET": 144,
+        "POST": [
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000
+        ]
+      },
+      "safety": "exact retry payloads, final acknowledged heads and retained drafts verified"
+    },
+    {
+      "kind": "VIRTUAL_TIME_FAKE_WEBDAV_NOT_LIVE_CAPACITY",
+      "rttMs": 200,
+      "sameNote": true,
+      "rounds": 1,
+      "seed": 219,
+      "arrivalSpreadMs": 0,
+      "patient": false,
+      "readers": 50,
+      "editors": 10,
+      "readerMix": "25 list + 25 content opens",
+      "virtualDurationMs": 29200,
+      "roles": {
+        "edit": {
+          "operations": 10,
+          "outcomes": {
+            "success": 1,
+            "busy": 8,
+            "conflict": 1
+          },
+          "attempts": 39,
+          "successfulLatencyVirtualMs": {
+            "p50": 14200,
+            "p95": 14200
+          },
+          "allOutcomesP95VirtualMs": 29200
+        },
+        "list": {
+          "operations": 25,
+          "outcomes": {
+            "success": 3,
+            "busy": 22
+          },
+          "attempts": 97,
+          "successfulLatencyVirtualMs": {
+            "p50": 5981,
+            "p95": 6389
+          },
+          "allOutcomesP95VirtualMs": 6546
+        },
+        "open": {
+          "operations": 25,
+          "outcomes": {
+            "success": 3,
+            "busy": 22
+          },
+          "attempts": 97,
+          "successfulLatencyVirtualMs": {
+            "p50": 5281,
+            "p95": 7607
+          },
+          "allOutcomesP95VirtualMs": 6723
+        }
+      },
+      "perRound": [
+        {
+          "round": 0,
+          "edit": {
+            "operations": 10,
+            "outcomes": {
+              "success": 1,
+              "busy": 8,
+              "conflict": 1
+            },
+            "attempts": 39,
+            "successfulLatencyVirtualMs": {
+              "p50": 14200,
+              "p95": 14200
+            },
+            "allOutcomesP95VirtualMs": 29200
+          },
+          "read": {
+            "operations": 50,
+            "outcomes": {
+              "success": 6,
+              "busy": 44
+            },
+            "attempts": 194,
+            "successfulLatencyVirtualMs": {
+              "p50": 5281,
+              "p95": 7607
+            },
+            "allOutcomesP95VirtualMs": 6688
+          }
+        }
+      ],
+      "http": {
+        "attempts": 233,
+        "statuses": {
+          "200": 7,
+          "409": 1,
+          "423": 225
+        },
+        "lostAcknowledgements": 0
+      },
+      "webdav": {
+        "requests": 279,
+        "lockAttempts": 239
+      },
+      "final": {
+        "savedDrafts": 1,
+        "retainedDrafts": 9,
+        "conflicts": 1,
+        "acknowledgementsVerified": 1,
+        "uniqueCommittedOperations": 1,
+        "replayAcknowledgements": 0,
+        "uniqueFrozenOperations": 10
+      },
+      "retryWaits": {
+        "GET": 144,
+        "POST": [
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000
+        ]
+      },
+      "safety": "exact retry payloads, final acknowledged heads and retained drafts verified"
+    },
+    {
+      "kind": "VIRTUAL_TIME_FAKE_WEBDAV_NOT_LIVE_CAPACITY",
+      "rttMs": 80,
+      "sameNote": false,
+      "rounds": 3,
+      "seed": 219,
+      "arrivalSpreadMs": 0,
+      "patient": false,
+      "readers": 50,
+      "editors": 10,
+      "readerMix": "25 list + 25 content opens",
+      "virtualDurationMs": 89120,
+      "roles": {
+        "edit": {
+          "operations": 30,
+          "outcomes": {
+            "busy": 22,
+            "success": 8
+          },
+          "attempts": 114,
+          "successfulLatencyVirtualMs": {
+            "p50": 12880,
+            "p95": 29200
+          },
+          "allOutcomesP95VirtualMs": 28960
+        },
+        "list": {
+          "operations": 75,
+          "outcomes": {
+            "success": 24,
+            "busy": 51
+          },
+          "attempts": 275,
+          "successfulLatencyVirtualMs": {
+            "p50": 3367,
+            "p95": 5896
+          },
+          "allOutcomesP95VirtualMs": 5992
+        },
+        "open": {
+          "operations": 75,
+          "outcomes": {
+            "success": 6,
+            "busy": 69
+          },
+          "attempts": 293,
+          "successfulLatencyVirtualMs": {
+            "p50": 2002,
+            "p95": 6521
+          },
+          "allOutcomesP95VirtualMs": 6027
+        }
+      },
+      "perRound": [
+        {
+          "round": 0,
+          "edit": {
+            "operations": 10,
+            "outcomes": {
+              "busy": 8,
+              "success": 2
+            },
+            "attempts": 40,
+            "successfulLatencyVirtualMs": {
+              "p50": 28960,
+              "p95": 29200
+            },
+            "allOutcomesP95VirtualMs": 29200
+          },
+          "read": {
+            "operations": 50,
+            "outcomes": {
+              "success": 8,
+              "busy": 42
+            },
+            "attempts": 190,
+            "successfulLatencyVirtualMs": {
+              "p50": 3367,
+              "p95": 6521
+            },
+            "allOutcomesP95VirtualMs": 6083
+          }
+        },
+        {
+          "round": 1,
+          "edit": {
+            "operations": 10,
+            "outcomes": {
+              "success": 3,
+              "busy": 7
+            },
+            "attempts": 37,
+            "successfulLatencyVirtualMs": {
+              "p50": 12880,
+              "p95": 28960
+            },
+            "allOutcomesP95VirtualMs": 28960
+          },
+          "read": {
+            "operations": 50,
+            "outcomes": {
+              "success": 12,
+              "busy": 38
+            },
+            "attempts": 188,
+            "successfulLatencyVirtualMs": {
+              "p50": 3333,
+              "p95": 6426
+            },
+            "allOutcomesP95VirtualMs": 5992
+          }
+        },
+        {
+          "round": 2,
+          "edit": {
+            "operations": 10,
+            "outcomes": {
+              "success": 3,
+              "busy": 7
+            },
+            "attempts": 37,
+            "successfulLatencyVirtualMs": {
+              "p50": 12880,
+              "p95": 28960
+            },
+            "allOutcomesP95VirtualMs": 28960
+          },
+          "read": {
+            "operations": 50,
+            "outcomes": {
+              "success": 10,
+              "busy": 40
+            },
+            "attempts": 190,
+            "successfulLatencyVirtualMs": {
+              "p50": 3332,
+              "p95": 6110
+            },
+            "allOutcomesP95VirtualMs": 5972
+          }
+        }
+      ],
+      "http": {
+        "attempts": 682,
+        "statuses": {
+          "200": 39,
+          "423": 643
+        },
+        "lostAcknowledgements": 1
+      },
+      "webdav": {
+        "requests": 889,
+        "lockAttempts": 702
+      },
+      "final": {
+        "savedDrafts": 3,
+        "retainedDrafts": 7,
+        "conflicts": 0,
+        "acknowledgementsVerified": 8,
+        "uniqueCommittedOperations": 8,
+        "replayAcknowledgements": 1,
+        "uniqueFrozenOperations": 15
+      },
+      "retryWaits": {
+        "GET": 418,
+        "POST": [
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000
+        ]
+      },
+      "safety": "exact retry payloads, final acknowledged heads and retained drafts verified"
+    },
+    {
+      "kind": "VIRTUAL_TIME_FAKE_WEBDAV_NOT_LIVE_CAPACITY",
+      "rttMs": 80,
+      "sameNote": false,
+      "rounds": 3,
+      "seed": 219,
+      "arrivalSpreadMs": 10000,
+      "patient": false,
+      "readers": 50,
+      "editors": 10,
+      "readerMix": "25 list + 25 content opens",
+      "virtualDurationMs": 105525,
+      "roles": {
+        "edit": {
+          "operations": 30,
+          "outcomes": {
+            "success": 27,
+            "busy": 3
+          },
+          "attempts": 79,
+          "successfulLatencyVirtualMs": {
+            "p50": 12880,
+            "p95": 28960
+          },
+          "allOutcomesP95VirtualMs": 28960
+        },
+        "list": {
+          "operations": 75,
+          "outcomes": {
+            "success": 57,
+            "busy": 18
+          },
+          "attempts": 182,
+          "successfulLatencyVirtualMs": {
+            "p50": 1339,
+            "p95": 5722
+          },
+          "allOutcomesP95VirtualMs": 5990
+        },
+        "open": {
+          "operations": 75,
+          "outcomes": {
+            "success": 15,
+            "busy": 60
+          },
+          "attempts": 280,
+          "successfulLatencyVirtualMs": {
+            "p50": 3555,
+            "p95": 6578
+          },
+          "allOutcomesP95VirtualMs": 6578
+        }
+      },
+      "perRound": [
+        {
+          "round": 0,
+          "edit": {
+            "operations": 10,
+            "outcomes": {
+              "success": 8,
+              "busy": 2
+            },
+            "attempts": 29,
+            "successfulLatencyVirtualMs": {
+              "p50": 12880,
+              "p95": 28960
+            },
+            "allOutcomesP95VirtualMs": 28960
+          },
+          "read": {
+            "operations": 50,
+            "outcomes": {
+              "success": 24,
+              "busy": 26
+            },
+            "attempts": 145,
+            "successfulLatencyVirtualMs": {
+              "p50": 240,
+              "p95": 6201
+            },
+            "allOutcomesP95VirtualMs": 6247
+          }
+        },
+        {
+          "round": 1,
+          "edit": {
+            "operations": 10,
+            "outcomes": {
+              "success": 9,
+              "busy": 1
+            },
+            "attempts": 26,
+            "successfulLatencyVirtualMs": {
+              "p50": 12480,
+              "p95": 28960
+            },
+            "allOutcomesP95VirtualMs": 28960
+          },
+          "read": {
+            "operations": 50,
+            "outcomes": {
+              "success": 25,
+              "busy": 25
+            },
+            "attempts": 156,
+            "successfulLatencyVirtualMs": {
+              "p50": 1759,
+              "p95": 6128
+            },
+            "allOutcomesP95VirtualMs": 6450
+          }
+        },
+        {
+          "round": 2,
+          "edit": {
+            "operations": 10,
+            "outcomes": {
+              "success": 10
+            },
+            "attempts": 24,
+            "successfulLatencyVirtualMs": {
+              "p50": 4800,
+              "p95": 28960
+            },
+            "allOutcomesP95VirtualMs": 28960
+          },
+          "read": {
+            "operations": 50,
+            "outcomes": {
+              "success": 23,
+              "busy": 27
+            },
+            "attempts": 161,
+            "successfulLatencyVirtualMs": {
+              "p50": 1556,
+              "p95": 5863
+            },
+            "allOutcomesP95VirtualMs": 6532
+          }
+        }
+      ],
+      "http": {
+        "attempts": 541,
+        "statuses": {
+          "200": 100,
+          "423": 441
+        },
+        "lostAcknowledgements": 1
+      },
+      "webdav": {
+        "requests": 1192,
+        "lockAttempts": 613
+      },
+      "final": {
+        "savedDrafts": 10,
+        "retainedDrafts": 0,
+        "conflicts": 0,
+        "acknowledgementsVerified": 27,
+        "uniqueCommittedOperations": 27,
+        "replayAcknowledgements": 1,
+        "uniqueFrozenOperations": 27
+      },
+      "retryWaits": {
+        "GET": 312,
+        "POST": [
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          8000,
+          8000,
+          8000,
+          8000,
+          4000,
+          4000,
+          8000,
+          4000,
+          8000,
+          8000,
+          16000,
+          16000,
+          16000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          8000,
+          4000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          16000,
+          16000,
+          4000,
+          4000,
+          4000,
+          4000,
+          8000,
+          8000,
+          8000,
+          4000,
+          4000,
+          4000,
+          16000,
+          8000,
+          8000,
+          16000
+        ]
+      },
+      "safety": "exact retry payloads, final acknowledged heads and retained drafts verified"
+    },
+    {
+      "kind": "VIRTUAL_TIME_FAKE_WEBDAV_NOT_LIVE_CAPACITY",
+      "rttMs": 80,
+      "sameNote": false,
+      "rounds": 1,
+      "seed": 220,
+      "arrivalSpreadMs": 0,
+      "patient": false,
+      "readers": 50,
+      "editors": 10,
+      "readerMix": "25 list + 25 content opens",
+      "virtualDurationMs": 28960,
+      "roles": {
+        "edit": {
+          "operations": 10,
+          "outcomes": {
+            "success": 3,
+            "busy": 7
+          },
+          "attempts": 37,
+          "successfulLatencyVirtualMs": {
+            "p50": 12880,
+            "p95": 28960
+          },
+          "allOutcomesP95VirtualMs": 28960
+        },
+        "list": {
+          "operations": 25,
+          "outcomes": {
+            "success": 9,
+            "busy": 16
+          },
+          "attempts": 92,
+          "successfulLatencyVirtualMs": {
+            "p50": 3825,
+            "p95": 6113
+          },
+          "allOutcomesP95VirtualMs": 6083
+        },
+        "open": {
+          "operations": 25,
+          "outcomes": {
+            "success": 2,
+            "busy": 23
+          },
+          "attempts": 98,
+          "successfulLatencyVirtualMs": {
+            "p50": 1980,
+            "p95": 6595
+          },
+          "allOutcomesP95VirtualMs": 6110
+        }
+      },
+      "perRound": [
+        {
+          "round": 0,
+          "edit": {
+            "operations": 10,
+            "outcomes": {
+              "success": 3,
+              "busy": 7
+            },
+            "attempts": 37,
+            "successfulLatencyVirtualMs": {
+              "p50": 12880,
+              "p95": 28960
+            },
+            "allOutcomesP95VirtualMs": 28960
+          },
+          "read": {
+            "operations": 50,
+            "outcomes": {
+              "success": 11,
+              "busy": 39
+            },
+            "attempts": 190,
+            "successfulLatencyVirtualMs": {
+              "p50": 3825,
+              "p95": 6595
+            },
+            "allOutcomesP95VirtualMs": 6110
+          }
+        }
+      ],
+      "http": {
+        "attempts": 227,
+        "statuses": {
+          "200": 14,
+          "423": 213
+        },
+        "lostAcknowledgements": 0
+      },
+      "webdav": {
+        "requests": 305,
+        "lockAttempts": 235
+      },
+      "final": {
+        "savedDrafts": 3,
+        "retainedDrafts": 7,
+        "conflicts": 0,
+        "acknowledgementsVerified": 3,
+        "uniqueCommittedOperations": 3,
+        "replayAcknowledgements": 0,
+        "uniqueFrozenOperations": 10
+      },
+      "retryWaits": {
+        "GET": 140,
+        "POST": [
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000
+        ]
+      },
+      "safety": "exact retry payloads, final acknowledged heads and retained drafts verified"
+    },
+    {
+      "kind": "VIRTUAL_TIME_FAKE_WEBDAV_NOT_LIVE_CAPACITY",
+      "rttMs": 80,
+      "sameNote": false,
+      "rounds": 1,
+      "seed": 221,
+      "arrivalSpreadMs": 0,
+      "patient": false,
+      "readers": 50,
+      "editors": 10,
+      "readerMix": "25 list + 25 content opens",
+      "virtualDurationMs": 28960,
+      "roles": {
+        "edit": {
+          "operations": 10,
+          "outcomes": {
+            "success": 3,
+            "busy": 7
+          },
+          "attempts": 37,
+          "successfulLatencyVirtualMs": {
+            "p50": 12880,
+            "p95": 28960
+          },
+          "allOutcomesP95VirtualMs": 28960
+        },
+        "list": {
+          "operations": 25,
+          "outcomes": {
+            "success": 7,
+            "busy": 18
+          },
+          "attempts": 93,
+          "successfulLatencyVirtualMs": {
+            "p50": 3634,
+            "p95": 5612
+          },
+          "allOutcomesP95VirtualMs": 5970
+        },
+        "open": {
+          "operations": 25,
+          "outcomes": {
+            "success": 3,
+            "busy": 22
+          },
+          "attempts": 97,
+          "successfulLatencyVirtualMs": {
+            "p50": 4117,
+            "p95": 6590
+          },
+          "allOutcomesP95VirtualMs": 6133
+        }
+      },
+      "perRound": [
+        {
+          "round": 0,
+          "edit": {
+            "operations": 10,
+            "outcomes": {
+              "success": 3,
+              "busy": 7
+            },
+            "attempts": 37,
+            "successfulLatencyVirtualMs": {
+              "p50": 12880,
+              "p95": 28960
+            },
+            "allOutcomesP95VirtualMs": 28960
+          },
+          "read": {
+            "operations": 50,
+            "outcomes": {
+              "success": 10,
+              "busy": 40
+            },
+            "attempts": 190,
+            "successfulLatencyVirtualMs": {
+              "p50": 3634,
+              "p95": 6590
+            },
+            "allOutcomesP95VirtualMs": 6133
+          }
+        }
+      ],
+      "http": {
+        "attempts": 227,
+        "statuses": {
+          "200": 13,
+          "423": 214
+        },
+        "lostAcknowledgements": 0
+      },
+      "webdav": {
+        "requests": 307,
+        "lockAttempts": 236
+      },
+      "final": {
+        "savedDrafts": 3,
+        "retainedDrafts": 7,
+        "conflicts": 0,
+        "acknowledgementsVerified": 3,
+        "uniqueCommittedOperations": 3,
+        "replayAcknowledgements": 0,
+        "uniqueFrozenOperations": 10
+      },
+      "retryWaits": {
+        "GET": 140,
+        "POST": [
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          4000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          8000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000,
+          16000
+        ]
+      },
+      "safety": "exact retry payloads, final acknowledged heads and retained drafts verified"
+    },
+    {
+      "kind": "VIRTUAL_TIME_FAKE_WEBDAV_NOT_LIVE_CAPACITY",
+      "rttMs": 20,
+      "sameNote": false,
+      "rounds": 1,
+      "seed": 219,
+      "arrivalSpreadMs": 0,
+      "patient": true,
+      "readers": 50,
+      "editors": 10,
+      "readerMix": "25 list + 25 content opens",
+      "virtualDurationMs": 20930,
+      "roles": {
+        "edit": {
+          "operations": 10,
+          "outcomes": {
+            "success": 10
+          },
+          "attempts": 28,
+          "successfulLatencyVirtualMs": {
+            "p50": 2062,
+            "p95": 13482
+          },
+          "allOutcomesP95VirtualMs": 13482
+        },
+        "list": {
+          "operations": 25,
+          "outcomes": {
+            "success": 25
+          },
+          "attempts": 79,
+          "successfulLatencyVirtualMs": {
+            "p50": 5885,
+            "p95": 17695
+          },
+          "allOutcomesP95VirtualMs": 17695
+        },
+        "open": {
+          "operations": 25,
+          "outcomes": {
+            "success": 25
+          },
+          "attempts": 86,
+          "successfulLatencyVirtualMs": {
+            "p50": 7175,
+            "p95": 16672
+          },
+          "allOutcomesP95VirtualMs": 16672
+        }
+      },
+      "perRound": [
+        {
+          "round": 0,
+          "edit": {
+            "operations": 10,
+            "outcomes": {
+              "success": 10
+            },
+            "attempts": 28,
+            "successfulLatencyVirtualMs": {
+              "p50": 2062,
+              "p95": 13482
+            },
+            "allOutcomesP95VirtualMs": 13482
+          },
+          "read": {
+            "operations": 50,
+            "outcomes": {
+              "success": 50
+            },
+            "attempts": 165,
+            "successfulLatencyVirtualMs": {
+              "p50": 6682,
+              "p95": 17695
+            },
+            "allOutcomesP95VirtualMs": 17695
+          }
+        }
+      ],
+      "http": {
+        "attempts": 193,
+        "statuses": {
+          "200": 60,
+          "423": 133
+        },
+        "lostAcknowledgements": 0
+      },
+      "webdav": {
+        "requests": 509,
+        "lockAttempts": 227
+      },
+      "final": {
+        "savedDrafts": 10,
+        "retainedDrafts": 0,
+        "conflicts": 0,
+        "acknowledgementsVerified": 10,
+        "uniqueCommittedOperations": 10,
+        "replayAcknowledgements": 0,
+        "uniqueFrozenOperations": 10
+      },
+      "retryWaits": {
+        "GET": 115,
+        "POST": [
+          1143,
+          1223,
+          1303,
+          1383,
+          1463,
+          1543,
+          1622,
+          1702,
+          1782,
+          1862,
+          3802,
+          2227,
+          5652,
+          2364,
+          5789,
+          5598,
+          5149,
+          6047
+        ]
+      },
+      "safety": "exact retry payloads, final acknowledged heads and retained drafts verified"
+    },
+    {
+      "kind": "VIRTUAL_TIME_FAKE_WEBDAV_NOT_LIVE_CAPACITY",
+      "rttMs": 80,
+      "sameNote": false,
+      "rounds": 1,
+      "seed": 219,
+      "arrivalSpreadMs": 0,
+      "patient": true,
+      "readers": 50,
+      "editors": 10,
+      "readerMix": "25 list + 25 content opens",
+      "virtualDurationMs": 47286,
+      "roles": {
+        "edit": {
+          "operations": 10,
+          "outcomes": {
+            "success": 10
+          },
+          "attempts": 46,
+          "successfulLatencyVirtualMs": {
+            "p50": 16598,
+            "p95": 32917
+          },
+          "allOutcomesP95VirtualMs": 32917
+        },
+        "list": {
+          "operations": 25,
+          "outcomes": {
+            "success": 25
+          },
+          "attempts": 114,
+          "successfulLatencyVirtualMs": {
+            "p50": 14343,
+            "p95": 31106
+          },
+          "allOutcomesP95VirtualMs": 31106
+        },
+        "open": {
+          "operations": 25,
+          "outcomes": {
+            "success": 25
+          },
+          "attempts": 147,
+          "successfulLatencyVirtualMs": {
+            "p50": 24280,
+            "p95": 40484
+          },
+          "allOutcomesP95VirtualMs": 40484
+        }
+      },
+      "perRound": [
+        {
+          "round": 0,
+          "edit": {
+            "operations": 10,
+            "outcomes": {
+              "success": 10
+            },
+            "attempts": 46,
+            "successfulLatencyVirtualMs": {
+              "p50": 16598,
+              "p95": 32917
+            },
+            "allOutcomesP95VirtualMs": 32917
+          },
+          "read": {
+            "operations": 50,
+            "outcomes": {
+              "success": 50
+            },
+            "attempts": 261,
+            "successfulLatencyVirtualMs": {
+              "p50": 18383,
+              "p95": 40484
+            },
+            "allOutcomesP95VirtualMs": 40484
+          }
+        }
+      ],
+      "http": {
+        "attempts": 307,
+        "statuses": {
+          "200": 60,
+          "423": 247
+        },
+        "lostAcknowledgements": 0
+      },
+      "webdav": {
+        "requests": 687,
+        "lockAttempts": 357
+      },
+      "final": {
+        "savedDrafts": 10,
+        "retainedDrafts": 0,
+        "conflicts": 0,
+        "acknowledgementsVerified": 10,
+        "uniqueCommittedOperations": 10,
+        "replayAcknowledgements": 0,
+        "uniqueFrozenOperations": 10
+      },
+      "retryWaits": {
+        "GET": 211,
+        "POST": [
+          1143,
+          1223,
+          1303,
+          1383,
+          1463,
+          1543,
+          1622,
+          1702,
+          1782,
+          1862,
+          2089,
+          3802,
+          5514,
+          2227,
+          5652,
+          2364,
+          4077,
+          5789,
+          2501,
+          9424,
+          5598,
+          1772,
+          5149,
+          6496,
+          9800,
+          9873,
+          6047,
+          2221,
+          5858,
+          6429,
+          8115,
+          2486,
+          6430,
+          9059,
+          7544,
+          6930
+        ]
+      },
+      "safety": "exact retry payloads, final acknowledged heads and retained drafts verified"
+    },
+    {
+      "kind": "VIRTUAL_TIME_FAKE_WEBDAV_NOT_LIVE_CAPACITY",
+      "rttMs": 200,
+      "sameNote": false,
+      "rounds": 1,
+      "seed": 219,
+      "arrivalSpreadMs": 0,
+      "patient": true,
+      "readers": 50,
+      "editors": 10,
+      "readerMix": "25 list + 25 content opens",
+      "virtualDurationMs": 121122,
+      "roles": {
+        "edit": {
+          "operations": 10,
+          "outcomes": {
+            "success": 10
+          },
+          "attempts": 76,
+          "successfulLatencyVirtualMs": {
+            "p50": 22004,
+            "p95": 65142
+          },
+          "allOutcomesP95VirtualMs": 65142
+        },
+        "list": {
+          "operations": 25,
+          "outcomes": {
+            "success": 25
+          },
+          "attempts": 159,
+          "successfulLatencyVirtualMs": {
+            "p50": 24549,
+            "p95": 57941
+          },
+          "allOutcomesP95VirtualMs": 57941
+        },
+        "open": {
+          "operations": 25,
+          "outcomes": {
+            "success": 21,
+            "busy": 4
+          },
+          "attempts": 419,
+          "successfulLatencyVirtualMs": {
+            "p50": 88696,
+            "p95": 116993
+          },
+          "allOutcomesP95VirtualMs": 120274
+        }
+      },
+      "perRound": [
+        {
+          "round": 0,
+          "edit": {
+            "operations": 10,
+            "outcomes": {
+              "success": 10
+            },
+            "attempts": 76,
+            "successfulLatencyVirtualMs": {
+              "p50": 22004,
+              "p95": 65142
+            },
+            "allOutcomesP95VirtualMs": 65142
+          },
+          "read": {
+            "operations": 50,
+            "outcomes": {
+              "success": 46,
+              "busy": 4
+            },
+            "attempts": 578,
+            "successfulLatencyVirtualMs": {
+              "p50": 48752,
+              "p95": 115580
+            },
+            "allOutcomesP95VirtualMs": 116993
+          }
+        }
+      ],
+      "http": {
+        "attempts": 654,
+        "statuses": {
+          "200": 56,
+          "423": 598
+        },
+        "lostAcknowledgements": 0
+      },
+      "webdav": {
+        "requests": 1274,
+        "lockAttempts": 766
+      },
+      "final": {
+        "savedDrafts": 10,
+        "retainedDrafts": 0,
+        "conflicts": 0,
+        "acknowledgementsVerified": 10,
+        "uniqueCommittedOperations": 10,
+        "replayAcknowledgements": 0,
+        "uniqueFrozenOperations": 10
+      },
+      "retryWaits": {
+        "GET": 528,
+        "POST": [
+          1143,
+          1223,
+          1303,
+          1383,
+          1463,
+          1543,
+          1622,
+          1702,
+          1782,
+          1862,
+          2089,
+          3802,
+          5514,
+          2227,
+          3939,
+          5652,
+          2364,
+          4077,
+          5789,
+          2501,
+          9424,
+          5598,
+          1772,
+          6945,
+          5149,
+          1323,
+          6496,
+          9800,
+          9873,
+          4172,
+          6047,
+          2221,
+          6429,
+          9230,
+          4743,
+          8115,
+          1915,
+          6988,
+          5316,
+          8501,
+          7544,
+          2687,
+          7442,
+          6290,
+          7186,
+          9616,
+          7314,
+          5333,
+          1475,
+          3332,
+          6495,
+          6903,
+          4030,
+          6546,
+          8947,
+          8181,
+          2971,
+          3221,
+          2195,
+          4602,
+          1024,
+          5979,
+          4488,
+          3513,
+          8306,
+          7981
+        ]
+      },
+      "safety": "exact retry payloads, final acknowledged heads and retained drafts verified"
+    },
+    {
+      "kind": "VIRTUAL_TIME_FAKE_WEBDAV_NOT_LIVE_CAPACITY",
+      "rttMs": 80,
+      "sameNote": true,
+      "rounds": 1,
+      "seed": 219,
+      "arrivalSpreadMs": 0,
+      "patient": true,
+      "readers": 50,
+      "editors": 10,
+      "readerMix": "25 list + 25 content opens",
+      "virtualDurationMs": 43183,
+      "roles": {
+        "edit": {
+          "operations": 10,
+          "outcomes": {
+            "success": 1,
+            "conflict": 9
+          },
+          "attempts": 48,
+          "successfulLatencyVirtualMs": {
+            "p50": 2263,
+            "p95": 2263
+          },
+          "allOutcomesP95VirtualMs": 41116
+        },
+        "list": {
+          "operations": 25,
+          "outcomes": {
+            "success": 25
+          },
+          "attempts": 106,
+          "successfulLatencyVirtualMs": {
+            "p50": 14343,
+            "p95": 28930
+          },
+          "allOutcomesP95VirtualMs": 28930
+        },
+        "open": {
+          "operations": 25,
+          "outcomes": {
+            "success": 25
+          },
+          "attempts": 138,
+          "successfulLatencyVirtualMs": {
+            "p50": 21294,
+            "p95": 39897
+          },
+          "allOutcomesP95VirtualMs": 39897
+        }
+      },
+      "perRound": [
+        {
+          "round": 0,
+          "edit": {
+            "operations": 10,
+            "outcomes": {
+              "success": 1,
+              "conflict": 9
+            },
+            "attempts": 48,
+            "successfulLatencyVirtualMs": {
+              "p50": 2263,
+              "p95": 2263
+            },
+            "allOutcomesP95VirtualMs": 41116
+          },
+          "read": {
+            "operations": 50,
+            "outcomes": {
+              "success": 50
+            },
+            "attempts": 244,
+            "successfulLatencyVirtualMs": {
+              "p50": 17129,
+              "p95": 36760
+            },
+            "allOutcomesP95VirtualMs": 36760
+          }
+        }
+      ],
+      "http": {
+        "attempts": 292,
+        "statuses": {
+          "200": 51,
+          "409": 9,
+          "423": 232
+        },
+        "lostAcknowledgements": 0
+      },
+      "webdav": {
+        "requests": 622,
+        "lockAttempts": 343
+      },
+      "final": {
+        "savedDrafts": 1,
+        "retainedDrafts": 9,
+        "conflicts": 9,
+        "acknowledgementsVerified": 1,
+        "uniqueCommittedOperations": 1,
+        "replayAcknowledgements": 0,
+        "uniqueFrozenOperations": 10
+      },
+      "retryWaits": {
+        "GET": 194,
+        "POST": [
+          1143,
+          1223,
+          1303,
+          1383,
+          1463,
+          1543,
+          1622,
+          1702,
+          1782,
+          1862,
+          2089,
+          3802,
+          5514,
+          2227,
+          5652,
+          2364,
+          4077,
+          5789,
+          2501,
+          9424,
+          5598,
+          1772,
+          5149,
+          6496,
+          9800,
+          9873,
+          6047,
+          2221,
+          5858,
+          6429,
+          8115,
+          6430,
+          7544,
+          2687,
+          7186,
+          9616,
+          3332,
+          6546
+        ]
+      },
+      "safety": "exact retry payloads, final acknowledged heads and retained drafts verified"
+    },
+    {
+      "kind": "VIRTUAL_TIME_FAKE_WEBDAV_NOT_LIVE_CAPACITY",
+      "rttMs": 80,
+      "sameNote": false,
+      "rounds": 3,
+      "seed": 219,
+      "arrivalSpreadMs": 10000,
+      "patient": true,
+      "readers": 50,
+      "editors": 10,
+      "readerMix": "25 list + 25 content opens",
+      "virtualDurationMs": 139270,
+      "roles": {
+        "edit": {
+          "operations": 30,
+          "outcomes": {
+            "success": 30
+          },
+          "attempts": 97,
+          "successfulLatencyVirtualMs": {
+            "p50": 3403,
+            "p95": 32951
+          },
+          "allOutcomesP95VirtualMs": 32951
+        },
+        "list": {
+          "operations": 75,
+          "outcomes": {
+            "success": 75
+          },
+          "attempts": 229,
+          "successfulLatencyVirtualMs": {
+            "p50": 4932,
+            "p95": 27109
+          },
+          "allOutcomesP95VirtualMs": 27109
+        },
+        "open": {
+          "operations": 75,
+          "outcomes": {
+            "success": 75
+          },
+          "attempts": 417,
+          "successfulLatencyVirtualMs": {
+            "p50": 21590,
+            "p95": 39531
+          },
+          "allOutcomesP95VirtualMs": 39531
+        }
+      },
+      "perRound": [
+        {
+          "round": 0,
+          "edit": {
+            "operations": 10,
+            "outcomes": {
+              "success": 10
+            },
+            "attempts": 35,
+            "successfulLatencyVirtualMs": {
+              "p50": 2103,
+              "p95": 40414
+            },
+            "allOutcomesP95VirtualMs": 40414
+          },
+          "read": {
+            "operations": 50,
+            "outcomes": {
+              "success": 50
+            },
+            "attempts": 213,
+            "successfulLatencyVirtualMs": {
+              "p50": 14736,
+              "p95": 33838
+            },
+            "allOutcomesP95VirtualMs": 33838
+          }
+        },
+        {
+          "round": 1,
+          "edit": {
+            "operations": 10,
+            "outcomes": {
+              "success": 10
+            },
+            "attempts": 28,
+            "successfulLatencyVirtualMs": {
+              "p50": 2502,
+              "p95": 29689
+            },
+            "allOutcomesP95VirtualMs": 29689
+          },
+          "read": {
+            "operations": 50,
+            "outcomes": {
+              "success": 50
+            },
+            "attempts": 225,
+            "successfulLatencyVirtualMs": {
+              "p50": 12410,
+              "p95": 39453
+            },
+            "allOutcomesP95VirtualMs": 39453
+          }
+        },
+        {
+          "round": 2,
+          "edit": {
+            "operations": 10,
+            "outcomes": {
+              "success": 10
+            },
+            "attempts": 34,
+            "successfulLatencyVirtualMs": {
+              "p50": 4588,
+              "p95": 32951
+            },
+            "allOutcomesP95VirtualMs": 32951
+          },
+          "read": {
+            "operations": 50,
+            "outcomes": {
+              "success": 50
+            },
+            "attempts": 208,
+            "successfulLatencyVirtualMs": {
+              "p50": 11107,
+              "p95": 38216
+            },
+            "allOutcomesP95VirtualMs": 38216
+          }
+        }
+      ],
+      "http": {
+        "attempts": 743,
+        "statuses": {
+          "200": 181,
+          "423": 562
+        },
+        "lostAcknowledgements": 1
+      },
+      "webdav": {
+        "requests": 1938,
+        "lockAttempts": 906
+      },
+      "final": {
+        "savedDrafts": 10,
+        "retainedDrafts": 0,
+        "conflicts": 0,
+        "acknowledgementsVerified": 30,
+        "uniqueCommittedOperations": 30,
+        "replayAcknowledgements": 1,
+        "uniqueFrozenOperations": 30
+      },
+      "retryWaits": {
+        "GET": 496,
+        "POST": [
+          1862,
+          1223,
+          1143,
+          3802,
+          1463,
+          2501,
+          3939,
+          5149,
+          1303,
+          1383,
+          1323,
+          1782,
+          2227,
+          4172,
+          5789,
+          5598,
+          9230,
+          3244,
+          5858,
+          6802,
+          3802,
+          6430,
+          1618,
+          8126,
+          8287,
+          1702,
+          1622,
+          2805,
+          2260,
+          1543,
+          2364,
+          2204,
+          4359,
+          2603,
+          5929,
+          1772,
+          5391,
+          9800,
+          4852,
+          7304,
+          5873,
+          6550,
+          7058,
+          1100,
+          3046,
+          2321,
+          1435,
+          5414,
+          5680,
+          3079,
+          5316,
+          2724,
+          2221,
+          2454,
+          4491,
+          1915,
+          1487,
+          3596,
+          5786,
+          6988,
+          7442,
+          6546,
+          6290,
+          3475,
+          5333,
+          1578,
+          4030
+        ]
+      },
+      "safety": "exact retry payloads, final acknowledged heads and retained drafts verified"
+    },
+    {
+      "kind": "VIRTUAL_TIME_FAKE_WEBDAV_NOT_LIVE_CAPACITY",
+      "rttMs": 80,
+      "sameNote": false,
+      "rounds": 1,
+      "seed": 220,
+      "arrivalSpreadMs": 0,
+      "patient": true,
+      "readers": 50,
+      "editors": 10,
+      "readerMix": "25 list + 25 content opens",
+      "virtualDurationMs": 46561,
+      "roles": {
+        "edit": {
+          "operations": 10,
+          "outcomes": {
+            "success": 10
+          },
+          "attempts": 44,
+          "successfulLatencyVirtualMs": {
+            "p50": 8750,
+            "p95": 34274
+          },
+          "allOutcomesP95VirtualMs": 34274
+        },
+        "list": {
+          "operations": 25,
+          "outcomes": {
+            "success": 25
+          },
+          "attempts": 108,
+          "successfulLatencyVirtualMs": {
+            "p50": 13589,
+            "p95": 27780
+          },
+          "allOutcomesP95VirtualMs": 27780
+        },
+        "open": {
+          "operations": 25,
+          "outcomes": {
+            "success": 25
+          },
+          "attempts": 167,
+          "successfulLatencyVirtualMs": {
+            "p50": 28361,
+            "p95": 45049
+          },
+          "allOutcomesP95VirtualMs": 45049
+        }
+      },
+      "perRound": [
+        {
+          "round": 0,
+          "edit": {
+            "operations": 10,
+            "outcomes": {
+              "success": 10
+            },
+            "attempts": 44,
+            "successfulLatencyVirtualMs": {
+              "p50": 8750,
+              "p95": 34274
+            },
+            "allOutcomesP95VirtualMs": 34274
+          },
+          "read": {
+            "operations": 50,
+            "outcomes": {
+              "success": 50
+            },
+            "attempts": 275,
+            "successfulLatencyVirtualMs": {
+              "p50": 19861,
+              "p95": 39354
+            },
+            "allOutcomesP95VirtualMs": 39354
+          }
+        }
+      ],
+      "http": {
+        "attempts": 319,
+        "statuses": {
+          "200": 60,
+          "423": 259
+        },
+        "lostAcknowledgements": 0
+      },
+      "webdav": {
+        "requests": 699,
+        "lockAttempts": 369
+      },
+      "final": {
+        "savedDrafts": 10,
+        "retainedDrafts": 0,
+        "conflicts": 0,
+        "acknowledgementsVerified": 10,
+        "uniqueCommittedOperations": 10,
+        "replayAcknowledgements": 0,
+        "uniqueFrozenOperations": 10
+      },
+      "retryWaits": {
+        "GET": 225,
+        "POST": [
+          1144,
+          1224,
+          1304,
+          1384,
+          1464,
+          1543,
+          1623,
+          1703,
+          1783,
+          1863,
+          2543,
+          4255,
+          5968,
+          2680,
+          1105,
+          2818,
+          4530,
+          1243,
+          2955,
+          3210,
+          6587,
+          7934,
+          2311,
+          2819,
+          3659,
+          7036,
+          6057,
+          8448,
+          2249,
+          3986,
+          7877,
+          4019,
+          6614,
+          4275
+        ]
+      },
+      "safety": "exact retry payloads, final acknowledged heads and retained drafts verified"
+    },
+    {
+      "kind": "VIRTUAL_TIME_FAKE_WEBDAV_NOT_LIVE_CAPACITY",
+      "rttMs": 80,
+      "sameNote": false,
+      "rounds": 1,
+      "seed": 221,
+      "arrivalSpreadMs": 0,
+      "patient": true,
+      "readers": 50,
+      "editors": 10,
+      "readerMix": "25 list + 25 content opens",
+      "virtualDurationMs": 46014,
+      "roles": {
+        "edit": {
+          "operations": 10,
+          "outcomes": {
+            "success": 10
+          },
+          "attempts": 42,
+          "successfulLatencyVirtualMs": {
+            "p50": 9986,
+            "p95": 23406
+          },
+          "allOutcomesP95VirtualMs": 23406
+        },
+        "list": {
+          "operations": 25,
+          "outcomes": {
+            "success": 25
+          },
+          "attempts": 117,
+          "successfulLatencyVirtualMs": {
+            "p50": 13408,
+            "p95": 42273
+          },
+          "allOutcomesP95VirtualMs": 42273
+        },
+        "open": {
+          "operations": 25,
+          "outcomes": {
+            "success": 25
+          },
+          "attempts": 157,
+          "successfulLatencyVirtualMs": {
+            "p50": 25379,
+            "p95": 37639
+          },
+          "allOutcomesP95VirtualMs": 37639
+        }
+      },
+      "perRound": [
+        {
+          "round": 0,
+          "edit": {
+            "operations": 10,
+            "outcomes": {
+              "success": 10
+            },
+            "attempts": 42,
+            "successfulLatencyVirtualMs": {
+              "p50": 9986,
+              "p95": 23406
+            },
+            "allOutcomesP95VirtualMs": 23406
+          },
+          "read": {
+            "operations": 50,
+            "outcomes": {
+              "success": 50
+            },
+            "attempts": 274,
+            "successfulLatencyVirtualMs": {
+              "p50": 20086,
+              "p95": 41567
+            },
+            "allOutcomesP95VirtualMs": 41567
+          }
+        }
+      ],
+      "http": {
+        "attempts": 316,
+        "statuses": {
+          "200": 60,
+          "423": 256
+        },
+        "lostAcknowledgements": 0
+      },
+      "webdav": {
+        "requests": 672,
+        "lockAttempts": 360
+      },
+      "final": {
+        "savedDrafts": 10,
+        "retainedDrafts": 0,
+        "conflicts": 0,
+        "acknowledgementsVerified": 10,
+        "uniqueCommittedOperations": 10,
+        "replayAcknowledgements": 0,
+        "uniqueFrozenOperations": 10
+      },
+      "retryWaits": {
+        "GET": 224,
+        "POST": [
+          1145,
+          1225,
+          1305,
+          1385,
+          1464,
+          1544,
+          1624,
+          1704,
+          1784,
+          1864,
+          2997,
+          1421,
+          3134,
+          4846,
+          1559,
+          3271,
+          4984,
+          1696,
+          3408,
+          4198,
+          9372,
+          5546,
+          3749,
+          5096,
+          4647,
+          8210,
+          2582,
+          9984,
+          4838,
+          3153,
+          3055,
+          1749
+        ]
+      },
+      "safety": "exact retry payloads, final acknowledged heads and retained drafts verified"
+    }
+  ]
+}

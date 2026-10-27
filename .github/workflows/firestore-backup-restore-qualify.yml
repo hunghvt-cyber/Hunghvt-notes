@@ -1,0 +1,44 @@
+name: Firestore backup restore qualification
+
+on:
+  workflow_run:
+    workflows: [Firestore Notes backup to private Koofr]
+    types: [completed]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: firestore-notes-backup-restore-qualification
+  cancel-in-progress: false
+
+jobs:
+  restore:
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.head_repository.full_name == 'hunghvt-cyber/web-notes'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Authenticate with isolated-restore-only WIF
+        uses: google-github-actions/auth@ba79af03959ebeac9769e648f473a284504d9193 # v2.1.10
+        with:
+          workload_identity_provider: projects/989224849517/locations/global/workloadIdentityPools/notes-firestore-restore-gha/providers/github-manual-restore
+          service_account: notes-firestore-restore-gha@notes-lab-56f0f.iam.gserviceaccount.com
+          project_id: notes-lab-56f0f
+          create_credentials_file: true
+          cleanup_credentials: true
+      - name: Restore verified backup once to a run-scoped vault, compare and remove it
+        env:
+          GOOGLE_CLOUD_PROJECT: notes-lab-56f0f
+          NOTES_BACKUP_KOOFR_CREDENTIAL: ${{ secrets.NOTES_BACKUP_KOOFR_CREDENTIAL }}
+        run: node scripts/firestore-backup-restore-qualify.mjs

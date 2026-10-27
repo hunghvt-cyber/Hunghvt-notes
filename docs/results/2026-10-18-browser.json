@@ -1,0 +1,45 @@
+{
+  "kind": "REAL_CHROMIUM_WITH_SIMULATED_WEBDAV",
+  "runId": "39057457895",
+  "runUrl": "https://github.com/hunghvt-cyber/web-notes/actions/runs/39057457895",
+  "sourceSha": "50f8d991f51cbbae526701811ba8527af2b66433",
+  "passed": true,
+  "tests": [
+    {
+      "name": "ipad-grid-and-checklist",
+      "passed": true,
+      "ms": 1379
+    },
+    {
+      "name": "typing-during-save-keeps-latest-input",
+      "passed": true,
+      "ms": 1623
+    },
+    {
+      "name": "lost-response-reload-replays-one-operation",
+      "passed": true,
+      "ms": 1422
+    },
+    {
+      "name": "two-tabs-conflict-preserves-local-text",
+      "passed": true,
+      "ms": 871
+    },
+    {
+      "name": "offline-reload-recovers-indexeddb-draft",
+      "passed": true,
+      "ms": 376
+    },
+    {
+      "name": "view-only-share-disables-editor",
+      "passed": true,
+      "ms": 124
+    }
+  ],
+  "limits": [
+    "WebDAV simulated; no account credentials in browser tests.",
+    "1024x768 Chromium viewport, not physical iPad/Safari verification.",
+    "Offline test serves public app assets through test routing; it verifies IndexedDB data recovery, not a fully offline app-shell/service worker.",
+    "Production login, Koofr CRUD/share/backup smoke waits for Vercel runtime secrets."
+  ]
+}
