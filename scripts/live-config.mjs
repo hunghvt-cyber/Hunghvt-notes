@@ -7,6 +7,7 @@ export function diagnoseOidc(token){
  console.log(JSON.stringify({kind:'oidc-context-check',repository:c.repository===repo,repositoryId:String(c.repository_id)==='1423348828',ownerId:String(c.repository_owner_id)==='252749231',ref:c.ref===ref,subject:c.sub==='repo:hunghvt-cyber@252749231/Hunghvt-notes@1423348828:ref:'+ref,workflow:c.workflow_ref===repo+'/.github/workflows/notes-preview-qualify.yml@'+ref,event:c.event_name==='push',audience:c.aud==='homepage-koofr-synthetic-benchmark-v1',issuer:c.iss==='https://token.actions.githubusercontent.com',algorithm:h.alg==='RS256',lifetime:Number.isFinite(c.exp)&&Number.isFinite(c.iat)&&c.exp>now&&c.iat<=now+30&&c.iat>=now-600&&c.exp-c.iat<=600,run:String(c.run_id)===process.env.GITHUB_RUN_ID}));
 }
 export function credentials(env){
+ if(env.NOTES_OFFLINE_TESTS==='1')throw Error('LIVE_PROVIDER_DISABLED_IN_OFFLINE_TESTS');
  const user=env.KOOFR_WEBDAV_USER,password=env.KOOFR_WEBDAV_APP_PASSWORD;
  if(typeof user!=='string'||!user||user.length>300||/[:\r\n]/.test(user)||typeof password!=='string'||!password||/[\r\n]/.test(password))throw Error('ONE_TIME_SETUP_REQUIRED');
  return {user,password,source:'dedicated_webdav_secret'};

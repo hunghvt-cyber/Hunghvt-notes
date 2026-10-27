@@ -58,6 +58,39 @@ của dedicated lab khi thực sự cần mở API. Chọn chính xác namespace
 qualification chuẩn bị. Không thêm secrets vào Production hay repo. Header share
 Bearer chỉ dành cho capability của Note/folder, không phải credential Koofr.
 
+### Owner read experiment (chưa triển khai)
+
+Nhánh `codex/notes-owner-open-experiment-20261027` thêm telemetry metadata và
+biến thể owner-only `ownerReadVariant=single-lease-v1`. Mặc định là
+`two-snapshot-v1`; Preview cần bật `NOTES_OWNER_READ_EXPERIMENT=enabled` rõ ràng.
+Handler production từ chối selector này kể cả khi biến môi trường bị promote.
+Shared read không đọc selector và tiếp tục dùng hai snapshot.
+
+Chỉ dùng Vercel Preview trong dedicated lab project với biến
+`NOTES_PREVIEW_ENABLED=synthetic-only-v1`, `VERCEL_ENV=preview`, và
+`KOOFR_NOTES_NAMESPACE=Homepage-Notes-Vercel-Probe-<run>-<uuid>` mới. Namespace
+hiện để trống trong `.env.preview.example`; chưa tạo namespace hay file Koofr.
+Không nhập config này vào Production, Homepage, Home-AI hoặc app password backup.
+
+API observer chỉ ghi route/status/reference/phase duration; provider-auth calls
+add auth timing (operation, elapsed, whether provider call returned, numeric
+error status), while owner note-open requests add WebDAV sequence/label/method/status/
+elapsed/DNS/TCP/TLS/headers/body/reused-socket metadata. Không ghi URL, path,
+headers, body, response text, note ID, cookie hay raw error. Client wall time đo
+request/retry tổng; không cần trả chi tiết từng WebDAV call trong response.
+
+Preview dùng mật khẩu tổng hợp riêng và **không gọi Homepage auth**. Do đó nó
+không thể đo thời gian `passwordProvider.current()` thật. Code đo Homepage
+`version`/`verify` trong live handler đã có, nhưng muốn lấy số thật cần một nguồn
+Homepage-auth tổng hợp riêng được duyệt hoặc một lần triển khai telemetry production
+được cho phép sau review; không dùng service key Production trong Preview.
+
+Chưa đủ cấu hình để chạy phép đo thật: cần quyền deploy vào dedicated Vercel lab
+Preview và xác nhận project target; Preview-only session/password, Koofr WebDAV
+app credential riêng, cùng namespace synthetic mới được cấp khi bắt đầu thử.
+Không cần thay hoặc đọc credential Production/backup. Trước khi tạo dữ liệu
+Koofr, review lại thời gian tồn tại và cách dọn synthetic fixture.
+
 ## Backup, khôi phục và rollback
 
 Export snapshot chứa hash/source epoch; dưới giới hạn 2 MB. Giữ snapshot ở vị trí

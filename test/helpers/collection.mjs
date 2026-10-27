@@ -1,9 +1,10 @@
 import {NoteStore} from '../../lib/store.mjs';
 import {createDav} from '../../lib/storage.mjs';
-export function backend(){
+export function backend({requestDelayMs=0}={}){
  let clock=0,tokenCounter=0;const files=new Map(),folders=new Set(),locks=new Map(),requests=[];
  function held(path){for(const [root,l] of locks){if(l.until<=clock){locks.delete(root);continue;}if(path===root||path.startsWith(root))return l;}return null;}
  async function wire(url,options,{fault,onInjected=()=>{}}={}){
+  if(requestDelayMs>0)await new Promise(resolve=>setTimeout(resolve,requestDelayMs));
   if(fault==='before-send'){onInjected({phase:fault,requestBodySubmitted:false,socketDestroyed:true});throw Error('NETWORK_OR_TIMEOUT');}
   const path=new URL(url).pathname,method=options.method,l=held(path);requests.push({path,method});let r={status:500,text:''};
   if(method==='MKCOL'){r.status=folders.has(path)?405:201;folders.add(path);}

@@ -5,7 +5,7 @@ import {createServer} from 'node:http';
 import {Readable} from 'node:stream';
 import {backend} from './helpers/collection.mjs';
 import {NoteStore} from '../lib/store.mjs';
-import {createPreviewHandler} from '../lib/preview-api.mjs';
+import {createPreviewHandler,previewConfig} from '../lib/preview-api.mjs';
 function setup(){const b=backend(),namespace='Homepage-Notes-Vercel-Probe-123-'+randomUUID();const cfg={NOTES_PREVIEW_ENABLED:'synthetic-only-v1',VERCEL_ENV:'preview',PREVIEW_BASE_URL:'https://preview.example',PREVIEW_SESSION_PASSWORD:randomUUID()+randomUUID(),PREVIEW_PORTAL_PASSWORD:'synthetic-test-password',KOOFR_NOTES_USER:'fake',KOOFR_NOTES_APP_PASSWORD:'synthetic-secret',KOOFR_NOTES_NAMESPACE:namespace};const stores=[],logs=[];const makeStore=x=>{const s=new NoteStore(x,{makeDav:b.makeDav,wire:b.wire});stores.push(s);return s;};const handler=createPreviewHandler({env:()=>cfg,makeStore,observe:x=>logs.push(x)});return {b,cfg,logs,stores,makeStore,handler,async init(){await makeStore({user:'fake',password:'synthetic-secret',namespace}).init();}};}
 async function call(s,route,{method='GET',data,session,cap,origin='https://preview.example',query=''}={}){
  const r=await s.handler(new Request('https://preview.example/api/preview?route='+route+query,{method,headers:{...(method!=='GET'?{'Content-Type':'application/json',Origin:origin}:{}),...(session?{Cookie:session}:{}),...(cap?{Authorization:'Bearer '+cap}:{})},...(data!==undefined?{body:JSON.stringify(data)}:{})}));return {r,status:r.status,body:await r.json(),session:r.headers.get('set-cookie')?.split(';')[0]};
@@ -15,6 +15,9 @@ test('preview defaults closed, refuses production/project/namespace config; no s
  const s=setup();delete s.cfg.NOTES_PREVIEW_ENABLED;assert.equal((await call(s,'notes')).status,503);assert.equal((await call(s,'health')).body.configured,false);
  s.cfg.NOTES_PREVIEW_ENABLED='synthetic-only-v1';assert.equal((await call(s,'notes')).status,401);assert.equal(s.b.requests.length,0);
  s.cfg.VERCEL_ENV='production';assert.equal((await call(s,'notes')).status,503);s.cfg.VERCEL_ENV='preview';s.cfg.KOOFR_NOTES_NAMESPACE='real-notes';assert.equal((await call(s,'notes')).status,503);
+});
+test('owner read experiment config is explicit and Preview-only',()=>{
+ const s=setup();assert.equal(previewConfig(s.cfg).ownerReadExperiment,false);s.cfg.NOTES_OWNER_READ_EXPERIMENT='enabled';assert.equal(previewConfig(s.cfg).ownerReadExperiment,true);s.cfg.VERCEL_ENV='production';assert.throws(()=>previewConfig(s.cfg),/PREVIEW_DISABLED/);
 });
 test('session login, Origin/JSON checks, tamper, logout and password rotation keep owner API private',async()=>{
  const s=setup();await s.init();const session=await owner(s);assert.equal((await call(s,'notes',{session})).status,200);
@@ -89,6 +92,20 @@ test('cache identity is authenticated, stable, isolated by namespace/account/pas
  s.cfg.KOOFR_NOTES_USER='another-account';assert.notEqual((await call(s,'auth',{session})).body.cacheScope,one);
  s.cfg.KOOFR_NOTES_NAMESPACE='Homepage-Notes-Vercel-Probe-123-'+randomUUID();assert.equal((await call(s,'auth',{session})).body.cacheScope,undefined);
  s.cfg.PREVIEW_PORTAL_PASSWORD='rotated-synthetic-password';assert.equal((await call(s,'auth',{session})).body.cacheScope,undefined);
+});
+
+test('owner read experiment is opt-in preview-only, records metadata, and leaves share reads unchanged',async()=>{
+ const s=setup();await s.init();const session=await owner(s),marker='SYNTHETIC_PRIVATE_NOTE_MARKER';
+ const saved=await call(s,'notes-save',{method:'POST',session,data:{action:'save',clientOpId:randomUUID(),title:'Synthetic timing note',text:marker,checklist:[]}});assert.equal(saved.status,200);assert.equal(s.logs.at(-1).webdavCalls,undefined);
+ const current=await call(s,'notes',{session,query:'&id='+saved.body.id});assert.equal(current.status,200);assert.equal(s.stores.at(-1).transportCalls.length,7);
+ const log=s.logs.at(-1);assert.equal(log.ownerReadVariant,'two-snapshot-v1');assert.equal(log.webdavCalls.length,7);assert.ok(log.webdavCalls.every(c=>Number.isFinite(c.elapsedMs)&&typeof c.label==='string'&&typeof c.method==='string'));
+ assert.equal(JSON.stringify(s.logs).includes(marker),false);assert.equal(JSON.stringify(s.logs).includes(s.cfg.KOOFR_NOTES_APP_PASSWORD),false);
+ const disabled=await call(s,'notes',{session,query:'&id='+saved.body.id+'&ownerReadVariant=single-lease-v1'});assert.equal(disabled.status,404);
+ s.cfg.NOTES_OWNER_READ_EXPERIMENT='enabled';const candidate=await call(s,'notes',{session,query:'&id='+saved.body.id+'&ownerReadVariant=single-lease-v1'});assert.equal(candidate.status,200);assert.equal(candidate.body.text,marker);assert.equal(candidate.body.revision,current.body.revision);assert.equal(s.stores.at(-1).transportCalls.length,4);assert.equal(s.logs.at(-1).ownerReadVariant,'single-lease-v1');
+ const link=await call(s,'note-share',{method:'POST',session,data:{action:'create',noteId:saved.body.id,permission:'edit'}});assert.equal(link.status,200);
+ const shared=await call(s,'shared-note',{cap:link.body.token});assert.equal(shared.status,200);assert.equal(shared.body.text,marker);assert.equal(s.stores.at(-1).transportCalls.length,7);assert.equal(s.logs.at(-1).ownerReadVariant,undefined);
+ const live=createPreviewHandler({live:true,env:()=>s.cfg,config:()=>({...previewConfig(s.cfg),ownerReadExperiment:true}),makeStore:s.makeStore,observe:x=>s.logs.push(x)});
+ const blocked=await live(new Request('https://preview.example/api/app?route=notes&id='+saved.body.id+'&ownerReadVariant=single-lease-v1',{headers:{Cookie:session}}));assert.equal(blocked.status,404);
 });
 
 test('owner bootstrap reads notes and folders under exactly one lock',async()=>{

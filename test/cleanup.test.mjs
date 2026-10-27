@@ -24,9 +24,9 @@ test('cleanup deletes only the 39 exact roots and verifies untouched folder name
   if(opts.method==='PROPFIND'){lists++;return new Response(listing([liveRoot,'unrelated-synthetic-backup',...(lists===1?names:[])]),{status:207});}
   assert.equal(opts.method,'DELETE');const name=decodeURIComponent(new URL(url).pathname.slice('/dav/Koofr/'.length,-1));assert.ok(names.includes(name));deletes.push(name);return new Response(null,{status:204});
  };
- const report=await cleanup(env,request);assert.equal(report.verified,true);assert.equal(report.removed,39);assert.equal(report.trashPurgeCalled,false);assert.deepEqual(deletes,names);assert.equal(lists,2);
+ const report=await cleanup(env,request,{log:()=>{}});assert.equal(report.verified,true);assert.equal(report.removed,39);assert.equal(report.trashPurgeCalled,false);assert.deepEqual(deletes,names);assert.equal(lists,2);
 });
 test('missing production root or access denial stops cleanup',async()=>{
- let writes=0;await assert.rejects(cleanup(env,async(_u,o)=>{if(o.method==='DELETE')writes++;return new Response(listing(names),{status:207});}),/LIVE_ROOT_NOT_PRESENT/);assert.equal(writes,0);
- await assert.rejects(cleanup(env,async(_u,o)=>{if(o.method==='PROPFIND')return new Response(listing([liveRoot,...names]),{status:207});writes++;return new Response(null,{status:403});}),/DELETE_HTTP_403/);assert.equal(writes,1);
+ let writes=0;await assert.rejects(cleanup(env,async(_u,o)=>{if(o.method==='DELETE')writes++;return new Response(listing(names),{status:207});},{log:()=>{}}),/LIVE_ROOT_NOT_PRESENT/);assert.equal(writes,0);
+ await assert.rejects(cleanup(env,async(_u,o)=>{if(o.method==='PROPFIND')return new Response(listing([liveRoot,...names]),{status:207});writes++;return new Response(null,{status:403});},{log:()=>{}}),/DELETE_HTTP_403/);assert.equal(writes,1);
 });

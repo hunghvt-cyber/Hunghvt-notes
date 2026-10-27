@@ -1,5 +1,9 @@
 # Hunghvt Notes
 
+For the native Firestore prototype's isolated Cloud Shell smoke test, see
+[docs/FIRESTORE-CLOUD-SMOKE.md](docs/FIRESTORE-CLOUD-SMOKE.md). It requires an
+existing dedicated non-production project/database and does not enable billing.
+
 Ứng dụng ghi chú độc lập: **https://hunghvt-notes.vercel.app/**.
 Dữ liệu lưu trên **Koofr WebDAV**, ứng dụng chạy trên **Vercel**.
 Nhánh phát hành là **`release/minimal-notes`**, không tự suy đoán `main` là production.

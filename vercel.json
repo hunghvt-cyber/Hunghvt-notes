@@ -24,6 +24,11 @@
     "api/preview.js": {
       "maxDuration": 120
     }
+  },
+  "git": {
+    "deploymentEnabled": {
+      "codex/notes-firestore-cloudshell-20261027": false
+    }
   }
 }
 

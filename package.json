@@ -6,11 +6,15 @@
     "node": "24.x"
   },
   "scripts": {
-    "test": "node --test test/*.test.mjs",
+    "test": "node scripts/test-offline.mjs",
+    "test:offline": "node scripts/test-offline.mjs",
     "test:browser": "node scripts/browser-smoke.mjs",
-    "test:load": "node scripts/retry-load.mjs"
+    "test:load": "node scripts/retry-load.mjs",
+    "test:firestore:emulator": "node scripts/firestore-emulator-smoke.mjs",
+    "test:firestore:cloud": "node scripts/firestore-cloud-smoke.mjs"
   },
   "dependencies": {
+    "@google-cloud/firestore": "9.4.0",
     "iron-session": "8.0.4"
   },
   "devDependencies": {
