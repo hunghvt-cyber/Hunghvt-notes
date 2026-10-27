@@ -2,6 +2,9 @@
 
 ## Phạm vi và trạng thái
 
+Source và workflow trên `main` đã hợp nhất ở commit `7c3598a34691a7983e08208e55c97c34bf596f0c`, tree `035a07789aa235f0e1b79938688633c9c963984f`; CI [run 40601380216](https://github.com/hunghvt-cyber/web-notes/actions/runs/40601380216) là test/browser, không phải backup. Schedule `30 20 * * *` UTC đã ở default branch; chưa có manual/cron backup, Koofr readback hoặc restore qualification. WIF/IAM cần đọc lại theo repo canonical sau rename. Secret cần cho workflow là `NOTES_BACKUP_KOOFR_CREDENTIAL`; trạng thái tồn tại chưa được kiểm chứng.
+
+
 - Nguồn: `notes-lab-56f0f/(default)/notes-production`.
 - Đích riêng: thư mục WebDAV `Notes-Firestore-Backups` trong Koofr; không dùng namespace Notes Koofr cũ.
 - Lịch workflow `firestore-backup.yml`: 03:30 Asia/Ho_Chi_Minh mỗi ngày (`30 20 * * *` UTC), có `workflow_dispatch`.
