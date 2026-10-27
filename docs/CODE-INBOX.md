@@ -55,3 +55,8 @@ Theo yêu cầu gửi lại code sau khi lỡ xóa: status của hai slot manage
 Theo yêu cầu người dùng, code xuất Excel phải lưu vào note mới tên **Excel qua txt**, slot `excel-to-txt`. Không dùng lại `office-v2` hoặc `office-v2-config` cho nội dung khác mục đích. Người dùng yêu cầu không khôi phục note cũ; không chỉnh sửa các note cũ trong lần gửi này. Lần tạo mới dùng `revision:null` và phải dừng nếu xung đột, không tự lấy revision để ghi đè note có sẵn.
 
 Focused inbox fixture tests đạt 4/4; dependency iron-session không có ở local nên loader chỉ thay import session bằng hàm ném lỗi nếu được gọi; các test inbox không gọi session. Không coi là full suite hoặc live evidence. Kiểm tra mới xác minh note Excel có ID khác và giữ nguyên nội dung note Office, từ chối tạo lại với revision null.
+
+
+## Rename checkpoint — 28/10/2026
+
+The active `release/minimal-notes` source now uses the canonical `hunghvt-cyber/web-notes` repository and immutable OIDC subject; PR #18 merged as `8ce7d3300ef0515c861b7bf2c1e7a294d82648ad`, and CI run [40602314009](https://github.com/hunghvt-cyber/web-notes/actions/runs/40602314009) passed both jobs. The current Production deployment `dpl_SrEHLu6jv6tjTUEPR7F25sxdsFZ1` was inspected directly; its `lib/inbox.mjs`, `lib/oidc.mjs`, and `scripts/publish-inbox.mjs` still check the old repository name. New GitHub OIDC tokens use `web-notes`, so Code Inbox requests may be rejected until the current Firestore Production source is deployed with the canonical claims. This backup/source task did not deploy Vercel. Do not deploy the old `release/minimal-notes` application as a workaround; it is not the current Firestore Production source.

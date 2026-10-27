@@ -10,6 +10,7 @@ Theo báo cáo Codex NAS và hồ sơ cutover được chuyển về repo này:
 - 28 notes tại cutover: 6 active, 22 trash; 2 folder, 11 share, 24 receipt, 0 erased tombstone. Full parity fingerprint nằm trong [hồ sơ cutover](history/ai-nas-lab/notes-firestore-production-cutover-20261027.md).
 - Giữ namespace/session và auth Homepage; không dùng Blob hoặc Koofr làm backend ghi Notes mới. Chưa có bằng chứng người dùng xác nhận phiên trình duyệt thật, hoặc GitHub OIDC Code Inbox thật sau cutover.
 - Checkpoint Production vẫn là deployment `dpl_SrEHLu6jv6tjTUEPR7F25sxdsFZ1`; công việc backup không thay alias hoặc deployment.
+- Nhánh `release/minimal-notes` đã được cập nhật claim canonical ở PR #18 (`8ce7d3300ef0515c861b7bf2c1e7a294d82648ad`, CI `40602314009`). Tuy nhiên Vercel Production deployment `dpl_SrEHLu6jv6tjTUEPR7F25sxdsFZ1` vẫn chứa claim repo cũ trong Code Inbox. Token OIDC mới có tên repo `web-notes`, vì vậy Code Inbox có thể từ chối yêu cầu cho tới khi source Firestore hiện hành được phát hành riêng. Không deploy nhánh Koofr cũ; công việc này chưa deploy Production.
 
 ## Backup
 Người dùng đã duyệt backup GitHub Actions 03:30 VN → Koofr private, 14 daily + 8 weekly + 6 monthly. Xem [nhiệm vụ backup và cleanup đã duyệt](BACKUP-AND-LEGACY-CLEANUP-20261027.md).

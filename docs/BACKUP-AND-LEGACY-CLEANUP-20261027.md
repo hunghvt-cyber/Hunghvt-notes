@@ -78,3 +78,7 @@ Nguồn chính thức tham khảo: [Google WIF cho pipeline](https://docs.cloud.
 - OIDC source dùng claim `hunghvt-cyber/web-notes` và ID `1423348828`. Chưa đọc lại WIF provider condition/IAM binding sau rename; môi trường phiên này không có gcloud/ADC.
 - Chưa xác minh secret `NOTES_BACKUP_KOOFR_CREDENTIAL`; chưa có upload/readback/hash verification hoặc restore parity; chưa tạo/dọn vault thử.
 - Vercel metadata: alias chính `hunghvt-notes.vercel.app` → `dpl_SrEHLu6jv6tjTUEPR7F25sxdsFZ1` READY; alias phụ `hunghvt-notes-hunghvt.vercel.app` → legacy `dpl_7rdKgAjtDKryMVMApjyQHj2ZMY9B` / immutable URL `hunghvt-notes-de329dlyt-hunghvt.vercel.app`. Backend vẫn Firestore. Chưa đổi alias/xóa deployment/namespace. Giữ legacy vì chưa qua backup + restore gate; exact Koofr root phải được kiểm chứng trước khi xóa.
+
+## Code Inbox sau đổi tên repo — 28/10/2026
+
+Nhánh source `release/minimal-notes` đã đổi các claim repo sang `hunghvt-cyber/web-notes` trong PR #18; CI [run 40602314009](https://github.com/hunghvt-cyber/web-notes/actions/runs/40602314009) thành công. Metadata và source Vercel Production đã đọc lại: deployment `dpl_SrEHLu6jv6tjTUEPR7F25sxdsFZ1` còn tên repo cũ trong handler Code Inbox và OIDC helper. GitHub OIDC sau rename phát claim canonical nên endpoint hiện có thể từ chối Code Inbox. Chưa deploy runtime; không dùng nhánh Koofr cũ làm bản deploy. Cần một release riêng dựa trên source Firestore hiện hành để phục hồi Code Inbox.
