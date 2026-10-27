@@ -65,7 +65,7 @@ export default async function handler(request){
   const inboxResponse=await inbox(new Request(`${origin}/api/inbox`,{method:'POST',headers:{Authorization:'Bearer synthetic-only','Content-Type':'application/json',Origin:origin,'sec-fetch-site':'same-origin'},body:JSON.stringify(makeInboxEnvelope(payload,keys.publicKey))}));
   const inboxResult=await json(inboxResponse);if(inboxResult.value.textHash!==textHash(payload.text)||inboxResult.value.verified!==true)throw Error('SMOKE_INBOX_FAILED');
   await store.repo.db.recursiveDelete(store.repo.vault());vaultCreated=false;
-  return reply(200,{ok:true,checks:{login:true,list:true,open:true,save:true,idempotency:true,casConflict:true,folder:true,order:true,share:true,shareRevoke:true,trash:true,restore:true,codeInbox:true},syntheticVaultRemoved:true});
- }catch(error){const code=/^SMOKE_[A-Z0-9_]+$/.test(error?.message??'')?error.message:'SMOKE_RUNTIME_FAILED';return reply(503,{ok:false,code});}
+  return reply(200,{ok:true,checks:{login:true,list:true,open:true,save:true,idempotency:true,casConflict:true,folder:true,order:true,share:true,shareRevoke:true,trash:true,restore:true,codeInbox:true},syntheticVault:env.NOTES_FIRESTORE_VAULT_ID,syntheticVaultRemoved:true});
+ }catch(error){const code=/^(?:SMOKE|FIRESTORE|VAULT|NOTES)_[A-Z0-9_]+$/.test(error?.message??'')?error.message:'SMOKE_RUNTIME_FAILED';return reply(503,{ok:false,code});}
  finally{if(vaultCreated)await store.repo.db.recursiveDelete(store.repo.vault()).catch(()=>{});await store?.close?.().catch(()=>{});}
 }
