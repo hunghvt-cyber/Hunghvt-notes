@@ -14,12 +14,11 @@ async function main(){
  const runId=process.env.GITHUB_RUN_ID;
  if(!/^\d+$/.test(runId??''))throw new Error('RESTORE_RUN_ID_INVALID');
  const remote=new KoofrFirestoreBackup(process.env.NOTES_BACKUP_KOOFR_CREDENTIAL??'');await remote.ensureRoot();
- const qualified=await remote.getControl('.restore-qualification-passed.json');
- if(qualified){const marker=JSON.parse(qualified.toString('utf8'));if(marker.schemaVersion!==1||marker.result!=='PASS'||!/^firestore-notes-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}Z-\d+-\d+\.json\.gz$/.test(marker.backupId??''))throw new Error('RESTORE_QUALIFICATION_MARKER_INVALID');safe('restore_qualification_already_passed',{backupId:marker.backupId,fingerprint:marker.fingerprint});return;}
- let backupId=process.env.NOTES_BACKUP_ID;
- let latest=null;
- if(!backupId){const bytes=await remote.getControl('.latest-verified-backup.json');if(!bytes)throw new Error('RESTORE_LATEST_BACKUP_MARKER_MISSING');latest=JSON.parse(bytes.toString('utf8'));backupId=latest.backupId;}
+ const bytes=await remote.getControl('.latest-verified-backup.json');if(!bytes)throw new Error('RESTORE_LATEST_BACKUP_MARKER_MISSING');
+ const latest=JSON.parse(bytes.toString('utf8')),backupId=latest.backupId;
  if(!/^firestore-notes-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}Z-\d+-\d+\.json\.gz$/.test(backupId??''))throw new Error('RESTORE_BACKUP_ID_INVALID');
+ const qualified=await remote.getControl('.restore-qualification-passed.json');
+ if(qualified){const marker=JSON.parse(qualified.toString('utf8'));if(marker.schemaVersion!==1||marker.result!=='PASS'||!/^firestore-notes-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}Z-\d+-\d+\.json\.gz$/.test(marker.backupId??''))throw new Error('RESTORE_QUALIFICATION_MARKER_INVALID');if(marker.backupId===backupId&&marker.fingerprint===latest.fingerprint)safe('restore_qualification_already_passed',{backupId:marker.backupId,fingerprint:marker.fingerprint});if(marker.backupId===backupId&&marker.fingerprint===latest.fingerprint)return;}
  const manifest=JSON.parse((await remote.get(`${backupId}.manifest.json`)).toString('utf8'));validateBackupManifest(manifest,scope);if(manifest.backupId!==backupId)throw new Error('RESTORE_MANIFEST_MISMATCH');
  const compressed=await remote.get(backupId);if(compressed.length!==manifest.compressedBytes||sha(compressed)!==manifest.compressedSha256||latest&&(latest.backupId!==backupId||latest.compressedSha256!==manifest.compressedSha256||latest.fingerprint!==manifest.fingerprint))throw new Error('RESTORE_DOWNLOAD_HASH_MISMATCH');
  const plain=gunzipSync(compressed,{maxOutputLength:50_000_000});if(plain.length!==manifest.snapshotBytes)throw new Error('RESTORE_SNAPSHOT_SIZE_MISMATCH');

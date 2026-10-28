@@ -16,6 +16,7 @@ jobs:
         with:
           node-version: '24'
       - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npm run check:source
       - run: npm test
       - name: Simulated retry load (no live provider)
         run: node scripts/retry-load.mjs --patient > retry-load.local.json
