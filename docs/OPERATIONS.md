@@ -52,3 +52,8 @@ must be removed with its endpoint after the same-backup restore gate.
 CI now runs `npm run check:source`, which syntax-checks and imports all `api/`
 and `lib/` JS modules and rejects known truncated-output markers. On the NAS
 Node 24.22.1, source check passed (29 modules) and offline tests passed (191/191).
+
+
+## Cron timestamp correction — 2026-10-28
+
+Backup `40659900983` at 08:52 UTC on 28 October was 15:52 Asia/Ho_Chi_Minh; the 03:30 VN run on 28 October had already passed. Backup `40663242871` captured at 09:18 UTC, or 16:18 VN, on 28 October. The next scheduled run is 03:30 VN on 29 October (20:30 UTC on 28 October). Both Actions runs cited above were manual dispatches; neither is cron evidence.

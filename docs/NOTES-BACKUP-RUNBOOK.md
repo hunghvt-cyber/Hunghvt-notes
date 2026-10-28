@@ -7,7 +7,7 @@ Source và workflow trên `main` đã hợp nhất ở commit `7c3598a34691a7983
 
 - Nguồn: `notes-lab-56f0f/(default)/notes-production`.
 - Đích riêng: thư mục WebDAV `Notes-Firestore-Backups` trong Koofr; không dùng namespace Notes Koofr cũ.
-- Lịch workflow `firestore-backup.yml`: 03:30 Asia/Ho_Chi_Minh mỗi ngày (`30 20 * * *` UTC), có `workflow_dispatch`.
+- Lịch workflow `firestore-backup.yml`: 03:30 Asia/Ho_Chi_Minh mỗi ngày (`30 20 * * *` UTC), có `workflow_dispatch`. Mốc 08:52 UTC ngày 28/10 tương ứng 15:52 VN; lịch 03:30 VN ngày 28/10 đã qua. Lần cron kế tiếp: 03:30 VN ngày 29/10 (20:30 UTC ngày 28/10). Các run 40659900983 và 40663242871 đều là manual, không phải cron.
 - Giữ tối thiểu 14 ngày gần nhất, 8 tuần gần nhất và 6 tháng gần nhất. Một snapshot có thể thỏa nhiều nhóm; snapshot được chọn theo lịch Việt Nam. Baseline được bảo vệ không khớp tên file thường nên retention không liệt kê/xóa.
 - Workflow tạo snapshot qua `FirestoreNativeRepository.exportLegacySnapshot`, gzip, manifest và SHA-256; upload, tải lại, giải nén, kiểm schema/counts/fingerprint; chỉ sau đó mới tính retention. Bản thiếu/corrupt/khác project hoặc vault không bao giờ là ứng viên xóa.
 - Giới hạn source snapshot 50 MB chưa nén. Chạm giới hạn thì run thất bại, không truncate và không prune.
