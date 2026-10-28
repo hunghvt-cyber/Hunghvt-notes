@@ -30,3 +30,16 @@ A single filtered review used the existing NAS wrapper, model `gemini-3.5-flash-
 - Both aliases, both deployments, both data sources, all auth/session material, history, trash, shares, receipts, tombstones, and exact legacy namespace remain untouched. No billing change.
 
 Next safe action is a read-only current Koofr export from the protected production runtime into private storage with hash/readback, then a complete semantic compare against a freshly captured Firestore snapshot. Only then freeze/isolate confirmed writers and deploy/test the explicit Firestore configuration before moving either alias.
+
+
+## Read-only export route preparation
+
+A source-only, feature-gated route was added in [PR #20](https://github.com/hunghvt-cyber/web-notes/pull/20) and merged in commit `1cc44d882fad9ad383141258c3c41bfaa0375474`. The source tree was tested as commit `2111f122387973cbdf5d29409e646264ad240906`, tree `fcb38e8ec1d7a58b3bee20037c0cc8b52c55bdcc` plus the route/timeout change. It exposes the existing bounded stable-catalog GET-only exporter and gives the function a 120-second limit. The route requires production environment, explicit `NOTES_MIGRATION_EXPORT_ENABLED=get-only-v1`, and `NOTES_WRITES_FROZEN=true`; it returns 404 when disabled, rejects non-GET, refuses a configured Firestore selector, and verifies the Koofr catalog before/after the read.
+
+- Focused test `node --test test/koofr-migration-export.test.mjs`: 1/1 PASS.
+- Full offline suite `node scripts/test-offline.mjs`: 187/187 PASS using NAS Node v22.23.4. Repository declares Node 24; CI/Vercel branch build subsequently completed READY.
+- `git diff --check`: PASS.
+- Gemini source-only review: no critical flaw identified in handler gates; its non-critical caveat was that Vercel deployment protection must be verified before staging. Gemini was not given Notes data.
+- Vercel build for PR source completed READY in the separate `notes-firestore-exact-082` project. Its Production environment-variable metadata is empty. A direct request to that deployment's export route returned 404. This verifies only that the default-closed route compiles and remains closed without flags; it is not a Production app deployment or Koofr export.
+
+The route is now present on canonical main but was **not enabled** in `hunghvt-notes`, and no deployment was created in the primary project. Existing aliases/deployments and all source data remain unchanged. A protected primary-project staged deployment with exact Production env, a private snapshot handoff/readback path, and safe isolation of all writers are still required before capturing the current Koofr source or moving aliases.
