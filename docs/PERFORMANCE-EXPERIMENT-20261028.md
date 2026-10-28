@@ -8,6 +8,8 @@ Candidate base commit: `92f1fcaac50a2be6b59ef1b2484b1049c2bcdc61` (tree `7c6571e
 
 Tested source candidate commit: `6d355b7f34b4450eaa83b60bca28518709cb407e`, tree `90739a681bada8e5a9d6e0db37f9c4ab5d11c5c8`. The evidence document is a follow-up commit and does not change that tested source tree.
 
+Canonical GitHub branch commit (source plus this report): `b6389a7b0cb0d9348506f5a3171c0b28756d72b4`, tree `ce8ba44630266ae429167e818e96f38fd035a496`. CI run [40710978280](https://github.com/hunghvt-cyber/web-notes/actions/runs/40710978280) completed successfully.
+
 Existing cache-first note opening and IndexedDB draft persistence were already present. A cache hit renders the cached note immediately, then checks its known revision; a response is accepted only while the selection and draft version still match. No persistent cache policy, auth cache, editor debounce, or draft durability was changed.
 
 ## Method
@@ -55,6 +57,8 @@ Accepted and independently checked: batching independent owner-read references w
 
 Synthetic results show a substantial median improvement for uncached opens and a smaller cached-open improvement; uncached-open p95 improved only 6.8%, so tail improvement is modest. Save, list, editor, search, and reload p95 did not demonstrate a consistent improvement. No broad UI cache or auth change is justified.
 
-The candidate was not staged or promoted. The Vercel project metadata had no Preview-target Notes environment configuration, while the active Firestore WIF provider condition is restricted to Vercel `environment:production`. A Preview request therefore cannot reach the test Firestore identity using verified configuration. Deploying with Production target could change aliases; copying unavailable Production secrets or broadening WIF solely for this experiment would weaken the gate. Production aliases, environment, IAM, and data were left untouched.
+GitHub's Vercel check did create an isolated staging deployment `dpl_CMj1HkLnpkgopaz4GG58WAcTvyCY` in project `notes-firestore-exact-082` (`prj_24XdIpwUoTqfoMNgNUB4y73Iyz1M`), not the Production project. It had only a preview deployment URL and its project SSO protection remained enabled. Preview environment metadata was empty. A new health request at 2026-10-28 14:57:51 UTC returned HTTP 200, request ID `KP-6678fe87`, `configured=false`, `production=true`; there was no backend field or Firestore read result. This is an explicit staging failure to configure, not a Firestore health pass.
+
+The active Firestore WIF provider condition is restricted to Vercel `environment:production`, so the empty Preview configuration cannot reach the test Firestore identity with verified settings. Deploying with Production target could change aliases; copying unavailable Production secrets or broadening WIF solely for this experiment would weaken the gate. Production aliases, environment, IAM, and data were left untouched. Do not promote this candidate until a staging deployment can use an explicitly scoped test vault and accepted WIF identity.
 
 Production's earlier NAS health p95 and ChatGPT's cross-environment latency are not compared with this local synthetic benchmark. Repeat the same browser/server procedure on a staging deployment with an explicitly scoped test vault and WIF identity before deploying the optimization or using the new timing fields in Production.
