@@ -8,7 +8,7 @@ Candidate base commit: `92f1fcaac50a2be6b59ef1b2484b1049c2bcdc61` (tree `7c6571e
 
 Tested source candidate commit: `6d355b7f34b4450eaa83b60bca28518709cb407e`, tree `90739a681bada8e5a9d6e0db37f9c4ab5d11c5c8`. The evidence document is a follow-up commit and does not change that tested source tree.
 
-Canonical GitHub branch commit (source plus this report): `b6389a7b0cb0d9348506f5a3171c0b28756d72b4`, tree `ce8ba44630266ae429167e818e96f38fd035a496`. CI run [40710978280](https://github.com/hunghvt-cyber/web-notes/actions/runs/40710978280) completed successfully.
+Canonical GitHub candidate branch commit (source plus initial report): `b6389a7b0cb0d9348506f5a3171c0b28756d72b4`, tree `ce8ba44630266ae429167e818e96f38fd035a496`. CI runs [40710978280](https://github.com/hunghvt-cyber/web-notes/actions/runs/40710978280) and [40711231295](https://github.com/hunghvt-cyber/web-notes/actions/runs/40711231295) both completed successfully. Draft review: [PR #24](https://github.com/hunghvt-cyber/web-notes/pull/24), not merged.
 
 Existing cache-first note opening and IndexedDB draft persistence were already present. A cache hit renders the cached note immediately, then checks its known revision; a response is accepted only while the selection and draft version still match. No persistent cache policy, auth cache, editor debounce, or draft durability was changed.
 
