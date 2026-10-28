@@ -2,7 +2,7 @@
 
 ## Source and tests
 
-- Canonical source commit: `14ba6c541dc486c3e932d1a965d01413b8f1604d` (PR #23; PR #22 is its parent).
+- Canonical source commit/tree deployed: `14ba6c541dc486c3e932d1a965d01413b8f1604d` / `e9abdaf464636ada7fdb81f2b6fe986593cc5203` (PR #23; PR #22 is its parent).
 - PR #22 adds server-side GitHub OIDC verification for the read-only Koofr exporter and a private Koofr baseline/readback workflow. PR #23 forwards the same short-lived token to Vercel Trusted Sources while retaining the route's independent Bearer JWT check.
 - Focused local tests: 9/9 passed. Offline suite on NAS Node v22.23.4: `npm test`, 190/190 passed. GitHub Actions “Notes simulation” passed for the parent and follow-up commits (runs 40646255602 and 40646812970).
 - The one failure from raw `node --test` was the repository network-guard harness being invoked outside its required wrapper; the supported `npm test` command passed 190/190.
