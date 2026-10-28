@@ -4,7 +4,7 @@
 Theo báo cáo Codex NAS và hồ sơ cutover được chuyển về repo này:
 - Repo GitHub canonical: `hunghvt-cyber/web-notes` (ID `1423348828`); tên cũ chuyển hướng. `main` đã tích hợp PR #16 tại `7c3598a34691a7983e08208e55c97c34bf596f0c`, tree `035a07789aa235f0e1b79938688633c9c963984f`.
 - URL https://hunghvt-notes.vercel.app
-- Backend Firestore: notes-lab-56f0f / (default) / notes-production.
+- Cutover report identifies Firestore `notes-lab-56f0f / (default) / notes-production`; independent audit 28/10 cannot establish the effective backend serving current runtime. Project env metadata lists legacy Koofr config, while the health route is backend-neutral. Treat backend as UNKNOWN until authenticated read-only provider-specific verification.
 - Deployment tại cutover: dpl_SrEHLu6jv6tjTUEPR7F25sxdsFZ1.
 - Source đã xác minh được hợp nhất từ branch codex/notes-production-cutover-20261027, commit 97c84e74d2e21ceb3a72b36dd16e6d9505a8e742, deployed tree ab169c6bd440f228a3f521fc4357b7bddf2eadec. Vercel vẫn không liên kết Git; push `main` không đổi deployment.
 - 28 notes tại cutover: 6 active, 22 trash; 2 folder, 11 share, 24 receipt, 0 erased tombstone. Full parity fingerprint nằm trong [hồ sơ cutover](history/ai-nas-lab/notes-firestore-production-cutover-20261027.md).
@@ -22,3 +22,8 @@ Kiểm tra Vercel metadata ngày 28/10: `hunghvt-notes.vercel.app` → `dpl_SrEH
 ## Bằng chứng và cập nhật
 Mọi thay đổi Notes được ghi ở repo này. ai-nas-lab chỉ giữ thông tin phối hợp Codex/Gemini và công cụ AI.
 Luôn phân biệt dữ liệu đọc trực tiếp với báo cáo từ NAS, test fixture, cloud smoke và deployment hiện hành. Kiểm tra metadata trước khi dựa vào checkpoint cũ.
+
+
+## Independent audit — 28/10/2026
+
+Read-only verification confirmed the canonical production alias and legacy alias/deployment, but did not establish the active runtime datastore. GitHub reports zero runs for the Firestore backup workflow; there is no Koofr readback or restore parity. Live WIF/IAM and the dedicated Koofr secret's existence remain unverified. No alias, deployment, namespace, credential, or Notes data was changed. See [full audit and evidence](BACKUP-AND-LEGACY-CLEANUP-AUDIT-20261028.md).
