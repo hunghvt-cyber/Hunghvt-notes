@@ -1,5 +1,17 @@
 # Notes vận hành — 28/10/2026
 
+## Current status — verified 2026-10-28
+
+This section supersedes earlier statements below that the backup had not yet run.
+
+- Backup run [40637421409](https://github.com/hunghvt-cyber/web-notes/actions/runs/40637421409) passed manual dispatch on `main`; Koofr readback/hash/manifest verification passed. Restore qualification [40637491951](https://github.com/hunghvt-cyber/web-notes/actions/runs/40637491951) passed with matching snapshot parity and verified removal of its run-scoped test vault. This does not yet prove a scheduled cron run.
+- WIF provider conditions and service-account bindings now name canonical repository `hunghvt-cyber/web-notes`, exact main workflow refs, and the same separate backup/restore service accounts. Database-scoped roles remain unchanged. See [WIF change and read-back](WIF-CANONICAL-UPDATE-20261028.md) and [verified backup/restore evidence](BACKUP-RESTORE-VERIFIED-20261028.md).
+- Production backend remains **UNKNOWN**. The deployed selector supports Firestore only when its effective runtime environment selects it; Vercel has not exposed this deployment's captured environment. Backup WIF success/read access is not proof of the app's active backend.
+- The pre-cutover Koofr snapshot copy on the NAS is present and matches the recorded SHA-256. The old Koofr remote namespace itself was not accessed in this check.
+- Both the primary Production alias and the secondary alias to legacy deployment `dpl_7rdKgAjtDKryMVMApjyQHj2ZMY9B` remain READY. The exact legacy namespace and conditional writers are documented in [Gemini review and read-only legacy inventory](GEMINI-REVIEW-LEGACY-INVENTORY-20261028.md).
+- No legacy alias, deployment, namespace, credential, or production data was changed or deleted. Cleanup remains blocked while Production backend is UNKNOWN and the old writer alias remains reachable.
+
+
 ## Hiện hành
 Theo báo cáo Codex NAS và hồ sơ cutover được chuyển về repo này:
 - Repo GitHub canonical: `hunghvt-cyber/web-notes` (ID `1423348828`); tên cũ chuyển hướng. `main` đã tích hợp PR #16 tại `7c3598a34691a7983e08208e55c97c34bf596f0c`, tree `035a07789aa235f0e1b79938688633c9c963984f`.
