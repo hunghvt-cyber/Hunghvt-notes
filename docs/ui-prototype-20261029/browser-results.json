@@ -1,0 +1,98 @@
+{
+  "browser": "Chromium headless, NAS arm64, emulated CSS viewports",
+  "viewports": [
+    {
+      "name": "phone",
+      "viewport": [
+        390,
+        844
+      ],
+      "document": [
+        390,
+        844
+      ],
+      "list": 0,
+      "editor": 390,
+      "editorVisible": true,
+      "titleHeight": 97,
+      "titleScroll": 97,
+      "titleInlineHeight": "97px",
+      "titleClipped": false,
+      "horizontalOverflow": false,
+      "touchControls": true
+    },
+    {
+      "name": "ipad-mini-portrait",
+      "viewport": [
+        744,
+        1133
+      ],
+      "document": [
+        744,
+        1133
+      ],
+      "list": 290,
+      "editor": 390,
+      "editorVisible": true,
+      "titleHeight": 90,
+      "titleScroll": 90,
+      "titleInlineHeight": "90px",
+      "titleClipped": false,
+      "horizontalOverflow": false,
+      "touchControls": true
+    },
+    {
+      "name": "ipad-mini-landscape",
+      "viewport": [
+        1133,
+        744
+      ],
+      "document": [
+        1133,
+        744
+      ],
+      "list": 340,
+      "editor": 561,
+      "editorVisible": true,
+      "titleHeight": 122,
+      "titleScroll": 122,
+      "titleInlineHeight": "122px",
+      "titleClipped": false,
+      "horizontalOverflow": false,
+      "touchControls": true
+    },
+    {
+      "name": "pc",
+      "viewport": [
+        1440,
+        900
+      ],
+      "document": [
+        1440,
+        900
+      ],
+      "list": 340,
+      "editor": 868,
+      "editorVisible": true,
+      "titleHeight": 86,
+      "titleScroll": 86,
+      "titleInlineHeight": "86px",
+      "titleClipped": false,
+      "horizontalOverflow": false,
+      "touchControls": true
+    }
+  ],
+  "interactions": [
+    "synthetic draft persisted across reload",
+    "search and open",
+    "history and share revoke",
+    "new note",
+    "viewport resize preserves text and caret",
+    "multi-select and move/trash/restore",
+    "keyboard search shortcut and focus ring",
+    "folder drawer",
+    "empty/conflict scenarios",
+    "reduced motion"
+  ],
+  "network": "none; no API/backend requests"
+}

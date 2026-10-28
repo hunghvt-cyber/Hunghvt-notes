@@ -1,0 +1,17 @@
+Review this responsive Notes UI prototype independently. The data below is synthetic; no backend, authentication, or private user data is involved.
+
+Layout and interaction summary:
+- Phone width 390 CSS px: single primary surface. Notes list and editor switch explicitly; folders open as a drawer. Bottom navigation remains available. Search, create, multi-select and editor actions have labeled touch controls. CSS uses 100dvh and safe-area insets.
+- Tablet portrait 744x1133 CSS px: compact 64px folder rail, 290px list, 390px editor. Tablet landscape 1133x744: full 232px folder sidebar, 340px list, 561px editor. PC 1440x900: 232px sidebar, 340px list, 868px editor.
+- Note title is an auto-growing textarea; body is one stable textarea. Draft uses a dedicated synthetic-only localStorage key, reports local hold, simulated syncing, and synced; it never makes network requests.
+- Actions shown include note create, folder move, multi-select, trash and restore, history, share and revoke, checklist/code insertion, and Code Inbox fixture entry. This is an interaction prototype; mock actions are not the Firestore implementation.
+- CSS breakpoints: <=700 phone one-pane; 701–900 compact folder rail with two panes; >900 full folder rail and list/editor. Reduced-motion styles, keyboard shortcut Ctrl/Cmd+K, visible focus ring, and >=40px visible button targets are intended.
+
+Chromium emulation at 390x844, 744x1133, 1133x744, and 1440x900 reported no horizontal overflow; visible controls met 40px height. Browser smoke also exercised search/open/edit, local draft after reload, history/share revoke, create, viewport resize preserving text/caret, multi-select, trash/restore, keyboard search shortcut, and folder drawer.
+
+Please assess:
+1. Is one-handed phone use and the list/editor transition clear? Any likely occlusion around virtual keyboard/Safari bars?
+2. Does 744x1133 have enough editor width, and does landscape avoid an over-narrow editor?
+3. Does desktop use width well without excessive line length or blank space?
+4. Which action/status labels risk confusing save, move, trash, permanent deletion, sharing/revocation, or Code Inbox?
+5. Suggest only concrete, small prototype changes. State what cannot be concluded without actual iPadOS/S25 devices or a visual screenshot review.

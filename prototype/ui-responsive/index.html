@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Notes · prototype responsive</title>
+  <link rel="stylesheet" href="./prototype.css">
+</head>
+<body>
+  <div class="prototype-banner">PROTOTYPE · dữ liệu tổng hợp · không kết nối backend</div>
+  <div class="app-shell">
+    <aside class="folders" id="folders" aria-label="Thư mục">
+      <a class="brand" href="#main" aria-label="Notes, về danh sách">N<span>Notes</span></a>
+      <button class="folder active" data-folder="Tất cả ghi chú">▦ <span>Tất cả ghi chú</span><b>8</b></button>
+      <button class="folder" data-folder="Công việc">▣ <span>Công việc</span><b>3</b></button>
+      <button class="folder" data-folder="Ý tưởng">▣ <span>Ý tưởng</span><b>2</b></button>
+      <button class="folder" data-folder="Cá nhân">▣ <span>Cá nhân</span><b>2</b></button>
+      <button class="folder" data-folder="Dự án dài hạn">▣ <span>Dự án dài hạn</span><b>1</b></button>
+      <div class="folder-spacer"></div>
+      <button class="folder" data-view="trash" aria-label="Thùng rác">▤ <span>Thùng rác</span><b>2</b></button>
+      <button class="folder" data-view="inbox" aria-label="Code Inbox">⌑ <span>Code Inbox</span><b>1</b></button>
+      <button class="folder" id="folder-manage">＋ <span>Quản lý thư mục</span></button>
+      <div class="account"><span class="avatar">H</span><span><strong>Hồ sơ tổng hợp</strong><small>Đã đồng bộ</small></span><button aria-label="Tùy chọn tài khoản">···</button></div>
+    </aside>
+
+    <main id="main">
+      <section class="list-pane" aria-label="Danh sách ghi chú">
+        <header class="list-top">
+          <div class="mobile-brand"><button id="show-folders" aria-label="Mở thư mục">☰</button><strong>Notes</strong><button id="new-note-mobile" aria-label="Tạo note mới">＋</button></div>
+          <div class="list-heading"><div><p class="eyebrow" id="crumb">KHÔNG GIAN CÁ NHÂN</p><h1 id="folder-title">Tất cả ghi chú</h1></div><button class="icon-button desktop-new" id="new-note" aria-label="Tạo note mới">＋ <span>Note mới</span></button></div>
+          <label class="search"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Tìm trong ghi chú" aria-label="Tìm ghi chú"><kbd>⌘ K</kbd></label>
+          <div class="list-tools"><span id="note-count">8 ghi chú</span><button id="select-mode" aria-pressed="false">Chọn nhiều</button><button id="sort" aria-label="Sắp xếp">↕</button><button id="restore-trash" hidden>Khôi phục mục gần nhất</button></div>
+        </header>
+        <div class="cards" id="cards" aria-live="polite"></div>
+        <div class="bulk" id="bulk" hidden><span id="selected-count">0 đã chọn</span><button id="bulk-move">Chuyển</button><button id="bulk-trash">Chuyển vào thùng rác</button><button id="cancel-select">Hủy</button></div>
+      </section>
+
+      <section class="editor-pane" aria-label="Trình soạn thảo">
+        <header class="editor-top"><div class="editor-mobile-actions"><button id="back-list">← Danh sách</button><span class="save-state" id="save-state" role="status">Đã đồng bộ</span></div><div class="editor-actions"><button id="history-button" aria-expanded="false">◷ <span>Lịch sử</span></button><button id="share-button">↗ <span>Chia sẻ</span></button><button class="more-button" id="more-button" aria-expanded="false" aria-label="Thao tác khác">···</button></div></header>
+        <div class="editor-scroll" id="editor-scroll"><div class="editor-content">
+          <label class="sr-only" for="title">Tiêu đề ghi chú</label><textarea id="title" class="title" rows="1" maxlength="200" aria-label="Tiêu đề ghi chú"></textarea>
+          <div class="meta"><span id="folder-meta">Công việc</span><span>·</span><span id="updated-meta">Vừa cập nhật</span><span class="meta-spacer"></span><button id="move-note">Đổi thư mục</button></div>
+          <div class="editor-tools"><button id="checklist-button">☑ <span>Checklist</span></button><button id="code-button">&lt;/&gt; <span>Khối mã</span></button><button id="trash-note" aria-label="Chuyển note vào thùng rác">⌫</button></div>
+          <label class="sr-only" for="body">Nội dung ghi chú</label><textarea id="body" aria-label="Nội dung ghi chú" spellcheck="false"></textarea>
+          <div class="editor-footer"><span>Markdown nhẹ · lưu tự động</span><span id="word-count">0 từ</span></div>
+          <div class="history-panel" id="history-panel" hidden><strong>Lịch sử gần đây</strong><p>Hôm nay, 10:42 · Bản hiện tại</p><p>Hôm qua, 16:18 · Bản trước</p><button id="history-close">Đóng</button></div>
+          <div class="share-panel" id="share-panel" hidden><strong>Chia sẻ ghi chú</strong><p>Link thử nghiệm · chỉ dữ liệu tổng hợp</p><button id="revoke-share">Ngừng chia sẻ</button><button id="share-close">Đóng</button></div>
+        </div></div>
+        <footer class="statusbar"><span class="status-dot"></span><span id="status-text">Đã đồng bộ</span><span class="status-spacer"></span><details class="state-picker"><summary>Trạng thái mẫu</summary><div class="scenario-menu"><button data-scenario="ready">Bình thường</button><button data-scenario="loading">Đang tải</button><button data-scenario="offline">Ngoại tuyến · draft đã giữ</button><button data-scenario="error">Lỗi đồng bộ</button><button data-scenario="conflict">Xung đột phiên</button><button data-scenario="empty">Kho trống</button></div></details><span>Không gian thử nghiệm</span></footer>
+      </section>
+    </main>
+    <nav class="mobile-nav" aria-label="Điều hướng chính"><button class="active" id="nav-notes">▦<span>Ghi chú</span></button><button id="nav-search">⌕<span>Tìm kiếm</span></button><button id="nav-trash">▤<span>Thùng rác</span></button><button id="nav-inbox">⌑<span>Code Inbox</span></button></nav>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="./prototype.js"></script>
+</body>
+</html>
