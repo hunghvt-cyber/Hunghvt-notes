@@ -27,7 +27,8 @@
   },
   "git": {
     "deploymentEnabled": {
-      "codex/notes-firestore-cloudshell-20261027": false
+      "codex/notes-firestore-cloudshell-20261027": false,
+      "release/minimal-notes": false
     }
   }
 }
