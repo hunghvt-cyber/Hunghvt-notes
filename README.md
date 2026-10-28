@@ -4,6 +4,7 @@
 
 - [Vận hành và trạng thái hiện tại](docs/OPERATIONS.md).
 - [Backup định kỳ và dọn hệ thống cũ — phạm vi đã duyệt](docs/BACKUP-AND-LEGACY-CLEANUP-20261027.md).
+- [Audit độc lập backup và dọn legacy — 28/10/2026](docs/BACKUP-AND-LEGACY-CLEANUP-AUDIT-20261028.md).
 - [Bằng chứng cutover và parity](docs/history/ai-nas-lab/notes-firestore-production-cutover-20261027.md).
 - [Firestore native repository](docs/FIRESTORE-NATIVE.md), [Code Inbox](docs/CODE-INBOX.md), [kiểm thử](docs/TESTING.md), [chi tiết backup/restore](docs/NOTES-BACKUP-RUNBOOK.md).
 - [Lịch sử nghiên cứu/bàn giao đã chuyển từ ai-nas-lab](docs/history/ai-nas-lab/README.md).
