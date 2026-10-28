@@ -16,6 +16,13 @@ test('preview defaults closed, refuses production/project/namespace config; no s
  s.cfg.NOTES_PREVIEW_ENABLED='synthetic-only-v1';assert.equal((await call(s,'notes')).status,401);assert.equal(s.b.requests.length,0);
  s.cfg.VERCEL_ENV='production';assert.equal((await call(s,'notes')).status,503);s.cfg.VERCEL_ENV='preview';s.cfg.KOOFR_NOTES_NAMESPACE='real-notes';assert.equal((await call(s,'notes')).status,503);
 });
+test('live Firestore health reads only vault metadata and reports explicit runtime scope',async()=>{
+ let read=false,closed=false;
+ const handler=createPreviewHandler({live:true,env:()=>({}),config:()=>({backend:'firestore-native-v1',projectId:'notes-lab-56f0f',vaultId:'notes-production'}),makeStore:async()=>({runtimeHealth:async()=>{read=true;return {readable:true,vaultInitialized:true};},close:async()=>{closed=true;}}),observe:()=>{}});
+ const response=await handler(new Request('https://preview.example/api/app?route=health'));
+ assert.equal(response.status,200);assert.deepEqual(await response.json(),{kind:'hunghvt-notes',configured:true,production:true,backend:'firestore-native-v1',projectId:'notes-lab-56f0f',vaultId:'notes-production',firestoreRead:'PASS',vaultInitialized:true});
+ assert.equal(read,true);assert.equal(closed,true);
+});
 test('owner read experiment config is explicit and Preview-only',()=>{
  const s=setup();assert.equal(previewConfig(s.cfg).ownerReadExperiment,false);s.cfg.NOTES_OWNER_READ_EXPERIMENT='enabled';assert.equal(previewConfig(s.cfg).ownerReadExperiment,true);s.cfg.VERCEL_ENV='production';assert.throws(()=>previewConfig(s.cfg),/PREVIEW_DISABLED/);
 });
