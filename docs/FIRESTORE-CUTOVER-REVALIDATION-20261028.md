@@ -34,7 +34,7 @@ Next safe action is a read-only current Koofr export from the protected producti
 
 ## Read-only export route preparation
 
-A source-only, feature-gated route was added in [PR #20](https://github.com/hunghvt-cyber/web-notes/pull/20) and merged in commit `1cc44d882fad9ad383141258c3c41bfaa0375474`. The source tree was tested as commit `2111f122387973cbdf5d29409e646264ad240906`, tree `fcb38e8ec1d7a58b3bee20037c0cc8b52c55bdcc` plus the route/timeout change. It exposes the existing bounded stable-catalog GET-only exporter and gives the function a 120-second limit. The route requires production environment, explicit `NOTES_MIGRATION_EXPORT_ENABLED=get-only-v1`, and `NOTES_WRITES_FROZEN=true`; it returns 404 when disabled, rejects non-GET, refuses a configured Firestore selector, and verifies the Koofr catalog before/after the read.
+A source-only, feature-gated route was added in [PR #20](https://github.com/hunghvt-cyber/web-notes/pull/20) and merged in commit `1cc44d882fad9ad383141258c3c41bfaa0375474`. The source tree was tested as commit `2111f122387973cbdf5d29409e646264ad240906`, tree `1714f4425f8a343fd7397f370493ac76df1bfcf1`. It exposes the existing bounded stable-catalog GET-only exporter and gives the function a 120-second limit. The route requires production environment, explicit `NOTES_MIGRATION_EXPORT_ENABLED=get-only-v1`, and `NOTES_WRITES_FROZEN=true`; it returns 404 when disabled, rejects non-GET, refuses a configured Firestore selector, and verifies the Koofr catalog before/after the read.
 
 - Focused test `node --test test/koofr-migration-export.test.mjs`: 1/1 PASS.
 - Full offline suite `node scripts/test-offline.mjs`: 187/187 PASS using NAS Node v22.23.4. Repository declares Node 24; CI/Vercel branch build subsequently completed READY.
