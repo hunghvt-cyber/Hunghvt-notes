@@ -44,7 +44,10 @@ deployment inventory is in [legacy writer inventory](LEGACY-WRITER-INVENTORY-202
 This is evidence of unauthenticated isolation; it does not prove that a
 credentialed Vercel/Trusted Source principal cannot enter an old deployment.
 Do not delete Koofr namespace until the new restore qualification passes and
-remaining authenticated writer access is confirmed closed.
+remaining authenticated writer access is confirmed closed. The exact provisioner
+on `release/minimal-notes` was retired at `c0fe02f`; the default-branch
+baseline OIDC workflow still reaches the old read-only export deployment and
+must be removed with its endpoint after the same-backup restore gate.
 
 CI now runs `npm run check:source`, which syntax-checks and imports all `api/`
 and `lib/` JS modules and rejects known truncated-output markers. On the NAS
