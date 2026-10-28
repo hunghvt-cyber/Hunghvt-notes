@@ -11,10 +11,11 @@
 
 - Target project verified by project ID: `prj_c4sEp6nB4msWTsPiGoALSuVutVTK` (`hunghvt-notes`, team `hunghvt`).
 - Immutable staging deployment: `dpl_CQQ9tSjTfkmJDKFJA5pyCLWnthVT`, `hunghvt-notes-jxnkvndz4-hunghvt.vercel.app`, READY, source commit above.
-- This deployment was created from canonical-main source files and production-scoped env values explicitly select `koofr-v1`, `NOTES_MIGRATION_EXPORT_ENABLED=get-only-v1`, and `NOTES_WRITES_FROZEN=true`. These are project Production env settings for deployments created after the change; they do not change the env snapshot of already-existing deployments and do not freeze an old immutable URL.
+- This deployment was created from canonical-main source files while the three staging-only Production env values were set (`koofr-v1`, `get-only-v1`, `true`). After the immutable deployment was READY, all three project-level values were cleared to empty and metadata readback confirmed. Existing deployments retain their original env snapshots; future deploys therefore get no migration-export enablement and no write-freeze flag by default.
 - The Vercel API assigned production aliases automatically despite the deployment request omitting an alias. They were promptly restored and read back:
   - `hunghvt-notes.vercel.app` -> `dpl_SrEHLu6jv6tjTUEPR7F25sxdsFZ1`
   - `hunghvt-notes-hunghvt.vercel.app` -> `dpl_7rdKgAjtDKryMVMApjyQHj2ZMY9B`
+- The staged deployment's alias inventory was read back as empty after restoration.
 - No Notes read/export was completed. A protected fetch attempt stopped at Vercel with filtered status `401 deployment_authentication_required`, before the route ran. This demonstrates the platform layer is still in force, not that server authorization or export works at runtime.
 - The exporter validates the GitHub OIDC token server-side (issuer, exact audience, immutable repo/owner subject and IDs, main ref, exact workflow_ref and push event), then requires the explicit feature flag, GET, and frozen state. Unit tests cover rejection before opening the Koofr source.
 
