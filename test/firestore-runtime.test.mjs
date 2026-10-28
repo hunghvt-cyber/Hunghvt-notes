@@ -13,10 +13,11 @@ test('native backend config is explicit, preview-scoped, and does not require Ko
 });
 
 test('Vercel WIF constructs a GoogleAuth client from a supplier and rejects external credential sources',async()=>{
- let settings;class FirestoreFake{constructor(value){settings=value;}collection(name){return {doc:id=>({collection:sub=>({doc:leaf=>({name,id,sub,leaf})})})};}}
+ let settings;class FirestoreFake{constructor(value){settings=value;}collection(name){return {doc:id=>({get:async()=>({exists:true}),collection:sub=>({doc:leaf=>({name,id,sub,leaf})})})};}}
  const wif={type:'external_account',audience:'//iam.googleapis.com/projects/123456789/locations/global/workloadIdentityPools/vercel/providers/notes',subject_token_type:'urn:ietf:params:oauth:token-type:jwt',token_url:'https://sts.googleapis.com/v1/token',service_account_impersonation_url:'https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/notes@notes-lab-56f0f.iam.gserviceaccount.com:generateAccessToken'};
  const env={VERCEL_ENV:'preview',NOTES_FIRESTORE_WIF_CONFIG:JSON.stringify(wif)};
  const store=await createFirestoreNativeStore({projectId:'notes-lab-56f0f',vaultId:'notes-preview',namespace:'preview'},{headers:new Headers()},{env,FirestoreClass:FirestoreFake,tokenProvider:async()=>'synthetic-oidc-token-'.padEnd(128,'x')});
  const client=await settings.auth.getClient();assert.ok(client);assert.equal(store.vaultId,'notes-preview');
+ assert.deepEqual(await store.runtimeHealth(),{readable:true,vaultInitialized:true});
  await assert.rejects(createFirestoreNativeStore({projectId:'notes-lab-56f0f',vaultId:'notes-preview',namespace:'preview'},{headers:new Headers()},{env:{...env,NOTES_FIRESTORE_WIF_CONFIG:JSON.stringify({...wif,credential_source:{file:'/tmp/credentials'}})},FirestoreClass:FirestoreFake,tokenProvider:async()=>'synthetic-oidc-token-'.padEnd(128,'x')}),e=>e.message==='FIRESTORE_WIF_CONFIG_INVALID');
 });
