@@ -1,0 +1,36 @@
+name: Delete exact retired Notes Koofr namespace
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: Type DELETE_KOOFR_NOTES_NAMESPACE_20261028 after reviewing backup and restore gates
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: notes-exact-legacy-namespace-delete
+  cancel-in-progress: false
+
+jobs:
+  delete_exact_namespace:
+    if: github.ref == 'refs/heads/main' && inputs.confirm == 'DELETE_KOOFR_NOTES_NAMESPACE_20261028'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '24'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Verify latest backup and restore markers, then delete only exact legacy namespace
+        env:
+          NOTES_LEGACY_DELETE_CONFIRM: ${{ inputs.confirm }}
+          NOTES_BACKUP_KOOFR_CREDENTIAL: ${{ secrets.NOTES_BACKUP_KOOFR_CREDENTIAL }}
+          KOOFR_WEBDAV_USER: ${{ secrets.KOOFR_WEBDAV_USER }}
+          KOOFR_WEBDAV_APP_PASSWORD: ${{ secrets.KOOFR_WEBDAV_APP_PASSWORD }}
+        run: node scripts/delete-legacy-koofr-namespace.mjs

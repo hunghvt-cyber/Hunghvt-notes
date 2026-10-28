@@ -35,25 +35,32 @@ the latest verified backup. Run a new manual backup after that fix reaches
 `main`; its `workflow_run` restore must emit both `restore_parity_pass` and
 `restore_vault_removed` for that new backup before cleanup.
 
-The project API reports SSO protection enabled for all non-custom deployment
-URLs. An unauthenticated HEAD request to every one of the 34 prior immutable
-deployment hosts returned 302 to Vercel SSO; both app aliases resolve to the
-Firestore deployment. A temporary shareable bypass on the secondary alias was
-revoked. No WAF config exists (active config lookup returned 404). Exact
-deployment inventory is in [legacy writer inventory](LEGACY-WRITER-INVENTORY-20261028.md).
-This is evidence of unauthenticated isolation; it does not prove that a
-credentialed Vercel/Trusted Source principal cannot enter an old deployment.
-Do not delete Koofr namespace until the new restore qualification passes and
-remaining authenticated writer access is confirmed closed. The exact provisioner
-on `release/minimal-notes` was retired at `c0fe02f`; the default-branch
-baseline OIDC workflow still reaches the old read-only export deployment and
-must be removed with its endpoint after the same-backup restore gate.
+The active Vercel firewall now has an exact-host `deny` rule for all 34 prior
+immutable deployment hosts. The current Firestore deployment and both app
+aliases are excluded. The rule is active in control-plane configuration;
+anonymous requests still return 302 because deployment protection runs before
+WAF, so those responses are not the deny-rule test. The deployment objects
+remain present. The temporary alias bypass was revoked. The old provisioner
+was retired at `c0fe02f`; this cleanup removes the baseline OIDC workflow and
+the exporter/rollback API entrypoints from canonical `main`. The exact
+namespace deletion workflow rechecks the same-backup restore qualification
+before deleting only the approved Koofr namespace. See the [legacy writer
+inventory](LEGACY-WRITER-INVENTORY-20261028.md).
 
-CI now runs `npm run check:source`, which syntax-checks and imports all `api/`
-and `lib/` JS modules and rejects known truncated-output markers. On the NAS
-Node 24.22.1, source check passed (29 modules) and offline tests passed (191/191).
+CI runs `npm run check:source`, which syntax-checks all `api/`, `lib/`, and
+`scripts/` JS modules, imports `api/` and `lib/`, and rejects known
+truncated-output markers. On Node 24.22.1, source check passed for 50 files
+and offline tests passed (195/195).
 
 
 ## Cron timestamp correction — 2026-10-28
 
 Backup `40659900983` at 08:52 UTC on 28 October was 15:52 Asia/Ho_Chi_Minh; the 03:30 VN run on 28 October had already passed. Backup `40663242871` captured at 09:18 UTC, or 16:18 VN, on 28 October. The next scheduled run is 03:30 VN on 29 October (20:30 UTC on 28 October). Both Actions runs cited above were manual dispatches; neither is cron evidence.
+
+## Final backup qualification and legacy writer lock — 2026-10-28
+
+Backup [40663242871](https://github.com/hunghvt-cyber/web-notes/actions/runs/40663242871) and automatic restore qualification [40663337366](https://github.com/hunghvt-cyber/web-notes/actions/runs/40663337366) both PASS for the exact backup ID `firestore-notes-2026-10-28T09-18-52Z-40663242871-1.json.gz`. Readback SHA-256 is `30b1441b402064b5f9245e0ce420533f41a7d696a4229e98f4273cf27d817f23`; fingerprint `525b16af87a11ff9fa690be6daf819475b79202e90819325ec73c8ff34011131`; parity counts are 32 notes (5 active, 27 trash), 2 folders, 11 shares, 36 receipts, 0 erased tombstones. Restore reported parity pass and removed `notes-restore-40663337366` after recursive delete.
+
+Vercel active firewall config version 1 now contains active exact-host deny rule `rule_block_retired_notes_deployment_hosts_P2DiU9`, matching only the 34 pre-cutover immutable deployment hosts; current Firestore deployment and both aliases are excluded. `firewallEnabled=true`, no pending config changes. Vercel processes deployment protection before WAF, so anonymous 302 is not treated as the deny test. The rule is the control-plane writer lock; no authenticated request probe was run. Custom WAF rules are available on all plans per Vercel documentation; no billing change was made. The old provision workflow was removed from `release/minimal-notes` at `c0fe02f`.
+
+The cleanup source removes the default-branch baseline OIDC workflow and request, exporter and rollback API entrypoints; the Production export flag is set to `disabled` and freeze flag to `false` for future deployments. The exact namespace deletion workflow revalidates the latest backup bytes/hash and matching restore marker at execution, then locks/deletes only `Hunghvt-Notes-Data-78cd53a3-e871-40e5-bf04-5e70ac20901e` and verifies its root is absent. This deletion has not run yet. See [inventory](LEGACY-WRITER-INVENTORY-20261028.md) and [backup evidence](BACKUP-RESTORE-VERIFIED-20261028.md).

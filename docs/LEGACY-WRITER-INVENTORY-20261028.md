@@ -9,7 +9,7 @@ Scope: Vercel project `hunghvt-notes`, project ID `prj_c4sEp6nB4msWTsPiGoALSuVut
 - Runtime health read on 2026-10-28 08:37:15 UTC returned `firestore-native-v1`, project `notes-lab-56f0f`, vault `notes-production`, `firestoreRead=PASS`.
 - Vercel project setting: SSO enabled for `all_except_custom_domains`; custom-domain list contains only `hunghvt-notes.vercel.app`. Secondary alias is not listed as a custom domain.
 - One temporary shareable protection bypass on the secondary alias was revoked; reread showed `protectionBypass={}`. No bypass secret is recorded here.
-- Vercel active firewall config lookup returned 404 (no active config).
+- Vercel active firewall configuration is enabled and contains the exact deny rule for retired immutable deployment hosts described below.
 - Unauthenticated HEAD to each prior immutable URL returned HTTP 302 to `https://vercel.com/sso-api`. Response bodies were not read. This proves anonymous requests are gated; it does not prove credentialed Vercel/Trusted Source principals cannot access old deployments.
 
 ## Prior immutable deployments
@@ -57,16 +57,23 @@ Inventory source: Vercel deployment list (35 total, one current Firestore deploy
 
 - Old primary deployment: `dpl_SrEHLu6jv6tjTUEPR7F25sxdsFZ1`, host `hunghvt-notes-m9km57e78-hunghvt.vercel.app`. Its old primary alias moved; its immutable URL is SSO-gated for anonymous requests.
 - Old secondary alias deployment: `dpl_7rdKgAjtDKryMVMApjyQHj2ZMY9B`, host `hunghvt-notes-de329dlyt-hunghvt.vercel.app`, source `Hunghvt-notes` / `release/minimal-notes`. Its immutable URL is SSO-gated for anonymous requests.
-- Legacy provision writer: branch `release/minimal-notes` commit `c0fe02f340b338275678733d77e622120cafb8fc` deleted `.github/workflows/notes-provision.yml` and `scripts/provision-notes.mjs`. GitHub returned 404 for both paths on that branch after the update. This disables the exact push-triggered provisioner for the Koofr namespace; shared WebDAV secrets remain untouched.
-- The default branch still has read-only baseline workflow `.github/workflows/notes-legacy-baseline.yml`; `.notes-migration/baseline-request.json` points to `dpl_CQQ9tSjTfkmJDKFJA5pyCLWnthVT` at `/api/migration-export`. The workflow requests OIDC and its endpoint enforces GET plus a write freeze. It is an active legacy read path, not a writer; remove it with the exporter route after the final backup/restore gate.
-- Current Production env metadata includes `NOTES_MIGRATION_EXPORT_ENABLED` and Koofr config key names; values were not read. `NOTES_MIGRATION_ROLLBACK_ENABLED` is absent from current project env metadata, so the rollback handler's explicit feature gate is not configured there. Historical per-deployment env snapshots are unavailable.
-- Main repo workflows still declare shared Koofr WebDAV secret names for synthetic preview/cleanup; secrets were not read or changed. New backup uses separate `NOTES_BACKUP_KOOFR_CREDENTIAL` and private backup root. No credential was revoked or rotated.
-- Production route configuration is not comprehensively enumerable from Vercel MCP: deployment file retrieval truncated larger modules, and project firewall configuration is absent. Credentialed trusted access and deployment deletion remain unverified.
-- Do not delete namespace until fresh backup and restore parity PASS for the same backup ID, and authenticated old writer paths are retired or proven unable to write. Alias removal alone is insufficient.
+- Legacy provision writer: branch `release/minimal-notes` commit `c0fe02f340b338275678733d77e622120cafb8fc` deleted `.github/workflows/notes-provision.yml` and `scripts/provision-notes.mjs`. GitHub returned 404 for both paths. Shared WebDAV secrets remain untouched.
+- Cleanup commit removes `.github/workflows/notes-legacy-baseline.yml`, `.notes-migration/baseline-request.json`, `scripts/notes-legacy-baseline.mjs`, and API entrypoints `api/migration-export.js` / `api/migration-rollback.js` from canonical `main`.
+- Production env values were not retrieved. `NOTES_MIGRATION_EXPORT_ENABLED` is now `disabled` and `NOTES_WRITES_FROZEN` is `false` for future deployments, confirmed by metadata readback. `NOTES_MIGRATION_ROLLBACK_ENABLED` is absent. Shared Koofr WebDAV and synthetic-test credentials remain unchanged.
+- Vercel active firewall config version 1 has `firewallEnabled=true`, `changes=[]`, and active rule `rule_block_retired_notes_deployment_hosts_P2DiU9` (`deny`, `host inc`, 34 exact prior immutable hosts). The current Firestore candidate and both app aliases are excluded. Vercel evaluates deployment protection before WAF, so anonymous 302 responses do not test this rule. No authenticated request probe was performed; the active control-plane rule is the configured all-request deny for those exact hosts. Vercel documents custom WAF rules as available on all plans; no billing change was made.
+- Connected Vercel tools expose no deployment-delete operation. Old deployment objects remain, but the exact host WAF deny, removed provisioning writer, removed baseline OIDC workflow, and removed migration routes close the known Koofr paths. Do not describe the deployment objects as deleted.
 
 ## Backup gate
 
-- Backup [40659900983](https://github.com/hunghvt-cyber/web-notes/actions/runs/40659900983) readback/hash verification PASS for `firestore-notes-2026-10-28T08-52-30Z-40659900983-1.json.gz`.
-- Restore [40659998751](https://github.com/hunghvt-cyber/web-notes/actions/runs/40659998751) only found an older PASS marker for run `40637421409`; it did not restore the backup above.
-- Restore script now compares marker backup ID and fingerprint to the latest verified backup before reuse. A fresh backup after merge will trigger actual restore.
+- Backup [40663242871](https://github.com/hunghvt-cyber/web-notes/actions/runs/40663242871), manual dispatch, source commit `56766025faf28679f26c117d02862d6a1a71ca56`, captured at `2026-10-28T09:18:52.624Z` (`16:18:52.624` VN).
+- Exact backup ID: `firestore-notes-2026-10-28T09-18-52Z-40663242871-1.json.gz`. Upload/readback, manifest, compressed SHA-256 and snapshot fingerprint verification: **PASS**. SHA-256 `30b1441b402064b5f9245e0ce420533f41a7d696a4229e98f4273cf27d817f23`; fingerprint `525b16af87a11ff9fa690be6daf819475b79202e90819325ec73c8ff34011131`.
+- Counts: 32 notes (5 active, 27 trash), 2 folders, 11 shares (0 active), 36 receipts, 0 erased tombstones. Retention reported `retained=1`, `verified=2`, `deleted=1`; only the managed backup prefix is eligible, separate baseline subtree is outside retention.
+- Restore [40663337366](https://github.com/hunghvt-cyber/web-notes/actions/runs/40663337366) used that exact backup ID. `restore_parity_pass` matched counts and fingerprint, then `restore_vault_removed` confirmed recursive deletion and absent root for `notes-restore-40663337366`. **Restore qualification: PASS.**
+- These were manual runs, not cron. At 08:52 UTC on 28 Oct it was 15:52 VN; the 03:30 VN run that day had passed. Next cron is 03:30 VN 29 Oct (`20:30 UTC` 28 Oct).
+
+## Exact namespace deletion workflow
+
+`.github/workflows/notes-legacy-namespace-delete.yml` is manual only and requires `DELETE_KOOFR_NOTES_NAMESPACE_20261028`. Before deleting the legacy namespace it rereads latest backup/restore controls, downloads the exact snapshot, and rechecks manifest, compressed hash, size, counts and fingerprint; the restore marker must match that backup ID and fingerprint. It verifies the namespace ownership marker, locks the exact root, deletes only descendants under that root, and requires the root to return 404. It emits counts and identifiers only. The namespace has not yet been deleted.
+
+The 03:30 Asia/Ho_Chi_Minh cron for 2026-10-28 had already passed at 08:52 UTC (15:52 VN). The next scheduled run is 03:30 VN on 2026-10-29 (2026-10-28 20:30 UTC). Runs 40663242871 and 40663337366 were manual backup/restore qualification, not cron evidence.
 
