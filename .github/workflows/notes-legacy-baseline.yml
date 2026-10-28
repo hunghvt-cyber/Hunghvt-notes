@@ -32,6 +32,21 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Decode only required GitHub OIDC claims locally
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          const endpoint = new URL(process.env.ACTIONS_ID_TOKEN_REQUEST_URL);
+          endpoint.searchParams.set('audience', 'https://hunghvt-notes.vercel.app/notes-legacy-baseline');
+          const response = await fetch(endpoint, { headers: { authorization: 'Bearer ' + process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN }, redirect: 'error' });
+          if (!response.ok) throw new Error('OIDC_TOKEN_REQUEST_FAILED');
+          const body = await response.json();
+          const parts = body.value.split('.');
+          if (parts.length !== 3) throw new Error('OIDC_TOKEN_FORMAT_INVALID');
+          const claims = JSON.parse(Buffer.from(parts[1], 'base64url').toString('utf8'));
+          const selected = Object.fromEntries(['iss', 'aud', 'sub', 'repository', 'repository_id', 'repository_owner_id', 'ref', 'workflow_ref', 'event_name'].map(key => [key, claims[key] ?? null]));
+          process.stdout.write(JSON.stringify(selected) + '\\n');
+          NODE
       - name: Authenticate with read-only main WIF
         uses: google-github-actions/auth@ba79af03959ebeac9769e648f473a284504d9193 # v2.1.10
         with:
