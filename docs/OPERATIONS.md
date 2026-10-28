@@ -86,3 +86,10 @@ The old `notes-firestore-exact-082` project has a successful build-only deployme
 ## Temporary access cleanup and live Production deployment — 2026-10-28
 
 The baseline-only WIF workflow allowlist was removed and read back; backup and restore qualification providers, repository principalSet bindings, database-scoped roles, Firestore/auth/Code Inbox configuration, and the retired-host firewall rule remain. Canonical Production now serves deployment `dpl_4xyMEmQUbR1m8tfuNjudzYu23LBM` from source commit `480b54605c8ed8d599af486bab7817456fd6afae`; both app aliases target it. Fresh runtime health reads Firestore successfully, and the migration export/rollback URLs return 404. Full filtered evidence and the Trusted Sources readback limitation are in [access cleanup and deployment evidence](ACCESS-CLEANUP-PRODUCTION-DEPLOYMENT-20261028.md).
+
+
+## Vercel project and branch inventory update — 2026-10-29
+
+The two Vercel projects approved for retirement, `notes-firestore-exact-082` and `homepage-koofr-lab`, were deleted by exact verified project name in team `team_gCsQcRiaCja0GafKj8JZLINI`. Readback returned project-not-found for both IDs. Canonical aliases remain on Notes deployment `dpl_4xyMEmQUbR1m8tfuNjudzYu23LBM` and Homepage NAS deployment `dpl_4T9PcviEaivkFGqDGsYKhRgVX4jE`. See [filtered Vercel deletion evidence](VERCEL-PROJECT-RETIREMENT-20261029.md).
+
+The remote branch plan, exact observed HEADs, archive-tag names, CI/ref dependencies, and preserved local worktrees are in the [branch lifecycle inventory](BRANCH-LIFECYCLE-20261029.md). The retired branches have not yet been deleted: exact archive tags must first be created and verified remotely. Code Inbox still depends on `release/minimal-notes` and its matching WIF ref; that branch is retained without merging its legacy app into `main`. PR #24 remains a draft isolated experiment.
