@@ -6,6 +6,7 @@ Scope: Vercel project `hunghvt-notes`, project ID `prj_c4sEp6nB4msWTsPiGoALSuVut
 
 - Keep: `dpl_2Ar8fGYSj7M4iorJHYUBfUGKsMDr`, `hunghvt-notes-7s1dvhwsk-hunghvt.vercel.app`, READY, source `ca18a373f0b53e26a473526de706559a1b957`.
 - Aliases `hunghvt-notes.vercel.app` and `hunghvt-notes-hunghvt.vercel.app` target this deployment.
+- A separate Vercel project `notes-firestore-exact-082` (`prj_24XdIpwUoTqfoMNgNUB4y73Iyz1M`) received the main push as a `production` target but is not the canonical `hunghvt-notes` project and its domain set does not include either Notes alias. Its deployment `dpl_8csSwdeiCaztCvbWDcXAXCEUz7F2` failed build because `vercel.json` still referenced the removed migration endpoints. The cleanup commit removes those stale function mappings. This project has no environment variables in metadata and is not treated as a verified/runtime candidate or alias target.
 - Runtime health read on 2026-10-28 08:37:15 UTC returned `firestore-native-v1`, project `notes-lab-56f0f`, vault `notes-production`, `firestoreRead=PASS`.
 - Vercel project setting: SSO enabled for `all_except_custom_domains`; custom-domain list contains only `hunghvt-notes.vercel.app`. Secondary alias is not listed as a custom domain.
 - One temporary shareable protection bypass on the secondary alias was revoked; reread showed `protectionBypass={}`. No bypass secret is recorded here.
