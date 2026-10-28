@@ -20,7 +20,7 @@ async function actionsToken(){
 async function exportKoofr(url,token){
  let response,last;
  for(let attempt=0;attempt<3;attempt++){
-  try{response=await fetch(url,{headers:{authorization:'Bearer '+token,accept:'application/gzip'},signal:AbortSignal.timeout(130000),redirect:'error'});if((response.status===429||response.status>=500)&&attempt<2){await response.arrayBuffer().catch(()=>{});await sleep(300*(2**attempt));continue;}break;}catch{last=new Error('KOFR_EXPORT_NETWORK_FAILED');if(attempt<2)await sleep(300*(2**attempt));}
+  try{response=await fetch(url,{headers:{authorization:'Bearer '+token,'x-vercel-trusted-oidc-idp-token':token,accept:'application/gzip'},signal:AbortSignal.timeout(130000),redirect:'error'});if((response.status===429||response.status>=500)&&attempt<2){await response.arrayBuffer().catch(()=>{});await sleep(300*(2**attempt));continue;}break;}catch{last=new Error('KOFR_EXPORT_NETWORK_FAILED');if(attempt<2)await sleep(300*(2**attempt));}
  }
  if(!response){throw last??new Error('KOFR_EXPORT_NETWORK_FAILED');}
  if(response.status!==200)throw new Error(`KOFR_EXPORT_HTTP_${response.status}`);
