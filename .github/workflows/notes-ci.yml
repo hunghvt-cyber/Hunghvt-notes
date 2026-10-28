@@ -1,6 +1,10 @@
 name: Notes simulation
 on:
   push:
+    branches:
+      - main
+      - release/minimal-notes
+      - notes/firestore-read-batching-perf-20261028
   pull_request:
 permissions:
   contents: read
