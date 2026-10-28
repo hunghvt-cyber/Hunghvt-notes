@@ -35,9 +35,11 @@ the latest verified backup. Run a new manual backup after that fix reaches
 `main`; its `workflow_run` restore must emit both `restore_parity_pass` and
 `restore_vault_removed` for that new backup before cleanup.
 
-The active Vercel firewall now has an exact-host `deny` rule for all 34 prior
-immutable deployment hosts. The current Firestore deployment and both app
-aliases are excluded. The rule is active in control-plane configuration;
+The active Vercel firewall on `hunghvt-notes` has an exact-host `deny` rule
+for all 34 prior immutable deployment hosts. The separate
+`notes-firestore-exact-082` project has another exact-host `deny` for its six
+old release-branch deployments. Current Firestore candidate domains and app
+aliases are excluded. Both rules are active in control-plane configuration;
 anonymous requests still return 302 because deployment protection runs before
 WAF, so those responses are not the deny-rule test. The deployment objects
 remain present. The temporary alias bypass was revoked. The old provisioner
@@ -51,8 +53,9 @@ CI runs `npm run check:source`, which syntax-checks all `api/`, `lib/`, and
 `scripts/` JS modules, imports `api/` and `lib/`, and rejects known
 truncated-output markers. After removing the old Koofr provision and test-root
 cleanup code, local source check passed for 48 files and offline tests passed
-(190/190). CI run 40666407214 has the test job passed; its browser job was
-still running at the latest check.
+(191/191), including a synthetic recursive-delete test restricted to the exact
+legacy root. CI run 40666407214 passed both jobs before that additional test
+was added; the new test is included in the next push.
 
 
 ## Cron timestamp correction — 2026-10-28
