@@ -1,5 +1,7 @@
 # Legacy baseline staging checkpoint — 2026-10-28
 
+> **Historical checkpoint only; access retired on 2026-10-28.** The private baseline remains separate from the deleted legacy app namespace. The baseline workflow and migration export/rollback entrypoints are removed from current main. The baseline-only Vercel Trusted Source was cleared, and the backup WIF allowlist now accepts only `firestore-backup.yml`; restore qualification remains separate. Exact namespace deletion passed in [run 40668142124](https://github.com/hunghvt-cyber/web-notes/actions/runs/40668142124). Do not recreate the temporary source/workflow or treat the staging claims below as current access. See [final access cleanup and Production deployment evidence](ACCESS-CLEANUP-PRODUCTION-DEPLOYMENT-20261028.md).
+
 ## Source and tests
 
 - Canonical source commit/tree deployed: `14ba6c541dc486c3e932d1a965d01413b8f1604d` / `e9abdaf464636ada7fdb81f2b6fe986593cc5203` (PR #23; PR #22 is its parent).
