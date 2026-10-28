@@ -12,6 +12,20 @@ test('pre-existing backup path without exact ownership marker fails closed',asyn
  const store=new KoofrFirestoreBackup('u:p',{fetchImpl:async(_url,options)=>options.method==='MKCOL'?response(405):response(404)});
  await assert.rejects(store.ensureRoot(),/BACKUP_ROOT_NOT_OWNED/);
 });
+test('baseline archive uses an isolated exact prefix and verifies its ownership marker',async()=>{
+ const calls=[],marker=Buffer.from('notes-legacy-baseline-managed-v1\n');
+ const store=new KoofrFirestoreBackup('u:p',{fetchImpl:async(url,options)=>{calls.push({url,options});if(options.method==='MKCOL')return response(201);return response(201);}});
+ await store.ensureBaselineRoot();
+ await store.putBaseline('legacy-koofr-1-1.json.gz',Buffer.from('snapshot'),'application/gzip');
+ assert.ok(calls[0].url.endsWith('/legacy-baselines/'));assert.deepEqual(calls[1].options.body,marker);
+ assert.ok(calls[2].url.endsWith('/legacy-baselines/legacy-koofr-1-1.json.gz'));
+ assert.equal(calls.some(x=>x.options.method==='DELETE'),false);
+});
+test('unowned baseline prefix and unsafe object names fail closed',async()=>{
+ const store=new KoofrFirestoreBackup('u:p',{fetchImpl:async(_url,options)=>options.method==='MKCOL'?response(405):response(404)});
+ await assert.rejects(store.ensureBaselineRoot(),/BASELINE_ROOT_NOT_OWNED/);
+ await assert.rejects(store.putBaseline('../private',Buffer.from('x'),'application/gzip'));
+});
 test('WebDAV transient 503 retries are bounded to three requests',async()=>{
  let count=0;const store=new KoofrFirestoreBackup('u:p',{fetchImpl:async()=>{count++;return response(503);},timeoutMs:1000});
  const r=await store.call('GET',koofrBackupRoot);assert.equal(r.status,503);assert.equal(count,3);

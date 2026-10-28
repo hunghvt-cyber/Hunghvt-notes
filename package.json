@@ -19,7 +19,8 @@
     "@google-cloud/firestore": "9.4.0",
     "@vercel/oidc": "^4.0.4",
     "google-auth-library": "^11.3.1",
-    "iron-session": "8.0.4"
+    "iron-session": "8.0.4",
+    "jose": "5.10.0"
   },
   "devDependencies": {
     "@playwright/test": "1.62.1"
