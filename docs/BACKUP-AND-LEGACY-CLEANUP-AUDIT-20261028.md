@@ -32,9 +32,11 @@ claim a backup, restore, or cleanup has succeeded.
   equated with the 187 suite. This audit establishes only the exact local
   command/tree above and the CI job steps; it does not infer a CI test count
   from job success.
-- Gemini review was unavailable in this session: no Gemini connector or
-  executable was exposed. No Notes data, snapshot, or credential was sent to
-  Gemini.
+- Gemini CLI was present, but its authenticated request failed with
+  `IneligibleTierError: UNSUPPORTED_CLIENT` for the configured Gemini Code
+  Assist for individuals tier. The filtered review prompt contained only the
+  generic backup/retention and blocker metadata above; no Notes data, repo path,
+  snapshot, or credential was sent. Gemini review is therefore unavailable.
 
 ## Production backend evidence
 
