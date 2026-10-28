@@ -49,8 +49,10 @@ inventory](LEGACY-WRITER-INVENTORY-20261028.md).
 
 CI runs `npm run check:source`, which syntax-checks all `api/`, `lib/`, and
 `scripts/` JS modules, imports `api/` and `lib/`, and rejects known
-truncated-output markers. On Node 24.22.1, source check passed for 50 files
-and offline tests passed (195/195).
+truncated-output markers. After removing the old Koofr provision and test-root
+cleanup code, local source check passed for 48 files and offline tests passed
+(190/190). CI run 40666407214 has the test job passed; its browser job was
+still running at the latest check.
 
 
 ## Cron timestamp correction — 2026-10-28
@@ -64,3 +66,5 @@ Backup [40663242871](https://github.com/hunghvt-cyber/web-notes/actions/runs/406
 Vercel active firewall config version 1 now contains active exact-host deny rule `rule_block_retired_notes_deployment_hosts_P2DiU9`, matching only the 34 pre-cutover immutable deployment hosts; current Firestore deployment and both aliases are excluded. `firewallEnabled=true`, no pending config changes. Vercel processes deployment protection before WAF, so anonymous 302 is not treated as the deny test. The rule is the control-plane writer lock; no authenticated request probe was run. Custom WAF rules are available on all plans per Vercel documentation; no billing change was made. The old provision workflow was removed from `release/minimal-notes` at `c0fe02f`.
 
 The cleanup source removes the default-branch baseline OIDC workflow/request, exact provisioner and old 39-root test cleanup writer, exporter/rollback API entrypoints, and obsolete Vercel function mappings. It also disables new Vercel deployments from `release/minimal-notes`. Production export is disabled in environment metadata and rollback enablement is absent. The exact namespace deletion workflow revalidates the latest backup bytes/hash and matching restore marker at execution, then locks/deletes only `Hunghvt-Notes-Data-78cd53a3-e871-40e5-bf04-5e70ac20901e` and verifies its root is absent. This deletion has not run yet. The isolated restore WIF identity remains because it performs qualification after each new successful backup; its scope is separate from the read-only backup identity. See [inventory](LEGACY-WRITER-INVENTORY-20261028.md) and [backup evidence](BACKUP-RESTORE-VERIFIED-20261028.md).
+
+The old `notes-firestore-exact-082` project has a successful build-only deployment but no app environment variables and no Notes aliases. It is not the live project. Canonical aliases still target the Firestore-native deployment recorded above; source route removal awaits a canonical-project deployment. No alias was moved in this cleanup step.
