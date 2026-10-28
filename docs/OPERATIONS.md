@@ -27,3 +27,7 @@ Luôn phân biệt dữ liệu đọc trực tiếp với báo cáo từ NAS, te
 ## Independent audit — 28/10/2026
 
 Read-only verification confirmed the canonical production alias and legacy alias/deployment, but did not establish the active runtime datastore. GitHub reports zero runs for the Firestore backup workflow; there is no Koofr readback or restore parity. Live WIF/IAM and the dedicated Koofr secret's existence remain unverified. No alias, deployment, namespace, credential, or Notes data was changed. See [full audit and evidence](BACKUP-AND-LEGACY-CLEANUP-AUDIT-20261028.md).
+
+## Preflight follow-up — 28/10/2026
+
+Vercel deployment artifact inspection confirmed the deployed selector source matches `main`, while the exact effective environment captured by that deployment is not exposed by the connected Vercel API. Backend remains UNKNOWN. Read-only inventory found the Koofr-only legacy deployment and conditional Code Inbox/rollback writers; nothing was changed. Use [the preflight runbook](BACKUP-PREFLIGHT-20261028.md) for exact artifact evidence, the filtered Google Cloud Shell check, GitHub UI secret check, and manual workflow input.
