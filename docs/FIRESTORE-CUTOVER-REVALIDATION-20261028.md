@@ -43,3 +43,13 @@ A source-only, feature-gated route was added in [PR #20](https://github.com/hung
 - Vercel build for PR source completed READY in the separate `notes-firestore-exact-082` project. Its Production environment-variable metadata is empty. A direct request to that deployment's export route returned 404. This verifies only that the default-closed route compiles and remains closed without flags; it is not a Production app deployment or Koofr export.
 
 The route is now present on canonical main but was **not enabled** in `hunghvt-notes`, and no deployment was created in the primary project. Existing aliases/deployments and all source data remain unchanged. A protected primary-project staged deployment with exact Production env, a private snapshot handoff/readback path, and safe isolation of all writers are still required before capturing the current Koofr source or moving aliases.
+
+
+## Additional runtime health probes
+
+Read-only GET probes of both immutable URLs returned:
+
+- Primary immutable deployment `hunghvt-notes-m9km57e78-hunghvt.vercel.app`: `configured=true, production=true`.
+- Legacy immutable deployment `hunghvt-notes-de329dlyt-hunghvt.vercel.app`: `configured=false, production=true`.
+
+The primary health handler validates app configuration but does not initialize or contact a store; `configured=true` therefore does not distinguish Koofr from Firestore. The legacy `configured=false` response means its health route currently reports incomplete app config, but it does not reveal which variable is absent or establish a safe retirement. Both URLs and aliases remain reachable. No writes were attempted.
