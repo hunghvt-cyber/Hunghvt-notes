@@ -1,5 +1,15 @@
 # Notes vận hành — 28/10/2026
 
+## Performance baseline — 2026-10-28
+
+NAS-to-Production health and synthetic Firestore UI measurements are recorded
+in [performance baseline](PERFORMANCE-BASELINE-20261028.md). Production health
+confirmed Firestore access, with a server-side p95 tail that is not yet split
+into OIDC, SDK initialization, and Firestore read time. UI measurements used a
+separate synthetic test-project vault, not Production Notes. The test vault was
+removed and its absence verified. No performance code change was justified by
+the current evidence.
+
 
 ## Cutover revalidation — 28/10/2026
 
