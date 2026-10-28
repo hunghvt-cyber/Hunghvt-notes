@@ -54,8 +54,8 @@ CI runs `npm run check:source`, which syntax-checks all `api/`, `lib/`, and
 truncated-output markers. After removing the old Koofr provision and test-root
 cleanup code, local source check passed for 48 files and offline tests passed
 (191/191), including a synthetic recursive-delete test restricted to the exact
-legacy root. CI run 40666407214 passed both jobs before that additional test
-was added; the new test is included in the next push.
+legacy root. CI run [40667083362](https://github.com/hunghvt-cyber/web-notes/actions/runs/40667083362)
+passed both test and browser jobs with the added cleanup test.
 
 
 ## Cron timestamp correction — 2026-10-28
