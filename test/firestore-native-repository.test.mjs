@@ -26,7 +26,7 @@ class Snapshot{
  data(){return copy(this.row);}
 }
 class FakeFirestore{
- constructor(){this.rows=new Map();this.collectionReads=0;this.attempts=0;}
+ constructor(){this.rows=new Map();this.collectionReads=0;this.attempts=0;this.transactionGetAllCalls=0;}
  collection(name){return new CollectionRef(this,name);}
  async runTransaction(fn,{maxAttempts=5}={}){
   for(let attempt=0;attempt<maxAttempts;attempt++){
@@ -48,6 +48,7 @@ class FakeFirestore{
      }
      const entry=this.rows.get(ref.path);reads.set(ref.path,entry?.version??0);return new Snapshot(ref.path,entry,this);
     },
+    getAll:async(...refs)=>{this.transactionGetAllCalls++;return Promise.all(refs.map(ref=>tx.get(ref)));},
     set:(ref,data)=>writes.push({kind:'set',path:ref.path,data:copy(data)}),
     create:(ref,data)=>writes.push({kind:'create',path:ref.path,data:copy(data)}),
     update:(ref,data)=>writes.push({kind:'update',path:ref.path,data:copy(data)}),
@@ -75,6 +76,14 @@ class FakeFirestore{
 const rid=n=>`00000000-0000-4000-8000-${String(n).padStart(12,'0')}`;
 const note=(text='hello')=>({title:'Test',text,checklist:[],pinned:false,folder:'Inbox'});
 const setup=async db=>{const repo=new FirestoreNativeRepository(db,{vaultId:'test-vault'});await repo.initialize({epoch:'0000000000000001',folders:['Inbox']});return repo;};
+
+test('owner read batches independent vault and note point reads without dropping history',async()=>{
+ const db=new FakeFirestore(),repo=await setup(db);
+ const id=rid(901),first=await repo.save(id,note('history version'),null,rid(902));
+ await repo.save(id,note('current version'),first.revision,rid(903));
+ const before=db.transactionGetAllCalls,result=await repo.read(id);
+ assert.equal(db.transactionGetAllCalls,before+1);assert.equal(result.text,'current version');assert.equal(result.history[0].text,'history version');
+});
 
 test('native save uses per-note CAS and operation receipts; replay does not advance revision',async()=>{
  const db=new FakeFirestore(),repo=await setup(db);

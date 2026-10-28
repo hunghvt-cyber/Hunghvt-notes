@@ -43,6 +43,16 @@ test('session login, Origin/JSON checks, tamper, logout and password rotation ke
  const out=await call(s,'auth',{method:'DELETE',session});assert.equal(out.status,200);assert.match(out.r.headers.get('set-cookie'),/Max-Age=0/);
  s.cfg.PREVIEW_PORTAL_PASSWORD='changed-test-password';assert.equal((await call(s,'notes',{session})).status,401);
 });
+
+test('runtime timing record contains phase durations only and no auth request data',async()=>{
+ const s=setup(),runtimeTimings={clientSetupMs:2.3,oidcSubjectTokenMs:[]},ops=[];let prepared=0;
+ const makeStore=()=>({runtimeTimings,metrics:[],runWithRuntimeTiming:fn=>fn(),prepareAuthForTiming:async()=>{prepared++;},loginAttempt:async()=>{ops.push('loginAttempt');}});
+ const handler=createPreviewHandler({env:()=>s.cfg,makeStore,observe:x=>s.logs.push(x)});
+ const response=await handler(new Request('https://preview.example/api/app?route=auth',{method:'POST',headers:{origin:'https://preview.example','content-type':'application/json'},body:JSON.stringify({password:'synthetic-test-password'})}));
+ assert.equal(response.status,200);assert.equal(prepared,1);assert.deepEqual(ops,['loginAttempt']);
+ const line=s.logs.at(-1),serialized=JSON.stringify(line);assert.ok(line.timingMs.total>=0);assert.ok(line.firestoreRuntime.clientSetupMs>=0);assert.ok(line.firestoreRuntime.accessTokenMs.ms>=0);assert.equal(line.storeOperationTimings[0].operation,'loginAttempt');
+ assert.equal(serialized.includes('synthetic-test-password'),false);assert.equal(serialized.includes('Set-Cookie'),false);
+});
 test('UUID creation is stable across retry, handles >28KB Unicode, conditional fetch and list delta',async()=>{
  const s=setup();await s.init();const session=await owner(s),op=randomUUID(),data={action:'save',clientOpId:op,title:'UUID thật',text:'đ😀'.repeat(12000),checklist:[{id:'done',text:'Đã làm',checked:true}],folder:'Thư mục mới',pinned:true};
  const saved=await call(s,'notes-save',{method:'POST',session,data});assert.equal(saved.status,200,JSON.stringify(saved.body));assert.equal(saved.body.id,op);assert.equal(saved.body.text,data.text);assert.equal(saved.body.folder,data.folder);
