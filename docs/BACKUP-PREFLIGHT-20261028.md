@@ -72,6 +72,7 @@ Notes application uses Firestore.
   `KOOFR_NOTES_USER` / `KOOFR_NOTES_APP_PASSWORD` variables. Values of
   credentials were not requested or read. Preserve them until every caller is
   disabled and the backup/restore gate passes.
+- The current `release/minimal-notes` head is `8ce7d3300ef0515c861b7bf2c1e7a294d82648ad`; its source claims canonical repository `hunghvt-cyber/web-notes`. The latest read-only Actions metadata for the Inbox publisher shows successful run `40492062698` at older commit `40d6afb6a0bf3e337cc1d76006724c5c9a4083bb` on 2026-10-27 10:54 UTC, before the canonical-claim update. No successful publisher run after that update was observed, so current OIDC/runtime compatibility remains unproven.
 - On branch `release/minimal-notes`, workflow
   `.github/workflows/notes-inbox.yml` sends an OIDC-authenticated inbox
   request to the production URL for changes to `.notes-inbox/request.json`.
