@@ -49,3 +49,12 @@ No Koofr snapshot or Firestore comparison was performed in this checkpoint. Ther
 - The same run then stopped before source access with `KOFR_EXPORT_NETWORK_FAILED`: Vercel Deployment Protection rejected the request. No Koofr or Firestore snapshot was taken.
 - The deployment remains target `production` even though its alias inventory is empty. Vercel Trusted Sources allows GitHub Actions on all plans, so this rule does not require a plan upgrade or billing change ([official documentation](https://vercel.com/docs/deployment-protection/methods-to-bypass-deployment-protection/trusted-sources)). Team metadata did not expose a plan name.
 - Runtime log query for each interval where the stage deployment briefly held a Production alias found four `GET /api/app` invocations and zero mutating HTTP methods for each deployment. The two request intervals were 06:52:40–06:55:00Z (deployment `dpl_E1NH7Cjs6i6UVzrpQsYYimu92ukz`) and 06:56:35–07:00:00Z (deployment `dpl_CQQ9tSjTfkmJDKFJA5pyCLWnthVT`). These logs show no stage-deployment writes in those windows; they do not imply old deployments were frozen.
+
+
+## Verified baseline run 40649120419
+
+- Run [40649120419](https://github.com/hunghvt-cyber/web-notes/actions/runs/40649120419), attempt 3, completed successfully from the approved `push` on `main`. The real OIDC/WIF step and protected exporter call passed.
+- The workflow completed capture, private Koofr upload, remote readback, compressed-object SHA-256 verification, and manifest/readback validation. No snapshot was uploaded as a GitHub artifact. Snapshot objects and hashes are intentionally not reproduced here.
+- Filtered comparison summary: Koofr had 28 notes (6 active, 22 trash), 2 folders, 11 shares (0 active), 24 receipts, and 0 erased markers. Firestore had 32 notes (5 active, 27 trash), 2 folders, 11 shares (0 active), 36 receipts, and 0 erased markers.
+- Full snapshot comparison reports `match: false`; difference categories are `notes`, `note-count`, and `idempotency-receipts`. Counts alone do not establish whether these represent post-checkpoint changes, tombstone effects, or conflicting content. Preserve both sources and their verified private baseline; do not merge, cut over, or delete legacy data until record-level comparison can classify the differences while preserving deletion state.
+- This is a manual Actions run, not evidence that the scheduled cron has executed. Neither legacy writers nor aliases were changed by this run.
