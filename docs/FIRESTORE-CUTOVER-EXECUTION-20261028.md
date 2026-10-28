@@ -23,3 +23,14 @@ Keep the verified Firestore backup/restore and private baseline from [baseline r
 ## Cutover outcome
 
 Pending. Record the exact deployment ID/URL, per-deployment config, live Firestore health response, aliases, old writer isolation, post-cutover backup/restore run, and exact namespace cleanup result here as each is verified. Do not delete the Koofr namespace until the new Firestore deployment and post-cutover restore qualification pass.
+
+
+## Runtime attempt — 2026-10-28
+
+- Candidate deployment built from canonical main commit `2de8337e860b177e9491d171aa8d0fc2a990cdd0`: `dpl_6Wbucvquftz3g9WAzf1ZUc1cYqEZ`, immutable URL `hunghvt-notes-7e4mg8q93-hunghvt.vercel.app`, state READY, target Production.
+- Candidate's protected `GET /api/app?route=health` returned HTTP 500 `FUNCTION_INVOCATION_FAILED`; no health JSON was emitted, so production backend remains UNKNOWN. `/api/inbox` also returned 500; the separate preview route returned 200. Do not infer that Firestore is active from the explicit environment settings alone.
+- Artifact metadata shows Node 24.x and the same declared Firestore/auth/OIDC package versions as the prior primary deployment. Candidate and old deployment share the same `api/app.js`, `api/inbox.js`, and `lib/app-config.mjs` file hashes; Firestore runtime/repository source differs. This narrows but does not establish the failure cause.
+- A prior runtime-log observation reported a Node syntax error (“Unexpected identifier 'output'”), but current Hobby retention did not provide a fresh log record for this request. Runtime error aggregation also returned no cluster. The available 500 response does not expose a root cause.
+- Re-read alias metadata after restoration: primary `hunghvt-notes.vercel.app` remains on `dpl_SrEHLu6jv6tjTUEPR7F25sxdsFZ1`; secondary `hunghvt-notes-hunghvt.vercel.app` remains on `dpl_7rdKgAjtDKryMVMApjyQHj2ZMY9B`. Candidate aliases were not switched. The immutable old deployment URLs remain reachable; legacy writers are not claimed isolated.
+- No backup was run after cutover because cutover has not occurred. No Koofr namespace, deployment, route, identity or permission was deleted. Existing verified backup/baseline remains untouched.
+- Blocker: obtain an actionable deployment build/runtime diagnostic or fix the function initialization failure, then repeat the root-only Firestore health read before alias changes. Only after that can the post-cutover backup/restore gate and exact legacy deletion proceed.
