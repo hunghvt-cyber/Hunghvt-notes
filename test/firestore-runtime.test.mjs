@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {randomBytes} from 'node:crypto';
 import {appConfig,productionProject} from '../lib/app-config.mjs';
 import {createFirestoreNativeStore} from '../lib/firestore-runtime.mjs';
 
@@ -20,4 +21,23 @@ test('Vercel WIF constructs a GoogleAuth client from a supplier and rejects exte
  const client=await settings.auth.getClient();assert.ok(client);assert.equal(store.vaultId,'notes-preview');
  assert.deepEqual(await store.runtimeHealth(),{readable:true,vaultInitialized:true});
  await assert.rejects(createFirestoreNativeStore({projectId:'notes-lab-56f0f',vaultId:'notes-preview',namespace:'preview'},{headers:new Headers()},{env:{...env,NOTES_FIRESTORE_WIF_CONFIG:JSON.stringify({...wif,credential_source:{file:'/tmp/credentials'}})},FirestoreClass:FirestoreFake,tokenProvider:async()=>'synthetic-oidc-token-'.padEnd(128,'x')}),e=>e.message==='FIRESTORE_WIF_CONFIG_INVALID');
+});
+
+test('Firestore runtime records only OIDC subject-token duration, never token text',async()=>{
+ let auth,calls=0;
+ const document={collection(){return this;},doc(){return this;}};
+ const db={collection(){return document;}};
+ class FakeFirestore{constructor(options){auth=options.auth;return db;}}
+ const cfg={projectId:'test-'+randomBytes(5).toString('hex'),vaultId:'test-vault',namespace:'synthetic'};
+ const env={VERCEL_ENV:'preview',NOTES_FIRESTORE_WIF_CONFIG:JSON.stringify({
+  type:'external_account',audience:'//iam.googleapis.com/projects/123/locations/global/workloadIdentityPools/notes-pool/providers/github',
+  subject_token_type:'urn:ietf:params:oauth:token-type:jwt',token_url:'https://sts.googleapis.com/v1/token',
+  service_account_impersonation_url:'https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/notes-test@example.iam.gserviceaccount.com:generateAccessToken'
+ })};
+ const store=await createFirestoreNativeStore(cfg,null,{env,FirestoreClass:FakeFirestore,tokenProvider:async()=>{calls++;return 'synthetic-short-token';}});
+ await assert.rejects(store.runWithRuntimeTiming(()=>auth.getAccessToken()));
+ assert.equal(calls,1);assert.equal(store.runtimeTimings.oidcSubjectTokenMs.length,1);
+ assert.equal(store.runtimeTimings.oidcSubjectTokenMs[0].succeeded,false);
+ assert.ok(store.runtimeTimings.oidcSubjectTokenMs[0].ms>=0);
+ assert.equal(JSON.stringify(store.runtimeTimings).includes('synthetic-short-token'),false);
 });
