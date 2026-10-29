@@ -1,0 +1,35 @@
+{
+  "browser": "Chromium headless with Playwright hasTouch; synthetic fixture only",
+  "measurements": [
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "minimumTarget": {
+        "width": 44,
+        "height": 44
+      }
+    },
+    {
+      "viewport": {
+        "width": 744,
+        "height": 1133
+      },
+      "minimumTarget": {
+        "width": 44,
+        "height": 44
+      }
+    },
+    {
+      "viewport": {
+        "width": 1133,
+        "height": 744
+      },
+      "minimumTarget": {
+        "width": 50,
+        "height": 44
+      }
+    }
+  ]
+}

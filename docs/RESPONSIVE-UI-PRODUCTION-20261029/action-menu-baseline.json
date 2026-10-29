@@ -1,0 +1,22 @@
+{
+  "browser": "Chromium headless on NAS; synthetic API/WebDAV fixture",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "deploymentSource": "main before this change",
+  "menu": {
+    "x": -11.34375,
+    "y": 198,
+    "width": 310,
+    "height": 112,
+    "right": 298.65625,
+    "bottom": 310
+  },
+  "withinViewport": false,
+  "cause": "absolute menu with right:0 was 310px wide but anchored to the workspace actions summary at x=254.656; its right edge aligned to x=298.656 so left edge escaped to -11.344. The workspace itself also clips overflow.",
+  "screenshots": [
+    "action-menu-before-1440x900.png",
+    "notes-list-before-1440x900.png"
+  ]
+}

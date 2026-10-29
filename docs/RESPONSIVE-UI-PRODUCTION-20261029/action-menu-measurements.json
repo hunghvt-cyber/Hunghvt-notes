@@ -1,0 +1,118 @@
+{
+  "browser": "Chromium headless; synthetic API/WebDAV fixture; CSS zoom emulates 125% and 150%",
+  "measurements": [
+    {
+      "zoom": 1,
+      "x": 1152,
+      "y": 737,
+      "right": 1432,
+      "bottom": 852,
+      "width": 280,
+      "height": 115,
+      "anchor": {
+        "top": 860,
+        "right": 1436,
+        "bottom": 896
+      },
+      "viewport": {
+        "left": 0,
+        "top": 0,
+        "right": 1440,
+        "bottom": 900
+      }
+    },
+    {
+      "zoom": 1.25,
+      "x": 1082.5,
+      "y": 698.75,
+      "right": 1432.5,
+      "bottom": 842,
+      "width": 350,
+      "height": 143.25,
+      "anchor": {
+        "top": 850,
+        "right": 1435,
+        "bottom": 895
+      },
+      "viewport": {
+        "left": 0,
+        "top": 0,
+        "right": 1440,
+        "bottom": 900
+      }
+    },
+    {
+      "zoom": 1.5,
+      "x": 1012.5,
+      "y": 660,
+      "right": 1432.5,
+      "bottom": 831.5,
+      "width": 420,
+      "height": 171.5,
+      "anchor": {
+        "top": 840,
+        "right": 1434,
+        "bottom": 894
+      },
+      "viewport": {
+        "left": 0,
+        "top": 0,
+        "right": 1440,
+        "bottom": 900
+      }
+    },
+    {
+      "zoom": "125%-layout-viewport-equivalent",
+      "x": 864,
+      "y": 557,
+      "right": 1144,
+      "bottom": 672,
+      "width": 280,
+      "height": 115,
+      "anchor": {
+        "top": 680,
+        "right": 1148,
+        "bottom": 716
+      },
+      "viewport": {
+        "left": 0,
+        "top": 0,
+        "right": 1152,
+        "bottom": 720
+      }
+    },
+    {
+      "zoom": "150%-layout-viewport-equivalent",
+      "x": 672,
+      "y": 429,
+      "right": 952,
+      "bottom": 544,
+      "width": 280,
+      "height": 115,
+      "anchor": {
+        "top": 552,
+        "right": 956,
+        "bottom": 596
+      },
+      "viewport": {
+        "left": 0,
+        "top": 0,
+        "right": 960,
+        "bottom": 600
+      }
+    },
+    {
+      "scenario": "after-container-scroll",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "menu": {
+        "x": 239,
+        "y": 193,
+        "width": 280,
+        "height": 115
+      }
+    }
+  ]
+}
