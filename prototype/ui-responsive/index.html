@@ -41,7 +41,7 @@
         <div class="editor-scroll" id="editor-scroll"><div class="editor-content">
           <label class="sr-only" for="title">Tiêu đề ghi chú</label><textarea id="title" class="title" rows="1" maxlength="200" aria-label="Tiêu đề ghi chú"></textarea>
           <div class="meta"><span id="folder-meta">Công việc</span><span>·</span><span id="updated-meta">Vừa cập nhật</span><span class="meta-spacer"></span><button id="move-note">Đổi thư mục</button></div>
-          <div class="editor-tools"><button id="checklist-button">☑ <span>Checklist</span></button><button id="code-button">&lt;/&gt; <span>Khối mã</span></button><button id="trash-note" aria-label="Chuyển note vào thùng rác">⌫</button></div>
+          <div class="editor-tools"><button id="checklist-button" aria-label="Chèn mục checklist">☑ <span>Checklist</span></button><button id="code-button" aria-label="Chèn khối mã">&lt;/&gt; <span>Khối mã</span></button><details class="editor-more"><summary aria-label="Thao tác khác">···</summary><div class="editor-menu"><button id="trash-note">Chuyển vào thùng rác</button></div></details></div>
           <label class="sr-only" for="body">Nội dung ghi chú</label><textarea id="body" aria-label="Nội dung ghi chú" spellcheck="false"></textarea>
           <div class="editor-footer"><span>Markdown nhẹ · lưu tự động</span><span id="word-count">0 từ</span></div>
           <div class="history-panel" id="history-panel" hidden><strong>Lịch sử gần đây</strong><p>Hôm nay, 10:42 · Bản hiện tại</p><p>Hôm qua, 16:18 · Bản trước</p><button id="history-close">Đóng</button></div>

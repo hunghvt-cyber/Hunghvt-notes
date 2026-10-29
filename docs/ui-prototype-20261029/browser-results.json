@@ -13,14 +13,14 @@
       ],
       "list": 0,
       "editor": 390,
-      "bodyWidth": 318,
+      "bodyWidth": 348,
       "editorVisible": true,
       "titleHeight": 97,
       "titleScroll": 97,
       "titleInlineHeight": "97px",
       "titleClipped": false,
       "horizontalOverflow": false,
-      "touchControls": true
+      "undersizedTouchControls": []
     },
     {
       "name": "ipad-mini-portrait",
@@ -32,16 +32,16 @@
         744,
         1133
       ],
-      "list": 290,
-      "editor": 390,
-      "bodyWidth": 310,
-      "editorVisible": true,
-      "titleHeight": 90,
-      "titleScroll": 90,
-      "titleInlineHeight": "90px",
+      "list": 744,
+      "editor": 0,
+      "bodyWidth": 0,
+      "editorVisible": false,
+      "titleHeight": 0,
+      "titleScroll": 0,
+      "titleInlineHeight": "60px",
       "titleClipped": false,
       "horizontalOverflow": false,
-      "touchControls": true
+      "undersizedTouchControls": []
     },
     {
       "name": "ipad-mini-landscape",
@@ -53,16 +53,16 @@
         1133,
         744
       ],
-      "list": 340,
-      "editor": 561,
-      "bodyWidth": 416,
+      "list": 320,
+      "editor": 749,
+      "bodyWidth": 656,
       "editorVisible": true,
-      "titleHeight": 122,
-      "titleScroll": 122,
-      "titleInlineHeight": "122px",
+      "titleHeight": 82,
+      "titleScroll": 82,
+      "titleInlineHeight": "82px",
       "titleClipped": false,
       "horizontalOverflow": false,
-      "touchControls": true
+      "undersizedTouchControls": []
     },
     {
       "name": "pc",
@@ -76,27 +76,35 @@
       ],
       "list": 340,
       "editor": 868,
-      "bodyWidth": 692,
+      "bodyWidth": 716,
       "editorVisible": true,
       "titleHeight": 86,
       "titleScroll": 86,
       "titleInlineHeight": "86px",
       "titleClipped": false,
       "horizontalOverflow": false,
-      "touchControls": true
+      "undersizedTouchControls": []
     }
   ],
+  "touchTargetRule": "all visible buttons at least 44x44 CSS px",
   "ipadPortraitComparison": {
     "viewport": "744x1133 CSS px",
-    "twoPane": {
-      "pane": "folders + list + editor",
-      "editorPaneWidth": 390,
-      "editableBodyWidth": 310
+    "default": "one-pane list/editor switch; folders in drawer",
+    "editorPaneWidth": 744,
+    "editableBodyWidth": 636
+  },
+  "responsiveMeasurements": {
+    "ipadLandscape": {
+      "viewport": "1133x744 CSS px",
+      "folderRailWidth": 64,
+      "editorPaneWidth": 749,
+      "editableBodyWidth": 656
     },
-    "onePane": {
-      "pane": "list/editor switch, folders in drawer",
-      "editorPaneWidth": 744,
-      "editableBodyWidth": 638
+    "pc": {
+      "viewport": "1440x900 CSS px",
+      "folderSidebarWidth": 232,
+      "editorPaneWidth": 868,
+      "editableBodyWidth": 716
     }
   },
   "interactions": [
@@ -104,11 +112,14 @@
     "search and open",
     "history and share revoke",
     "new note",
-    "viewport resize preserves text and caret",
+    "viewport resize preserves text, focus, and caret",
+    "long title tail remains editable",
+    "long body scrolling and code insertion",
+    "labeled trash menu",
+    "local, syncing, synced, error, conflict, and empty states",
     "multi-select and move/trash/restore",
     "keyboard search shortcut and focus ring",
     "folder drawer",
-    "empty/conflict scenarios",
     "reduced motion"
   ],
   "network": "none; no API/backend requests"
