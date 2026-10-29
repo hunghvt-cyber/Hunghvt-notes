@@ -47,6 +47,6 @@ Gemini key4 (`gemini-3.5-flash-lite`) found no code-level release blocker and co
 
 ## Cloud and device gate
 
-The canonical Vercel project has no isolated Preview runtime scope for a synthetic vault. The former `notes-firestore-exact-082` project is absent, and the current environment inventory is Production-only. No synthetic note/history read was made through Vercel OIDC. NAS fixtures do not qualify that path. No Production deployment, alias, protection bypass, billing or access policy was changed.
+Historical direct Preview OIDC qualification succeeded on 2026-10-27, but this is not current qualification. Read-only IAM inspection on 2026-10-30 found the `vercel-notes-preview` WIF pool disabled, the Preview service account without IAM bindings, and no Preview Firestore data role. The accessible Firestore permission boundary is database-wide rather than a synthetic-vault boundary. No synthetic note/history read was made through current Vercel OIDC. Exact checks and blockers are in [typing/cloud follow-up](TYPING-PROFILE-20261030.md). No Production deployment, alias, protection bypass, billing or access policy was changed.
 
 S25 Ultra and iPad were not tested. After a future qualified cloud release, the user checklist is: reopen the app, reopen a viewed note, switch notes quickly, type Vietnamese with IME, and edit the same note on two devices. Do not claim an 8/10 Google Keep experience before user evaluation.

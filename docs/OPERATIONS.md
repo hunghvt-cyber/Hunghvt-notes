@@ -289,3 +289,11 @@ giữ deployment `dpl_2bPR3FTkbDabFjmNu7BwcEofEfUu`, SHA
 Rollback target vẫn `dpl_9Tg1qnrqSKNHaNoKG1knMcMVxCst` (SHA
 `96da1a42baf0d1ddd2ba7bc13c0f5dfe789bf10a`). Không có deployment mới hay
 thay đổi alias trong nhiệm vụ này.
+
+### Follow-up typing profile và cloud gate — 30/10/2026
+
+PR #34 vẫn draft; Production tiếp tục giữ deployment `dpl_2bPR3FTkbDabFjmNu7BwcEofEfUu`. Profile tổng hợp chuẩn hóa click → nội dung hiện/editor dùng được (2 animation frames), đo revision nền riêng và profile từng input event. Main/candidate cùng fixture Chromium headless/NAS, 20 lần mỗi điều kiện; kết quả và giới hạn tại [typing profile](TYPING-PROFILE-20261030.md) và [JSON](TYPING-PROFILE-20261030.json). Candidate click p95 95 ms, revision p95 160.9 ms; input-to-two-frame p95 29.9 ms, handler p95 0.1 ms. Không thấy long task, cache put, prefetch HTTP hoặc DOM subtree replacement khi gõ. Playwright 403 ms cũ không tái hiện (cùng End+x replay p95 83.23 ms), nhưng nguyên nhân outlier chưa chứng minh. Đây không phải phép đo thiết bị thật.
+
+Gemini key4 (`gemini-3.5-flash-lite`) review profile/source: giữ nhận định chưa có dấu hiệu app task cần sửa; hạ mức kết luận rằng 403 ms chắc chắn chỉ là measurement noise. Key5 cùng model xác nhận mốc benchmark và giới hạn headless/n=20; bác bỏ nhận định Git/custom domain là blocker bản chất bằng bằng chứng direct deployment lịch sử. Chi tiết có trong report.
+
+Cloud read-only: WIF pool `vercel-notes-preview` state ACTIVE nhưng `disabled: true`; provider subject đúng Preview environment; Preview service account tồn tại nhưng không có binding, và không có `roles/datastore.user` cho identity này. `notes-gcloud` không có active CLI account, nhưng IAM API read-only qua dedicated ADC trả HTTP 200; không mutation. Quyền Firestore hiện khả dụng theo database, không theo vault. Vercel CLI không cài; MCP đọc được project/deployment metadata nhưng không liệt kê environment variables. Không tạo deployment/vault hoặc thử Firestore read khi OIDC bị disable. Cần cloud owner khôi phục Preview WIF/SA binding theo database scope được duyệt, cung cấp công cụ xác minh env OIDC, rồi chạy read/revision/lazy-history/auth/cleanup với vault tổng hợp. NAS ADC/fixture không thay thế gate. Production, aliases và rollback giữ nguyên; không bật billing hay nới quyền.

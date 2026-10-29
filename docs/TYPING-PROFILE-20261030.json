@@ -1,0 +1,325 @@
+{
+  "date": "2026-10-30",
+  "kind": "SYNTHETIC_TYPING_AND_OPEN_PROFILE_NOT_PRODUCTION",
+  "privacy": "No real Notes, note IDs, contents, sessions, tokens, credentials or secrets; only aggregate timings and request shape/counts.",
+  "method": {
+    "browser": "Chromium headless on NAS",
+    "storage": "Current in-memory Firestore-compatible test handler",
+    "samplesPerCondition": 20,
+    "notes": "12 synthetic notes (current acknowledged-content cache bound), six inserted characters per open (120 input events per condition)",
+    "baselineSource": "origin/main d735659d1457f5aa2144ed45fb1aaa9ca07ec495 public assets",
+    "candidateSource": "PR #34 current source tree 97c99645e083a1969f1029c476cba89392835ac0",
+    "revisionDelayMs": 120,
+    "openEndpoint": "card click capture → expected content visible + enabled editor → two requestAnimationFrame callbacks; revalidation duration measured separately",
+    "typingEndpoint": "real Chromium input event handler (event capture → microtask), event-to-two-RAF, and separate Playwright End+x command wall time",
+    "percentiles": "20-sample p95 is the maximum order statistic and remains sensitive to outliers; not device or Production performance."
+  },
+  "conditions": {
+    "main": {
+      "date": "2026-10-30",
+      "source": "origin-main",
+      "variant": "main-cache-writes-on",
+      "samples": 20,
+      "fixture": "Synthetic-only in-memory Firestore-compatible API; 12 small notes; Chromium headless on NAS",
+      "prefetchOff": false,
+      "cacheWritesOff": false,
+      "openClickToUsable": {
+        "n": 20,
+        "p50Ms": 102.4,
+        "p95Ms": 120
+      },
+      "backgroundRevision": {
+        "n": 20,
+        "p50Ms": 152,
+        "p95Ms": 170.2
+      },
+      "fullContentRequest": {
+        "n": 0,
+        "p50Ms": null,
+        "p95Ms": null
+      },
+      "revisionResponseOverlappedPlaywrightInputPair": {
+        "samples": 8,
+        "total": 20
+      },
+      "legacyPlaywrightPressPair": {
+        "n": 20,
+        "p50Ms": 55.82,
+        "p95Ms": 85.89
+      },
+      "inputEventDispatchLag": {
+        "n": 120,
+        "p50Ms": 0.5,
+        "p95Ms": 0.7
+      },
+      "inputHandlerSync": {
+        "n": 120,
+        "p50Ms": 0,
+        "p95Ms": 0.1
+      },
+      "inputToTwoRaf": {
+        "n": 120,
+        "p50Ms": 14.5,
+        "p95Ms": 29.3
+      },
+      "longTasks": {
+        "count": 0,
+        "maxMs": 0
+      },
+      "cacheWritesDuringInput": 0,
+      "maxCachePutSyncMs": 0,
+      "editorDomReplaceCalls": 0,
+      "editorMutationTargets": {
+        "save-status": 240,
+        "conflict": 120
+      },
+      "requestErrors": 0,
+      "requests": 39,
+      "responseBytes": 11898,
+      "prefetchRequests": 0,
+      "inputEventSamples": 120
+    },
+    "candidatePrefetchOn": {
+      "date": "2026-10-30",
+      "source": "candidate",
+      "variant": "candidate-prefetch-on-cache-writes-on",
+      "samples": 20,
+      "fixture": "Synthetic-only in-memory Firestore-compatible API; 12 small notes; Chromium headless on NAS",
+      "prefetchOff": false,
+      "cacheWritesOff": false,
+      "openClickToUsable": {
+        "n": 20,
+        "p50Ms": 82,
+        "p95Ms": 95
+      },
+      "backgroundRevision": {
+        "n": 20,
+        "p50Ms": 151,
+        "p95Ms": 160.9
+      },
+      "fullContentRequest": {
+        "n": 0,
+        "p50Ms": null,
+        "p95Ms": null
+      },
+      "revisionResponseOverlappedPlaywrightInputPair": {
+        "samples": 18,
+        "total": 20
+      },
+      "legacyPlaywrightPressPair": {
+        "n": 20,
+        "p50Ms": 60.58,
+        "p95Ms": 83.23
+      },
+      "inputEventDispatchLag": {
+        "n": 120,
+        "p50Ms": 0.6,
+        "p95Ms": 0.8
+      },
+      "inputHandlerSync": {
+        "n": 120,
+        "p50Ms": 0,
+        "p95Ms": 0.1
+      },
+      "inputToTwoRaf": {
+        "n": 120,
+        "p50Ms": 13.9,
+        "p95Ms": 29.9
+      },
+      "longTasks": {
+        "count": 0,
+        "maxMs": 0
+      },
+      "cacheWritesDuringInput": 0,
+      "maxCachePutSyncMs": 0,
+      "editorDomReplaceCalls": 0,
+      "editorMutationTargets": {
+        "save-status": 240,
+        "conflict": 120
+      },
+      "requestErrors": 0,
+      "requests": 39,
+      "responseBytes": 11898,
+      "prefetchRequests": 0,
+      "inputEventSamples": 120
+    },
+    "candidatePrefetchOff": {
+      "date": "2026-10-30",
+      "source": "candidate",
+      "variant": "candidate-prefetch-off-cache-writes-on",
+      "samples": 20,
+      "fixture": "Synthetic-only in-memory Firestore-compatible API; 12 small notes; Chromium headless on NAS",
+      "prefetchOff": true,
+      "cacheWritesOff": false,
+      "openClickToUsable": {
+        "n": 20,
+        "p50Ms": 82.8,
+        "p95Ms": 93.8
+      },
+      "backgroundRevision": {
+        "n": 20,
+        "p50Ms": 150.7,
+        "p95Ms": 217.2
+      },
+      "fullContentRequest": {
+        "n": 0,
+        "p50Ms": null,
+        "p95Ms": null
+      },
+      "revisionResponseOverlappedPlaywrightInputPair": {
+        "samples": 12,
+        "total": 20
+      },
+      "legacyPlaywrightPressPair": {
+        "n": 20,
+        "p50Ms": 66.94,
+        "p95Ms": 98.54
+      },
+      "inputEventDispatchLag": {
+        "n": 120,
+        "p50Ms": 0.5,
+        "p95Ms": 0.8
+      },
+      "inputHandlerSync": {
+        "n": 120,
+        "p50Ms": 0,
+        "p95Ms": 0.2
+      },
+      "inputToTwoRaf": {
+        "n": 120,
+        "p50Ms": 14.5,
+        "p95Ms": 29.2
+      },
+      "longTasks": {
+        "count": 0,
+        "maxMs": 0
+      },
+      "cacheWritesDuringInput": 0,
+      "maxCachePutSyncMs": 0,
+      "editorDomReplaceCalls": 0,
+      "editorMutationTargets": {
+        "save-status": 240,
+        "conflict": 120
+      },
+      "requestErrors": 0,
+      "requests": 39,
+      "responseBytes": 11898,
+      "prefetchRequests": 0,
+      "inputEventSamples": 120
+    },
+    "candidateCacheWritesOff": {
+      "date": "2026-10-30",
+      "source": "candidate",
+      "variant": "candidate-prefetch-on-cache-writes-off",
+      "samples": 20,
+      "fixture": "Synthetic-only in-memory Firestore-compatible API; 12 small notes; Chromium headless on NAS",
+      "prefetchOff": false,
+      "cacheWritesOff": true,
+      "openClickToUsable": {
+        "n": 20,
+        "p50Ms": 83.6,
+        "p95Ms": 100.2
+      },
+      "backgroundRevision": {
+        "n": 20,
+        "p50Ms": 155.2,
+        "p95Ms": 180
+      },
+      "fullContentRequest": {
+        "n": 0,
+        "p50Ms": null,
+        "p95Ms": null
+      },
+      "revisionResponseOverlappedPlaywrightInputPair": {
+        "samples": 16,
+        "total": 20
+      },
+      "legacyPlaywrightPressPair": {
+        "n": 20,
+        "p50Ms": 64.1,
+        "p95Ms": 84.22
+      },
+      "inputEventDispatchLag": {
+        "n": 120,
+        "p50Ms": 0.5,
+        "p95Ms": 0.8
+      },
+      "inputHandlerSync": {
+        "n": 120,
+        "p50Ms": 0,
+        "p95Ms": 0.1
+      },
+      "inputToTwoRaf": {
+        "n": 120,
+        "p50Ms": 16.6,
+        "p95Ms": 29.5
+      },
+      "longTasks": {
+        "count": 0,
+        "maxMs": 0
+      },
+      "cacheWritesDuringInput": 0,
+      "maxCachePutSyncMs": 0,
+      "editorDomReplaceCalls": 0,
+      "editorMutationTargets": {
+        "save-status": 240,
+        "conflict": 120
+      },
+      "requestErrors": 0,
+      "requests": 39,
+      "responseBytes": 11898,
+      "prefetchRequests": 0,
+      "inputEventSamples": 120
+    }
+  },
+  "profileFindings": {
+    "inputHandlerP95Ms": {
+      "main": 0.1,
+      "candidatePrefetchOn": 0.1,
+      "candidatePrefetchOff": 0.2,
+      "candidateCacheWritesOff": 0.1
+    },
+    "inputToTwoRafP95Ms": {
+      "main": 29.3,
+      "candidatePrefetchOn": 29.9,
+      "candidatePrefetchOff": 29.2,
+      "candidateCacheWritesOff": 29.5
+    },
+    "longTasksDuringInput": 0,
+    "cachePutsDuringInput": 0,
+    "rendererReplaceChildrenDuringInput": 0,
+    "observedDomMutations": "Only save-status/conflict UI attribute updates; no list/editor/checklist/history subtree replacement.",
+    "revisionOverlapSamples": {
+      "main": 8,
+      "candidatePrefetchOn": 18,
+      "candidatePrefetchOff": 12,
+      "candidateCacheWritesOff": 16
+    },
+    "prefetchHttpDuringMeasuredEditorInteraction": 0,
+    "interpretation": "The 403 ms historical Playwright wall value was not reproduced. A focused replay of the same End+x Playwright calls measured candidate p95 83.23 ms while browser input-to-two-frame paint was 29.9 ms. This does not establish the exact cause of the earlier outlier or physical-device latency. Prefetch and cache write toggles did not change browser input metrics; no prefetch or IndexedDB writes occurred in the measured typing interval."
+  },
+  "cloud": {
+    "vercelReadOnlyProjectAndDeploymentMetadata": "Read succeeded. Current Production deployment unchanged.",
+    "previewWifPool": {
+      "name": "vercel-notes-preview",
+      "state": "ACTIVE",
+      "disabled": true
+    },
+    "previewWifProvider": {
+      "name": "notes-preview",
+      "issuer": "https://oidc.vercel.com/hunghvt",
+      "subjectCondition": "owner:hunghvt:project:hunghvt-notes:environment:preview"
+    },
+    "previewServiceAccount": "Exists; its IAM policy currently has no bindings.",
+    "currentFirestoreAccess": "roles/datastore.user is bound to the Production service account with a default-database condition; no such binding exists for the Preview service account.",
+    "tooling": "Vercel CLI is absent. Vercel MCP readback can inspect project/deployment/custom-environment metadata but exposes no environment-variable listing. Direct no-Git deployment is historically proven possible; Git connection/custom Preview domain is not itself the blocker.",
+    "gcloud": "The notes-gcloud wrapper reports no active gcloud CLI account. Read-only Cloud Resource Manager/IAM API checks using the existing dedicated ADC succeeded (HTTP 200); no IAM mutation was attempted.",
+    "blocker": "Current Vercel Preview subject cannot exchange into the Preview service account because the WIF pool is disabled and the service account has no impersonation binding or Firestore data role. The available IAM boundary is database-wide, not vault-specific. Requalifying requires restoration of an explicitly scoped Preview identity and database access; this task made no permission change, so candidate Vercel OIDC/Firestore reads were not run.",
+    "cleanup": "No cloud vault or deployment was created; no cleanup required."
+  },
+  "release": {
+    "appSourceChanged": false,
+    "productionDeployment": "dpl_2bPR3FTkbDabFjmNu7BwcEofEfUu unchanged",
+    "decision": "Keep PR #34 draft; no Production deployment or alias change. Local UI profile does not replace Vercel OIDC/Firestore qualification or real-device testing."
+  }
+}
