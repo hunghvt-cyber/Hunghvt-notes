@@ -1,0 +1,53 @@
+{
+  "browser": "Chromium headless on NAS; simulated WebDAV fixture only",
+  "measurements": [
+    {
+      "width": 390,
+      "height": 844,
+      "name": "phone",
+      "folders": 0,
+      "list": 0,
+      "editor": 370,
+      "writingArea": 317,
+      "title": 317,
+      "editorScroll": 368,
+      "titleHeight": 292
+    },
+    {
+      "width": 744,
+      "height": 1133,
+      "name": "tablet-portrait",
+      "folders": 0,
+      "list": 0,
+      "editor": 724,
+      "writingArea": 640,
+      "title": 640,
+      "editorScroll": 722,
+      "titleHeight": 130
+    },
+    {
+      "width": 1133,
+      "height": 744,
+      "name": "tablet-landscape",
+      "folders": 64,
+      "list": 320,
+      "editor": 701,
+      "writingArea": 639,
+      "title": 639,
+      "editorScroll": 699,
+      "titleHeight": 245
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop",
+      "folders": 232,
+      "list": 340,
+      "editor": 820,
+      "writingArea": 659,
+      "title": 659,
+      "editorScroll": 818,
+      "titleHeight": 259
+    }
+  ]
+}
