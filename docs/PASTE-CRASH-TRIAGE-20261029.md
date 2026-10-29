@@ -1,5 +1,13 @@
 # Production paste hang triage and fix — 2026-10-29
 
+> **Historical draft behavior:** This report records the `96da1a42` release,
+> which persisted unsynced drafts in IndexedDB and could restore them after a
+> reload. PR [#30](https://github.com/hunghvt-cyber/web-notes/pull/30) removed
+> persistent draft recovery. Current edits not yet acknowledged by Firestore
+> remain only in the open page's memory and may be lost on close/reload; the old
+> IndexedDB database is left untouched. See
+> [current speed and draft release evidence](SPEED-AND-DRAFTS-20261029.md).
+
 ## Finding
 
 The reported “Aw, Snap” crash was **not reproduced**. A synthetic 1 MB paste
