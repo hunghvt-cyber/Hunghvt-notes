@@ -37,7 +37,7 @@ function openFolderDrawer(){if(innerWidth>960)return;$('workspace').classList.ad
 function showListSurface(){closeFolderDrawer();$('workspace').classList.remove('mobile-editor-active');$('editor-empty').hidden=false;document.querySelectorAll('#mobile-nav button').forEach(b=>b.classList.toggle('active',b.id===(inTrash?'nav-trash':'nav-notes')));}
 function showEditorSurface(){closeFolderDrawer();$('workspace').classList.add('mobile-editor-active');$('editor-empty').hidden=true;document.querySelectorAll('#mobile-nav button').forEach(b=>b.classList.toggle('active',b.id==='nav-notes'));}
 function resizeTitle(){const el=$('title');if(!el)return;const scrollTop=el.scrollTop;el.style.height='auto';const cap=parseFloat(getComputedStyle(el).maxHeight)||el.scrollHeight;el.style.height=Math.min(el.scrollHeight,cap)+'px';el.scrollTop=scrollTop;}
-async function returnToList(){openSequence++;await hold();showListSurface();await drafts();}
+async function returnToList(){openSequence++;await hold();if(inTrash){inTrash=false;selecting=false;selected.clear();trashSelection.clear();$('search').removeAttribute('aria-label');await refresh();}showListSurface();await drafts();}
 function download(name,value){const u=URL.createObjectURL(new Blob([JSON.stringify(value,null,2)],{type:'application/json'})),a=document.createElement('a');a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);}
 function displayState(s){
  if(active!==s)return;
@@ -149,7 +149,7 @@ $('mobile-new').addEventListener('click',()=>newNote().catch(fail));
 $('folder-drawer-toggle').addEventListener('click',()=>{$('workspace').classList.contains('folder-drawer-open')?closeFolderDrawer():openFolderDrawer();});
 $('drawer-backdrop').addEventListener('click',closeFolderDrawer);
 $('nav-notes').addEventListener('click',async()=>{try{if(inTrash){inTrash=false;selecting=false;selected.clear();trashSelection.clear();showListSurface();await refresh();}else await returnToList();}catch(e){fail(e);}});
-$('nav-search').addEventListener('click',async()=>{try{await returnToList();$('search').focus({preventScroll:true});}catch(e){fail(e);}});
+$('nav-search').addEventListener('click',async()=>{try{await returnToList();$('search').focus({preventScroll:true});document.querySelectorAll('#mobile-nav button').forEach(b=>b.classList.toggle('active',b.id==='nav-search'));}catch(e){fail(e);}});
 $('nav-trash').addEventListener('click',()=>showTrash().catch(fail));
 $('sort-toggle').addEventListener('click',()=>{sortOpen=!sortOpen;selectionUI();if(sortOpen)$('sort-mode').focus();});
 $('sort-mode').addEventListener('change',async()=>{sortMode=$('sort-mode').value;sortOpen=false;render();await cacheList();if(sortMode==='custom')status('Chọn một hoặc nhiều Note rồi dùng Lên / Xuống để đổi thứ tự.');});
