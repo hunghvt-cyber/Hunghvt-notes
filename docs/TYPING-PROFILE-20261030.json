@@ -320,6 +320,17 @@
   "release": {
     "appSourceChanged": false,
     "productionDeployment": "dpl_2bPR3FTkbDabFjmNu7BwcEofEfUu unchanged",
-    "decision": "Keep PR #34 draft; no Production deployment or alias change. Local UI profile does not replace Vercel OIDC/Firestore qualification or real-device testing."
+    "decision": "Keep PR #34 draft; no Production deployment or alias change. Local UI profile does not replace Vercel OIDC/Firestore qualification or real-device testing.",
+    "ci": {
+      "runId": 40921433107,
+      "url": "https://github.com/hunghvt-cyber/web-notes/actions/runs/40921433107",
+      "conclusion": "success",
+      "headSha": "ba362b86446499bca55131bcfe7b414f72ddd97d",
+      "tree": "19c5a6aed35be32fade69c00a9e55a14b868141f",
+      "jobs": [
+        "test",
+        "browser"
+      ]
+    }
   }
 }

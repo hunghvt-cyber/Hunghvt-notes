@@ -44,4 +44,6 @@ Do WIF pool bị disable và Preview SA không có quyền impersonation/data, P
 
 ## Release gate
 
+GitHub Actions [run 40921433107](https://github.com/hunghvt-cyber/web-notes/actions/runs/40921433107) passed `test` and `browser` on exact PR head `ba362b86446499bca55131bcfe7b414f72ddd97d`, tree `19c5a6aed35be32fade69c00a9e55a14b868141f`. The earlier source/offline/browser rerun was also successful locally.
+
 Source/browser profiling không tìm ra regression khi gõ cần patch trong lượt này; cũng không giải quyết blocker cloud. PR #34 vẫn draft và Production giữ `dpl_2bPR3FTkbDabFjmNu7BwcEofEfUu`, các alias/rollback không đổi. Không tuyên bố đạt trải nghiệm 8/10 Google Keep. S25 Ultra/iPad và Vercel OIDC→Firestore read/history hiện tại chưa được kiểm chứng. Khi cloud gate mở, cần chạy lại qualification, browser/CI trên exact candidate và đo thiết bị thật trước khi promote.
