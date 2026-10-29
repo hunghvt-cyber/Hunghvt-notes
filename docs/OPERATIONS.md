@@ -121,3 +121,18 @@ headless Chromium. The actual synthetic store returns its existing 413 for
 the 1 MB case and the draft survives reload. No backend/auth/schema or
 production Notes were changed. Full measurements, Gemini review outcomes,
 limitations, and release/rollback record: [paste crash triage](PASTE-CRASH-TRIAGE-20261029.md).
+
+PR [#28](https://github.com/hunghvt-cyber/web-notes/pull/28) merged the
+paste responsiveness and draft-recovery fix to `main` at
+`96da1a42baf0d1ddd2ba7bc13c0f5dfe789bf10a`; CI run
+[#449](https://github.com/hunghvt-cyber/web-notes/actions/runs/40841393285)
+passed test and browser jobs. Production deployment
+`dpl_9Tg1qnrqSKNHaNoKG1knMcMVxCst` reached READY from that exact SHA and now
+serves both `hunghvt-notes.vercel.app` and
+`hunghvt-notes-hunghvt.vercel.app`. Read-only app, CSS, JS, and health checks
+returned HTTP 200 through the primary alias; health reported Firestore read
+PASS. Rollback targets are the pre-release primary deployment
+`dpl_EqVyaCg6bsmuHuqFKvXRgYavceGf` and secondary deployment
+`dpl_7Y9AiUP9uutwVXedkypQ6se9auec`. Detailed synthetic measurements, the
+fact that “Aw, Snap” was not reproduced, review outcomes, and device limits
+are recorded in [paste crash triage](PASTE-CRASH-TRIAGE-20261029.md).

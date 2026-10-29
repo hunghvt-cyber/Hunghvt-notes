@@ -127,6 +127,47 @@ readback also showed `hunghvt-notes-hunghvt.vercel.app` still pointing to
 `dpl_7Y9AiUP9uutwVXedkypQ6se9auec` (responsive release); that secondary alias
 was out of sync with the current primary before this work.
 
-This document will be amended with the merged source SHA, final deployment
-state, alias targets, post-deploy HTTP/health/asset checks, and rollback
-instructions after release.
+## Production release
+
+The fix was merged to canonical `main` in PR [#28](https://github.com/hunghvt-cyber/web-notes/pull/28),
+source commit `96da1a42baf0d1ddd2ba7bc13c0f5dfe789bf10a` (tree
+`61ced1cff6f7d0f302162eab649f2f43f1b19e98`). CI run
+[#449](https://github.com/hunghvt-cyber/web-notes/actions/runs/40841393285)
+passed both offline/source tests and browser tests. Gemini's two filtered
+reviews and Codex's accepted/rejected findings are summarized above. No
+production Notes, clipboard, session, or credentials were provided to Gemini.
+
+Before the release, primary alias `hunghvt-notes.vercel.app` pointed to
+READY deployment `dpl_EqVyaCg6bsmuHuqFKvXRgYavceGf` (source
+`3398d29deff5b32fad2f14b4349bc8a622bf2695`). The secondary alias
+`hunghvt-notes-hunghvt.vercel.app` pointed to older deployment
+`dpl_7Y9AiUP9uutwVXedkypQ6se9auec` (source
+`f7b0544194d0f71f66307d35e5eb35d5bf2c853b`).
+
+Vercel deployment `dpl_9Tg1qnrqSKNHaNoKG1knMcMVxCst`
+(`hunghvt-notes-3a4t8znpu-hunghvt.vercel.app`) was explicitly created from
+the merged `main` SHA above and reached `READY` at 2026-10-29 08:24 UTC.
+Both `hunghvt-notes.vercel.app` and `hunghvt-notes-hunghvt.vercel.app` now
+resolve to that deployment. The secondary alias returns a Vercel protection
+page to anonymous HTTP clients; authenticated Vercel fetch returned the new
+app asset from the alias. This is a protection response, not an application
+health failure.
+
+Read-only checks through the primary alias returned HTTP 200 for `/`,
+`/app.css`, `/app.js`, `/sync.js`, and `/api/app?route=health`. The served
+`app.js` contains the one-shot `insertFromPaste` handler; `sync.js` contains
+the in-flight/coalesced IndexedDB draft writer. Health reported
+`firestore-native-v1`, `production=true`, and `firestoreRead=PASS`. No note
+was read, created, or changed by these checks.
+
+Rollback: reassign the primary alias to
+`dpl_EqVyaCg6bsmuHuqFKvXRgYavceGf`; if restoring the exact pre-release alias
+state, also reassign the secondary alias to
+`dpl_7Y9AiUP9uutwVXedkypQ6se9auec`. Do not delete either deployment.
+
+The user-visible “Aw, Snap” crash itself was not reproduced, and continued
+editing immediately after a 500 KB paste remains slow (~4.2 s) in headless
+Chromium. The change materially reduces the reproduced paste stall but does
+not prove the crash's unique cause or eliminate all large-textarea reflow
+cost. Safari, low-memory conditions, physical iOS/Android devices, and real
+virtual keyboards remain untested.
