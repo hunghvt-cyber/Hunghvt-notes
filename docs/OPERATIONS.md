@@ -159,3 +159,20 @@ trễ, số content GET giảm 3→2; request stale đang chờ bị bỏ trư�
 Cold list chỉ có một mẫu nên p95 không có ý nghĩa phân phối. Candidate báo cáo
 request/browser handler duration cùng tách server duration; đây không phải
 đo Production hoặc Vercel OIDC. Xem [chi tiết đã lọc](SPEED-AND-DRAFTS-20261029.md).
+
+PR [#30](https://github.com/hunghvt-cyber/web-notes/pull/30) merged at
+`3aa153bed9e768092e24c50a3037dc385635ff11` (tree
+`107dc688af1a6953d407ae9eb3ab7566a762ce8b`); CI run
+[#457](https://github.com/hunghvt-cyber/web-notes/actions/runs/40876954309)
+passed source, offline, simulated-load, and browser checks. Production
+deployment `dpl_2bPR3FTkbDabFjmNu7BwcEofEfUu` was built from exact candidate
+SHA `7991b8045f36835dc8e69f829c5399a4ac31d4ec`, whose tree equals merged main.
+Immutable URL health returned HTTP 200 and Firestore read PASS; app HTML, JS,
+CSS, cache and sync assets matched source byte-for-byte. Both app aliases and
+the Git-main alias point to this deployment. Rollback target:
+`dpl_9Tg1qnrqSKNHaNoKG1knMcMVxCst` (SHA
+`96da1a42baf0d1ddd2ba7bc13c0f5dfe789bf10a`). The create-deployment API
+briefly assigned the default secondary alias while staging; it was immediately
+restored to the previous deployment and all aliases were read back before
+candidate qualification and final promotion. Full filtered evidence and exact
+alias map are in [release verification](SPEED-AND-DRAFTS-20261029.md).
