@@ -276,3 +276,16 @@ tree `8cd0526e79265507f3785fd0948df1dc5055c34b`. GitHub Actions run
 đạt cả `test` và `browser` trên exact commit này. PR #34 vẫn draft. Đây là
 CI/source evidence, không thay thế cloud OIDC qualification hay phép đo trên
 thiết bị thật.
+
+Sau đó chỉ cập nhật hồ sơ release: PR head
+`c850f4ce070631569c71b003c4c2d12af877e0be`, tree
+`a20806fcc1dde1e92b2f155d38773dd609846a43`; CI run
+[40906908055](https://github.com/hunghvt-cyber/web-notes/actions/runs/40906908055)
+đạt `test` và `browser` trên exact head. Production readback ngày 2026-10-29
+giữ deployment `dpl_2bPR3FTkbDabFjmNu7BwcEofEfUu`, SHA
+`7991b8045f36835dc8e69f829c5399a4ac31d4ec`. Ba alias hiện hành:
+`hunghvt-notes.vercel.app`, `hunghvt-notes-hunghvt.vercel.app`,
+`hunghvt-notes-git-main-hunghvt.vercel.app`; alias readback không có bypass.
+Rollback target vẫn `dpl_9Tg1qnrqSKNHaNoKG1knMcMVxCst` (SHA
+`96da1a42baf0d1ddd2ba7bc13c0f5dfe789bf10a`). Không có deployment mới hay
+thay đổi alias trong nhiệm vụ này.
