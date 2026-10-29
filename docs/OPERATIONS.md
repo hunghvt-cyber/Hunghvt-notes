@@ -178,3 +178,12 @@ candidate qualification and final promotion. Full filtered evidence and exact
 alias map are in [release verification](SPEED-AND-DRAFTS-20261029.md). The
 temporary Vercel share-link bypass used by the protected-URL check was revoked;
 the final alias readback has no protection-bypass entries.
+
+
+## PR #34 frontend-only split — 30/10/2026
+
+PR #34 có thêm API/Firestore query contract cho lazy history, bounded prefetch và preview summary. Phần đó vẫn ở draft do chưa có Firestore thử nghiệm cô lập. Một split frontend-only được tạo từ `main` tại branch `codex/pr34-frontend-cache-first-20261030`: cache-first list/content và background revision check dùng endpoint Production hiện hành; không có API/backend/auth/config diff. Prefetch theo viewport và lazy history không nằm trong split.
+
+Source check 49 files, offline 191/191, browser fixture 30/30 đã đạt trên candidate. Benchmark main/candidate 20 mẫu, chỉ dữ liệu tổng hợp; kết quả ở [bảng so sánh](PR35-FRONTEND-CACHE-20261030.json) và [báo cáo](PR35-FRONTEND-CACHE-20261030.md). Candidate cải thiện p95 mở note cache nhỏ 208→161 ms, note lớn 305→224 ms với bytes giảm 2.63 MB→1.44 KB, và gõ khi GET nền bị trễ 142→94 ms. Warm-list p95 315 ms chưa đạt 300 ms; cached-note p95 161 ms chưa đạt 100 ms; quick-switch p95 475 ms so với main 460 ms và p50 402 so với 345 ms. Không tuyên bố nhanh hơn Production hoặc trên thiết bị thật.
+
+Gemini key4 không tìm thấy lỗi blocker có bằng chứng; key5 khuyến nghị đợi full CI và nhấn mạnh các mục tiêu cache chưa đạt. Tại thời điểm ghi nhận chưa có merge/deployment. Giữ Production như cũ. Chỉ phần API/backend mới trong PR #34 còn cần cloud qualification; fixture không thay thế Vercel OIDC.
