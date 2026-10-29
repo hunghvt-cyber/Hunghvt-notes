@@ -1,20 +1,155 @@
 <!doctype html>
-<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer"><title>Notes</title><link rel="stylesheet" href="/app.css"></head>
-<body><main><header><a class="home-link" href="https://homepage-nas.vercel.app/">← Trang chủ</a><h1>Notes</h1><p>Ghi chú, checklist và thư mục</p></header>
-<div id="sync-banner" role="status"><div id="sync-progress" hidden></div><span id="global-status">Đang kết nối…</span></div>
-<section id="login" hidden><h2>Mở Notes</h2><form id="login-form"><label for="password">Mật khẩu Notes</label><input id="password" type="password" autocomplete="current-password" required><button>Mở khóa</button></form></section>
-<div id="workspace" hidden>
-<nav class="toolbar"><button id="new">Note mới</button><select id="sort-mode" aria-label="Kiểu sắp xếp" hidden><option value="updated-desc">Cập nhật mới nhất</option><option value="updated-asc">Cập nhật cũ nhất</option><option value="title-asc">Tiêu đề A → Z</option><option value="title-desc">Tiêu đề Z → A</option><option value="custom">Tùy chỉnh</option></select><button id="select-mode" aria-pressed="false">Chọn nhiều</button><button id="backup">Tải backup</button><button id="logout">Khóa</button><button id="draft-toggle" aria-expanded="false" hidden>Chưa đồng bộ <span id="draft-badge">(0)</span></button></nav>
-<details id="draft-panel" hidden><summary>Nội dung chưa đồng bộ <span id="draft-count"></span></summary><p>Mở lại hoặc tải xuống nếu cần khôi phục nội dung chưa lưu.</p><div id="draft-list"></div><button id="export-drafts">Tải nội dung chưa đồng bộ</button></details>
-<div class="layout"><aside><label for="search">Tìm trong tiêu đề và đoạn xem trước</label><input id="search" type="search"><div id="folder-list"></div>
-<details id="folder-controls"><summary>Quản lý thư mục</summary><input id="new-folder" maxlength="80" aria-label="Tên thư mục mới"><button id="create-folder">Tạo thư mục</button><select id="manage-folder" aria-label="Chọn thư mục"></select><label><input id="delete-folder-notes" type="checkbox"> Chuyển cả Notes trong thư mục vào Thùng rác</label><button id="remove-folder">Xóa thư mục</button><button id="share-folder">Chia sẻ thư mục</button><button id="manage-folder-shares">Quản lý chia sẻ</button></details>
-</aside><div><div class="list-heading"><h2 id="list-title">Tất cả ghi chú</h2><button id="sort-toggle" type="button" aria-label="Sắp xếp ghi chú" aria-controls="sort-mode" aria-expanded="false" title="Sắp xếp ghi chú">☷ Sắp xếp</button></div><div id="bulk-toolbar" class="toolbar" hidden><button id="select-all">Chọn tất cả</button><button id="deselect-all">Bỏ chọn tất cả</button><span id="selected-count">0 Note đã chọn</span><label id="move-label" for="move-folder">Chuyển đến</label><select id="move-folder" aria-label="Thư mục đích"></select><button id="bulk-move">Di chuyển</button><button id="order-up" hidden>Lên</button><button id="order-down" hidden>Xuống</button><button id="bulk-restore" hidden disabled>Khôi phục đã chọn</button><button id="bulk-purge" hidden disabled>Xóa vĩnh viễn đã chọn</button><button id="bulk-delete" disabled>Xóa các Note đã chọn</button><button id="cancel-select">Hủy chọn</button></div><div id="note-list" class="grid"></div></div></div>
-<section id="editor" hidden><div class="toolbar"><h2>Soạn ghi chú</h2><button id="close-editor">Đóng soạn thảo</button></div>
-<label for="title">Tiêu đề</label><input id="title" maxlength="200"><label for="folder">Thư mục</label><input id="folder" list="folders" maxlength="80"><datalist id="folders"></datalist><label id="pin-label"><input id="pinned" type="checkbox"> Ghim</label>
-<label for="text">Nội dung</label><textarea id="text" rows="10" spellcheck="false" wrap="soft"></textarea><div id="checklist"></div><button id="add-check">Chèn checklist</button>
-<div class="toolbar"><button id="save">Lưu ngay</button><button id="copy">Copy toàn bộ</button><button id="clear">Xóa nội dung</button><button id="undo" disabled>Hoàn tác</button><button id="delete">Xóa Note</button></div><p id="save-status" role="status"></p><p id="copy-status" role="status" aria-live="polite"></p>
-<div id="conflict" hidden><p>Note đã thay đổi ở phiên khác. Nội dung bạn đang soạn vẫn được giữ.</p><button id="conflict-copy">Lưu thành Note mới</button><button id="remote-version">Mở bản trên máy chủ</button><button id="download-draft">Tải nội dung này</button></div>
-<label for="history">Bản trước · chọn để xem lại rồi bấm Lưu</label><select id="history"></select>
-<details id="note-sharing"><summary>Chia sẻ Note</summary><button id="share-note">Tạo link sửa Note</button><div id="share-list"></div></details>
-</section><section id="share-result" hidden><h2 id="share-heading">Chia sẻ</h2><p>Ai có link đều có quyền đã chọn. Link hoạt động đến khi thu hồi.</p><div id="share-new-link" hidden><input id="share-url" readonly aria-label="Link chia sẻ"><button id="copy-share">Sao chép link</button><p id="share-copy-status" role="status" aria-live="polite"></p></div><div id="all-shares"></div></section>
-</div></main><script type="module" src="/app.js"></script></body></html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="referrer" content="no-referrer">
+  <title>Notes</title>
+  <link rel="stylesheet" href="/app.css">
+</head>
+<body>
+  <main>
+    <header class="app-header">
+      <a class="home-link" href="https://homepage-nas.vercel.app/">← Trang chủ</a>
+      <h1>Notes</h1>
+      <p>Ghi chú, checklist và thư mục</p>
+    </header>
+    <div id="sync-banner" role="status"><div id="sync-progress" hidden></div><span id="global-status">Đang kết nối…</span></div>
+
+    <section id="login" hidden>
+      <h2>Mở Notes</h2>
+      <form id="login-form">
+        <label for="password">Mật khẩu Notes</label>
+        <input id="password" type="password" autocomplete="current-password" required>
+        <button>Mở khóa</button>
+      </form>
+    </section>
+
+    <div id="workspace" hidden>
+      <nav class="toolbar workspace-toolbar" aria-label="Thao tác Notes">
+        <button id="new">Note mới</button>
+        <button id="select-mode" aria-pressed="false">Chọn nhiều</button>
+        <details id="workspace-actions" class="action-menu">
+          <summary aria-label="Thao tác không gian">···</summary>
+          <div class="menu-panel">
+            <button id="backup">Tải backup</button>
+            <button id="logout">Khóa Notes</button>
+            <button id="draft-toggle" aria-expanded="false" hidden>Chưa đồng bộ <span id="draft-badge">(0)</span></button>
+          </div>
+        </details>
+      </nav>
+      <details id="draft-panel" hidden>
+        <summary>Nội dung chưa đồng bộ <span id="draft-count"></span></summary>
+        <p>Mở lại hoặc tải xuống nếu cần khôi phục nội dung chưa lưu.</p>
+        <div id="draft-list"></div>
+        <button id="export-drafts">Tải nội dung chưa đồng bộ</button>
+      </details>
+
+      <div class="layout">
+        <aside id="folder-panel" aria-label="Thư mục">
+          <div id="folder-list"></div>
+          <details id="folder-controls">
+            <summary>Quản lý thư mục</summary>
+            <input id="new-folder" maxlength="80" aria-label="Tên thư mục mới">
+            <button id="create-folder">Tạo thư mục</button>
+            <select id="manage-folder" aria-label="Chọn thư mục"></select>
+            <label><input id="delete-folder-notes" type="checkbox"> Chuyển cả Notes trong thư mục vào Thùng rác</label>
+            <button id="remove-folder">Xóa thư mục</button>
+            <button id="share-folder">Chia sẻ thư mục</button>
+            <button id="manage-folder-shares">Quản lý chia sẻ</button>
+          </details>
+        </aside>
+
+        <section id="list-pane" aria-label="Danh sách ghi chú">
+          <div class="list-mobile-top">
+            <button id="folder-drawer-toggle" aria-label="Mở thư mục" aria-controls="folder-panel" aria-expanded="false">☰</button>
+            <strong>Notes</strong>
+            <button id="mobile-new" aria-label="Tạo note mới">＋</button>
+          </div>
+          <div class="list-heading">
+            <h2 id="list-title">Tất cả ghi chú</h2>
+            <button id="sort-toggle" type="button" aria-label="Sắp xếp ghi chú" aria-controls="sort-mode" aria-expanded="false">☷ Sắp xếp</button>
+          </div>
+          <select id="sort-mode" aria-label="Kiểu sắp xếp" hidden>
+            <option value="updated-desc">Cập nhật mới nhất</option>
+            <option value="updated-asc">Cập nhật cũ nhất</option>
+            <option value="title-asc">Tiêu đề A → Z</option>
+            <option value="title-desc">Tiêu đề Z → A</option>
+            <option value="custom">Tùy chỉnh</option>
+          </select>
+          <label class="search-field" for="search">Tìm ghi chú<input id="search" type="search"></label>
+          <div id="bulk-toolbar" class="toolbar" hidden>
+            <button id="select-all">Chọn tất cả</button><button id="deselect-all">Bỏ chọn tất cả</button>
+            <span id="selected-count">0 Note đã chọn</span><label id="move-label" for="move-folder">Chuyển đến</label>
+            <select id="move-folder" aria-label="Thư mục đích"></select><button id="bulk-move">Di chuyển</button>
+            <button id="order-up" hidden>Lên</button><button id="order-down" hidden>Xuống</button>
+            <button id="bulk-restore" hidden disabled>Khôi phục đã chọn</button>
+            <button id="bulk-purge" hidden disabled>Xóa vĩnh viễn đã chọn</button>
+            <button id="bulk-delete" disabled>Xóa các Note đã chọn</button><button id="cancel-select">Hủy chọn</button>
+          </div>
+          <div id="note-list" class="grid"></div>
+        </section>
+      </div>
+
+      <div id="editor-empty" aria-live="polite"><span>Chọn một ghi chú để xem hoặc chỉnh sửa.</span></div>
+      <section id="editor" aria-label="Trình soạn thảo" hidden>
+        <header class="editor-top">
+          <button id="close-editor">← Danh sách</button>
+          <span id="save-status" role="status"></span>
+          <details id="editor-history" class="action-menu">
+            <summary>Lịch sử</summary>
+            <div class="menu-panel history-menu">
+              <label for="history">Bản trước · chọn để xem rồi bấm Lưu</label>
+              <select id="history"></select>
+            </div>
+          </details>
+          <details id="note-sharing" class="action-menu">
+            <summary>Chia sẻ</summary>
+            <div class="menu-panel"><button id="share-note">Tạo link sửa Note</button><div id="share-list"></div></div>
+          </details>
+          <details id="editor-more" class="action-menu">
+            <summary aria-label="Thao tác khác">···</summary>
+            <div class="menu-panel">
+              <button id="copy">Copy toàn bộ</button>
+              <button id="clear">Xóa nội dung</button>
+              <button id="undo" disabled>Hoàn tác</button>
+              <button id="delete" aria-label="Chuyển Note vào thùng rác">Chuyển vào thùng rác</button>
+            </div>
+          </details>
+        </header>
+        <div class="editor-scroll" id="editor-scroll">
+          <div class="editor-content">
+            <label for="title">Tiêu đề</label>
+            <textarea id="title" rows="1" maxlength="200" aria-label="Tiêu đề ghi chú"></textarea>
+            <div class="note-meta"><label for="folder">Thư mục</label><input id="folder" list="folders" maxlength="80"><datalist id="folders"></datalist><label id="pin-label"><input id="pinned" type="checkbox"> Ghim</label></div>
+            <label for="text">Nội dung</label>
+            <textarea id="text" rows="10" spellcheck="false" wrap="soft" aria-label="Nội dung ghi chú"></textarea>
+            <div id="checklist"></div>
+            <button id="add-check" aria-label="Chèn mục checklist">＋ Chèn checklist</button>
+            <div class="toolbar editor-save-toolbar"><button id="save">Lưu ngay</button></div>
+            <p id="copy-status" role="status" aria-live="polite"></p>
+            <div id="conflict" hidden>
+              <p>Note đã thay đổi ở phiên khác. Nội dung bạn đang soạn vẫn được giữ.</p>
+              <button id="conflict-copy">Lưu thành Note mới</button><button id="remote-version">Mở bản trên máy chủ</button><button id="download-draft">Tải nội dung này</button>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="share-result" hidden>
+        <h2 id="share-heading">Chia sẻ</h2><p>Ai có link đều có quyền đã chọn. Link hoạt động đến khi thu hồi.</p>
+        <div id="share-new-link" hidden><input id="share-url" readonly aria-label="Link chia sẻ"><button id="copy-share">Sao chép link</button><p id="share-copy-status" role="status" aria-live="polite"></p></div>
+        <div id="all-shares"></div>
+      </section>
+    </div>
+
+    <nav id="mobile-nav" aria-label="Điều hướng chính">
+      <button id="nav-notes" class="active"><span aria-hidden="true">▦</span><span>Ghi chú</span></button>
+      <button id="nav-search"><span aria-hidden="true">⌕</span><span>Tìm kiếm</span></button>
+      <button id="nav-trash"><span aria-hidden="true">▤</span><span>Thùng rác</span></button>
+    </nav>
+  </main>
+  <button id="drawer-backdrop" aria-label="Đóng thư mục" hidden></button>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>
