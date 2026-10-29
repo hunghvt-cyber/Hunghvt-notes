@@ -40,7 +40,7 @@ Workflow riêng lắng nghe `workflow_run` thành công của backup trên `main
 
 Chỉ `restore_parity_pass` cùng `restore_vault_removed` là qualification. Marker `.restore-qualification-passed.json` khiến run kế tiếp bỏ qua nếu `backupId` và fingerprint đã được xác nhận; backup mới sẽ được restore qualification riêng. Giữ WIF restore provider và `roles/datastore.user` riêng, giới hạn vào Firestore scope cần thiết, vì workflow tự chạy sau mỗi backup thành công. Không cấp quyền ghi cho backup identity; không xóa backup provider read-only.
 
-Restore giữ revision/epoch, lịch sử nằm trong record, active/trash, folder/order, share/revocation/token-box, receipts và purge tombstones. Snapshot bao gồm dữ liệu Firestore; draft chỉ còn trên thiết bị và chưa đồng bộ không thể được backup server thu nhận.
+Restore giữ revision/epoch, lịch sử nằm trong record, active/trash, folder/order, share/revocation/token-box, receipts và purge tombstones. Snapshot bao gồm dữ liệu Firestore; nội dung chưa ACK chỉ nằm trong RAM của tab, không được backup server thu nhận và có thể mất khi đóng/tải lại trang. Ứng dụng không còn đọc/ghi database IndexedDB draft cũ; database cũ được giữ nguyên.
 
 ## Phục hồi sau khi kho Koofr cũ bị xóa
 
