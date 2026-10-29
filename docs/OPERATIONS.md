@@ -136,3 +136,25 @@ PASS. Rollback targets are the pre-release primary deployment
 `dpl_7Y9AiUP9uutwVXedkypQ6se9auec`. Detailed synthetic measurements, the
 fact that “Aw, Snap” was not reproduced, review outcomes, and device limits
 are recorded in [paste crash triage](PASTE-CRASH-TRIAGE-20261029.md).
+
+## Tốc độ danh sách/note và bỏ persistent drafts — 2026-10-29
+
+Candidate làm mới cache danh sách bất đồng bộ sau khi render kết quả máy chủ,
+bỏ các lần ghi cache cũ khi có snapshot mới hơn, và loại request mở note đã
+chờ trong lane khi lựa chọn đã đổi. Không thay API Firestore, lịch sử, CAS,
+kiểm revision, cache freshness hay quyền truy cập. Draft không còn được đọc/ghi
+từ IndexedDB; nội dung chưa ACK chỉ ở RAM. Các câu trong phần paste triage
+phía trên về khôi phục draft sau reload mô tả source cũ và đã bị thay thế.
+
+Đo trên Chromium headless/NAS với 20 note tổng hợp nhỏ và một note 128 KiB,
+API handler/Firestore repository mô phỏng bằng in-memory fixture; không có
+Notes Production. Trước `d5d815932a0b` → candidate: danh sách cold p50/p95
+889/889 ms (n=1) → 782/782 ms (n=1); warm 312/363 ms (n=6) → 298/326 ms
+(n=6). Mở note nhỏ cold 213/282 ms → 208/243 ms (n=7), lớn 214/255 ms →
+203/256 ms (n=7), nhỏ warm 191/245 ms → 199/230 ms (n=7), quick switch
+413/483 ms → 408/459 ms (n=7). Không có cải thiện ổn định về thời gian mở
+note trong mẫu nhỏ này; p95 có dao động. Ở burst chuyển nhanh có response
+trễ, số content GET giảm 3→2; request stale đang chờ bị bỏ trước khi gửi.
+Cold list chỉ có một mẫu nên p95 không có ý nghĩa phân phối. Candidate báo cáo
+request/browser handler duration cùng tách server duration; đây không phải
+đo Production hoặc Vercel OIDC. Xem [chi tiết đã lọc](SPEED-AND-DRAFTS-20261029.md).

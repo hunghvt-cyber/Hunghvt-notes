@@ -3,7 +3,7 @@
 - Đọc README.md và docs/OPERATIONS.md trước. Source production đã kiểm chứng từ checkpoint 27/10/2026 được hợp nhất vào main; Vercel không liên kết Git nên push main không tự deploy. Luôn đối chiếu deployment riêng.
 - Người dùng đã đồng ý chuyển Firestore và đã báo cáo hoàn tất cutover. Các quy tắc cũ “Koofr là backend chính/không database” đã được quyết định mới thay thế; các guard bảo toàn dữ liệu vẫn phải giữ.
 - Nhiệm vụ tiếp theo được người dùng duyệt: docs/BACKUP-AND-LEGACY-CLEANUP-20261027.md. Hoàn thành code/CI/WIF/backup/restore và dọn exact legacy targets sau qualification; không hỏi lại quyền đã được giao.
-- Giữ Firestore current data, history, trash, drafts, revision CAS, operation idempotency, sharing/revocation, namespace/session và Code Inbox. Không đổi mật khẩu/session hoặc xóa credential còn dùng.
+- Giữ Firestore current data, history, trash, revision CAS, operation idempotency, sharing/revocation, namespace/session và Code Inbox. Draft chưa ACK chỉ ở RAM của tab; không đọc/ghi database IndexedDB draft cũ và không xóa database đó âm thầm. Không đổi mật khẩu/session hoặc xóa credential còn dùng.
 - Repo công khai: không commit Notes thật, snapshot, credential, raw provider response hoặc private logs. Không upload snapshot thành GitHub artifact.
 - Backup runner chỉ đọc Firestore, dùng GitHub OIDC/WIF riêng và credential Koofr riêng. Restore qualification dùng danh tính one-off riêng, không cấp workflow read-only quyền ghi chỉ để test.
 - Retention chỉ quản lý prefix backup riêng sau upload/download/hash verify; không xóa baseline cutover, backup khác hoặc dữ liệu Tapo/Photos/Drive/Homepage.

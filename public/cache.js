@@ -1,4 +1,5 @@
-// A separate database preserves every existing draft and its schema.
+// This database stores only authenticated list previews and sort preferences.
+// The legacy draft database is intentionally neither opened nor modified.
 export class NoteCache {
  constructor(){this.db=null;}
  async tx(mode,fn){

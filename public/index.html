@@ -35,17 +35,9 @@
           <div class="menu-panel">
             <button id="backup">Tải backup</button>
             <button id="logout">Khóa Notes</button>
-            <button id="draft-toggle" aria-expanded="false" hidden>Chưa đồng bộ <span id="draft-badge">(0)</span></button>
           </div>
         </details>
       </nav>
-      <details id="draft-panel" hidden>
-        <summary>Nội dung chưa đồng bộ <span id="draft-count"></span></summary>
-        <p>Mở lại hoặc tải xuống nếu cần khôi phục nội dung chưa lưu.</p>
-        <div id="draft-list"></div>
-        <button id="export-drafts">Tải nội dung chưa đồng bộ</button>
-      </details>
-
       <div class="layout">
         <aside id="folder-panel" aria-label="Thư mục">
           <div id="folder-list"></div>
@@ -131,7 +123,7 @@
             <p id="copy-status" role="status" aria-live="polite"></p>
             <div id="conflict" hidden>
               <p>Note đã thay đổi ở phiên khác. Nội dung bạn đang soạn vẫn được giữ.</p>
-              <button id="conflict-copy">Lưu thành Note mới</button><button id="remote-version">Mở bản trên máy chủ</button><button id="download-draft">Tải nội dung này</button>
+              <button id="conflict-copy">Lưu thành Note mới</button><button id="remote-version">Mở bản trên máy chủ</button>
             </div>
           </div>
         </div>

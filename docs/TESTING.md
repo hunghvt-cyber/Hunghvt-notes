@@ -4,6 +4,15 @@ Các mục dưới lưu bằng chứng theo từng thời điểm. Xem [RELEASE.
 để biết checkpoint CI gần nhất và giới hạn kiểm chứng của mã đang chạy;
 không áp dụng kết quả cũ cho các commit mới hơn.
 
+## Draft chỉ trong RAM và điều hướng nhanh
+
+Candidate ngày 29/10/2026 bỏ toàn bộ đọc/ghi persistent drafts; test kiểm ACK,
+timeout/retry với cùng `clientOpId`, CAS conflict, thao tác paste/undo, cảnh báo
+rời trang khi chưa ACK, và xác nhận database IndexedDB draft cũ vẫn còn nguyên
+mà app không truy cập. Browser smoke dùng fixture tổng hợp và kiểm response
+note cũ tới muộn/điều hướng nhanh. So sánh timing và giới hạn mẫu nằm trong
+[bằng chứng tốc độ và draft](SPEED-AND-DRAFTS-20261029.md).
+
 ## Sau khi tách
 
 `npm test` dùng WebDAV giả lập: backend/HTTP adapter, lock hết hạn, lỗi kết nối,
