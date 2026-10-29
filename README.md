@@ -13,6 +13,8 @@
 
 Autosave gửi thay đổi lên Firestore; nhãn “Đã lưu” chỉ xuất hiện sau ACK hợp lệ. Thay đổi chưa được ACK chỉ còn trong RAM của trang đang mở, và có thể mất khi đóng hoặc tải lại trang. Trình duyệt không còn khôi phục persistent draft; database IndexedDB cũ được để nguyên, không đọc hay xóa. Cache IndexedDB riêng chỉ chứa danh sách và nội dung đã được server xác nhận, theo scope tài khoản; sau xác thực, app có thể hiện bản cache trước rồi kiểm tra revision và quyền trên server. Bản cache cũ được đánh dấu chưa xác minh; cache không cấp quyền truy cập. Số đo tổng hợp mới nhất và giới hạn được ghi tại [cache performance](docs/CACHE-PERFORMANCE-20261029.json).
 
+Viewport prefetch/cache follow-up và blocker cloud qualification cho PR #34 được ghi tại [báo cáo ngày 29/10](docs/VIEWPORT-PREFETCH-20261029.md), cùng [bảng số đo đã lọc](docs/VIEWPORT-PREFETCH-20261029.json). Đây là candidate chưa deploy; không dùng số NAS/headless để khẳng định Production hoặc trải nghiệm thiết bị thật nhanh hơn.
+
 ## Source và triển khai
 
 `hunghvt-cyber/web-notes` (repository ID `1423348828`) là repo canonical. PR #16 đã hợp nhất vào `main` tại commit `7c3598a34691a7983e08208e55c97c34bf596f0c`, tree `035a07789aa235f0e1b79938688633c9c963984f`. Candidate ban đầu `186479392acf793caf628831075d98405231562b` / tree `04f3183c5b29165014985d1b992c88e2ef0d0c73` đã được xác minh; tree cuối sau cập nhật claims là tree trên. GitHub CI [run 40601380216](https://github.com/hunghvt-cyber/web-notes/actions/runs/40601380216) đạt ở hai job test/browser. PR không deploy runtime Vercel.

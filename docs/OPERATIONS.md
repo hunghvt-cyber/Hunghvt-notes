@@ -181,6 +181,11 @@ the final alias readback has no protection-bypass entries.
 
 ## Follow-up candidate: cache-first và mở note — 2026-10-29
 
+Ghi chú: đoạn dưới ghi snapshot PR #34 trước khi chuyển sang tải trước theo
+viewport. Các con số/hành vi `first 8`, `2 note/phiên` và phép đo rapid switch
+chỉ mô tả snapshot lịch sử; candidate hiện hành và trạng thái phát hành nằm ở
+phần [viewport-driven prefetch follow-up](VIEWPORT-PREFETCH-20261029.md).
+
 Đây là candidate trên nhánh `codex/cache-first-note-cache-20261029`, bắt đầu
 từ `main` tại `d735659d1457f5aa2144ed45fb1aaa9ca07ec495`. Chưa merge và chưa
 deploy. Dữ liệu IndexedDB dùng để cache chỉ là snapshot đã được server ACK,
@@ -226,3 +231,40 @@ lập và dữ liệu tổng hợp. Không dùng Production Notes/session để 
 không promote alias cho tới khi có bằng chứng an toàn cho đường đọc đó.
 Health-only probe không chứng minh API đọc note. S25 Ultra/iPad thật chưa
 được đo; deployment/rollback hiện tại tiếp tục là bản cũ.
+
+## Tải trước theo viewport — 2026-10-29
+
+PR #34 vẫn draft. Candidate thay danh sách cố định đầu trang bằng
+`IntersectionObserver`, ưu tiên hướng cuộn, concurrency 1 và đợi tối đa 80 ms
+trước request nền để thao tác cuộn kịp đổi vùng ưu tiên. Giới hạn 40 lần bắt
+đầu/768 KiB prefetch mỗi phiên; bỏ body trên 64 KiB, không tải history. Cache
+đã ACK vẫn giới hạn 12 note/1 MiB tổng/256 KiB mỗi note. Open/save không xếp
+sau prefetch; click cùng note đang tải dùng lại request đó. Sửa nội dung hủy
+prefetch và stale response phải khớp request/session/note.
+
+Preview 200 ký tự tiếp tục lấy từ query metadata/list được phép đọc. Số lần
+Firestore document read không đổi; metadata, response và lần ghi note sau này
+có thêm bytes. Preview cũ không được migrate hàng loạt. Không đọc, di chuyển
+hoặc xóa database draft cũ; nội dung chưa ACK chỉ ở RAM.
+
+Đo main/candidate bằng Chromium headless/NAS, 20 mẫu mỗi case với fixture
+Firestore-compatible trong RAM, không dùng Notes thật. Main/candidate p50/p95:
+list cold 341.6/413.9 → 305.0/345.8 ms; list warm 283.1/332.8 →
+275.5/332.8 ms; cuộn tới preview 109.0/131.6 → 113.3/136.1 ms; mở note
+chưa cache 217.7/265.4 → 195.8/240.9 ms (candidate tắt prefetch); mở cached
+note sau reload 150.7/186.5 → 120.8/295.1 ms; gõ khi revalidation trễ
+73.2/85.2 → 74.6/403.0 ms; chuyển nhanh ba note 340.0/778.5 →
+268.6/391.1 ms. Đuôi latency biến động, không khẳng định tăng tốc tổng thể.
+Riêng candidate: click-to-paint note đã prefetch 22.6/29.0 ms và click khi
+request đang chạy 60.3/74.5 ms; broad action wall-time lần lượt p95 127.9 và
+154.4 ms. List-only cold/warm có 35/26 prefetch response, 9,680/4,325 bytes;
+không có note click trong chính các cửa sổ đo đó. Đây là traffic suy đoán trong
+cửa sổ thao tác, không khẳng định không dùng về sau. Xem [báo cáo đã lọc]
+(VIEWPORT-PREFETCH-20261029.md) và [JSON](VIEWPORT-PREFETCH-20261029.json).
+
+Source check đạt; offline 193/193; browser 33/33; retry/load harness mô phỏng
+đạt. Gemini key1–3 phân tích độc lập; key4/5 review bản cuối. Chi tiết nhận/
+bác bỏ có trong báo cáo. Vercel OIDC chưa có Preview scope/vault cô lập; không
+thực hiện note/history read trên cloud. Không deploy, không đổi alias/bypass,
+không bật billing. Production và rollback giữ nguyên; S25 Ultra/iPad chưa đo.
+Không tuyên bố đạt 8/10 Google Keep trước người dùng đánh giá.

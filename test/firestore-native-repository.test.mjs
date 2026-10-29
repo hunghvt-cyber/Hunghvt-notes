@@ -84,6 +84,15 @@ test('ordinary note reads skip history versions and prefetch refuses oversized c
  const largeId=rid(91),large=await repo.save(largeId,note('x'.repeat(100000)),null,rid(199)),before=db.documentReads.length;const largeSkipped=await repo.read(largeId,{includeHistory:false,maxBytes:64*1024});assert.deepEqual(largeSkipped,{prefetchSkipped:true,revision:large.revision});assert.equal(db.documentReads.slice(before).some(path=>path.includes('/chunks/')),false,'oversized prefetch must not read chunk documents');
 });
 
+test('Firestore list carries a 200-character preview from the metadata document without per-note reads',async()=>{
+ const db=new FakeFirestore(),repo=await setup(db),id=rid(92),text='x'.repeat(260);
+ await repo.save(id,note(text),null,rid(192));
+ const before=db.documentReads.length,rows=await repo.list();
+ assert.equal(rows.find(row=>row.id===id).text,'x'.repeat(200));
+ assert.equal(db.documentReads.length-before,1,'list reads the vault document and metadata query, not individual note bodies');
+ assert.equal(db.collectionReads,1);
+});
+
 test('native save uses per-note CAS and operation receipts; replay does not advance revision',async()=>{
  const db=new FakeFirestore(),repo=await setup(db);
  const id=rid(1),op=rid(101),first=await repo.save(id,note(),null,op,{includeNote:true});
