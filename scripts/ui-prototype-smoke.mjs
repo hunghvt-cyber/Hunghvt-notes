@@ -38,6 +38,7 @@ try {
       viewport: [innerWidth, innerHeight], document: [document.documentElement.scrollWidth, document.documentElement.scrollHeight],
       list: Math.round(document.querySelector('.list-pane').getBoundingClientRect().width),
       editor: Math.round(document.querySelector('.editor-pane').getBoundingClientRect().width),
+      bodyWidth: Math.round(document.querySelector('#body').getBoundingClientRect().width),
       editorVisible: getComputedStyle(document.querySelector('.editor-pane')).display !== 'none',
       titleHeight: Math.round(document.querySelector('#title').getBoundingClientRect().height),
       titleScroll: Math.round(document.querySelector('#title').scrollHeight),
@@ -109,6 +110,16 @@ try {
     }
     await page.close();
   }
+  const tablet = await browser.newPage({ viewport: { width: 744, height: 1133 }, deviceScaleFactor: 1 });
+  await tablet.goto(`${base}/prototype/ui-responsive/?layout=single`, { waitUntil: 'networkidle' });
+  const ipadSinglePane = await tablet.locator('#body').evaluate(el => Math.round(el.getBoundingClientRect().width));
+  await tablet.screenshot({ path: resolve(output, 'after-ipad-mini-portrait-single-editor.png'), fullPage: false });
+  await tablet.getByRole('button', { name: '← Danh sách' }).click();
+  await tablet.screenshot({ path: resolve(output, 'after-ipad-mini-portrait-single-list.png'), fullPage: false });
+  await tablet.locator('.note-card').first().click();
+  const ipadSingleReopen = await tablet.locator('#body').evaluate(el => Math.round(el.getBoundingClientRect().width));
+  if (ipadSinglePane !== ipadSingleReopen) throw new Error('single-pane editor width changed during list/editor navigation');
+  await tablet.close();
   const css = await readFile(resolve(root, 'public/app.css'), 'utf8');
   const baseline = `<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>${css}\n.demo{position:fixed;top:0;right:0;background:#f7e8c3;padding:4px 8px;font:11px system-ui;z-index:99}.demo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:9px}.demo-card{aspect-ratio:1;max-height:240px;padding:11px;overflow:hidden;background:#fffef8}.demo-card strong,.demo-card p{display:block;overflow:hidden;overflow-wrap:anywhere;white-space:pre-wrap}</style></head><body><div class="demo">BASELINE · fixture tổng hợp · CSS/source hiện hành</div><main><header><h1>Notes</h1><p>Ghi chú, checklist và thư mục</p></header><div class="toolbar"><button>Note mới</button><button>Chọn nhiều</button><button>Tải backup</button></div><div class="layout"><aside><label>Tìm trong tiêu đề và đoạn xem trước</label><input placeholder="Tìm kiếm"><button>Công việc</button><button>Ý tưởng</button><button>Cá nhân</button><button>Thùng rác</button></aside><section><h2>Tất cả ghi chú</h2><div class="demo-grid">${['Kế hoạch tuần · tiêu đề dài để kiểm tra|Ưu tiên hoàn thiện bản trình bày, gom phản hồi và chuẩn bị nội dung cho buổi trao đổi thứ Sáu.|Công việc','Ghi chú cuộc họp nhóm|Quyết định, việc tiếp theo và nội dung checklist.|Công việc','Mẫu cấu hình máy chủ|export const options = { retries: 3, mode: readonly };|Dự án dài hạn','Ý tưởng hộp thư nhanh|Một nơi nhận các mẩu nội dung rồi phân loại sau.|Ý tưởng','Danh sách đọc cuối tuần|Bài viết về thiết kế thông tin và vài cuốn sách.|Cá nhân','Lộ trình dự án|Giai đoạn một, hai và ba.|Dự án dài hạn','Bữa tối cuối tuần|Rau củ, mì và gia vị.|Cá nhân','Ghi nhanh ý tưởng|Một dòng ý tưởng ngắn để kiểm tra mật độ.|Ý tưởng'].map(s=>{const [t,p,f]=s.split('|');return `<button class="demo-card"><strong>${t}</strong><p>${p}</p><small>${f}</small></button>`}).join('')}</div></section></div><section><h2>Soạn ghi chú</h2><label>Tiêu đề</label><input value="Kế hoạch tuần · tiêu đề dài để kiểm tra"><label>Nội dung</label><textarea rows="8">Ưu tiên hoàn thiện bản trình bày, gom phản hồi và chuẩn bị nội dung cho buổi trao đổi thứ Sáu.\n\nChecklist:\n☐ Rà soát các mục đang mở\n☐ Gửi bản nháp cho nhóm</textarea><button>Lưu ngay</button><button>Chia sẻ</button></section></main></body></html>`;
   for (const [name, width, height] of [['phone', 390, 844], ['ipad-mini-portrait', 744, 1133], ['ipad-mini-landscape', 1133, 744], ['pc', 1440, 900]]) {
@@ -117,7 +128,8 @@ try {
     await page.screenshot({ path: resolve(output, `before-${name}.png`), fullPage: false });
     await page.close();
   }
-  await import('node:fs/promises').then(({ writeFile }) => writeFile(resolve(output, 'browser-results.json'), JSON.stringify({ browser: 'Chromium headless, NAS arm64, emulated CSS viewports', viewports: results, interactions: ['synthetic draft persisted across reload', 'search and open', 'history and share revoke', 'new note', 'viewport resize preserves text and caret', 'multi-select and move/trash/restore', 'keyboard search shortcut and focus ring', 'folder drawer', 'empty/conflict scenarios', 'reduced motion'], network: 'none; no API/backend requests' }, null, 2) + '\n'));
+  const portraitSplit = results.find(row => row.name === 'ipad-mini-portrait');
+  await import('node:fs/promises').then(({ writeFile }) => writeFile(resolve(output, 'browser-results.json'), JSON.stringify({ browser: 'Chromium headless, NAS arm64, emulated CSS viewports', viewports: results, ipadPortraitComparison: { viewport: '744x1133 CSS px', twoPane: { pane: 'folders + list + editor', editorPaneWidth: portraitSplit.editor, editableBodyWidth: portraitSplit.bodyWidth }, onePane: { pane: 'list/editor switch, folders in drawer', editorPaneWidth: 744, editableBodyWidth: ipadSinglePane } }, interactions: ['synthetic draft persisted across reload', 'search and open', 'history and share revoke', 'new note', 'viewport resize preserves text and caret', 'multi-select and move/trash/restore', 'keyboard search shortcut and focus ring', 'folder drawer', 'empty/conflict scenarios', 'reduced motion'], network: 'none; no API/backend requests' }, null, 2) + '\n'));
   console.log(JSON.stringify(results));
 } finally {
   await browser.close();

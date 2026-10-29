@@ -26,7 +26,7 @@ Baseline screenshots at the same synthetic fixture and CSS viewport sizes:
 ## Prototype layout
 
 - **Phone (≤700 CSS px):** one primary surface. The list and editor have explicit navigation; folders open in a drawer; a bottom navigation bar provides Notes, Search, Trash, and Code Inbox. The editor reserves space above the bottom bar and updates its inset from `visualViewport` when the viewport changes. Title and body remain the same DOM controls during resize so draft text and caret do not jump.
-- **iPad mini portrait (744×1133 reference):** compact 64px folder rail, 290px list, 390px editor. The two-pane editor is available at this width instead of forcing a list-only tablet page.
+- **iPad mini portrait (744×1133 reference):** compare both variants using the same note fixture. Two-pane mode has a compact 64px folder rail, 290px list, 390px editor, and 310px editable body width. One-pane mode switches list/editor with folders in a drawer; editor is 744px wide with a 638px editable body. The wider editing surface helps long prose and code; the split view keeps note browsing visible. The prototype keeps both for review rather than deciding device preference from width alone.
 - **iPad mini landscape (1133×744 reference):** full 232px folder sidebar, 340px list, 561px editor.
 - **PC (1440×900 tested, intended through 1920 CSS px):** full folder sidebar, fixed-width list, flexible editor. The editable text column is constrained by the editor content max-width plus side padding; code uses the full text area.
 
@@ -42,13 +42,15 @@ Prototype screenshots:
 | Phone editor, 390×844 | ![Prototype phone editor](ui-prototype-20261029/after-phone.png) |
 | Phone conflict fixture | ![Conflict state](ui-prototype-20261029/after-state-conflict.png) |
 | Phone empty fixture | ![Empty state](ui-prototype-20261029/after-state-empty.png) |
-| iPad mini reference portrait, 744×1133 | ![Prototype tablet portrait](ui-prototype-20261029/after-ipad-mini-portrait.png) |
+| iPad mini reference portrait, 744×1133, list + editor (390px pane / 310px body) | ![Prototype tablet portrait split](ui-prototype-20261029/after-ipad-mini-portrait.png) |
+| iPad mini reference portrait, 744×1133, one-pane editor (744px pane / 638px body) | ![Prototype tablet portrait one pane](ui-prototype-20261029/after-ipad-mini-portrait-single-editor.png) |
+| iPad mini reference portrait, 744×1133, one-pane list | ![Prototype tablet portrait list](ui-prototype-20261029/after-ipad-mini-portrait-single-list.png) |
 | iPad mini reference landscape, 1133×744 | ![Prototype tablet landscape](ui-prototype-20261029/after-ipad-mini-landscape.png) |
 | PC, 1440×900 | ![Prototype PC](ui-prototype-20261029/after-pc.png) |
 
 ## Browser and source checks
 
-Chromium headless ran the prototype at 390×844, 744×1133, 1133×744, and 1440×900. All four had no horizontal overflow; visible controls met the 40px check; the long title did not clip. The interaction smoke covered search/open, editing, local synthetic draft after reload, history, share/revoke, creation, resize with text and caret retained, keyboard search, drawer open, multi-select, trash/restore, empty/conflict states, focus indicator, and reduced motion. Per-viewport dimensions and checks are in `ui-prototype-20261029/browser-results.json`; the runner is `scripts/ui-prototype-smoke.mjs`.
+Chromium headless ran the prototype at 390×844, 744×1133, 1133×744, and 1440×900. All four had no horizontal overflow; visible controls met the 40px check; the long title did not clip. The interaction smoke covered search/open, editing, local synthetic draft after reload, history, share/revoke, creation, resize with text and caret retained, keyboard search, drawer open, multi-select, trash/restore, empty/conflict states, focus indicator, and reduced motion. Per-viewport dimensions, text-area widths, and checks are in `ui-prototype-20261029/browser-results.json`; the runner is `scripts/ui-prototype-smoke.mjs`. At the 744×1133 CSS reference, measured body width is 310px in split mode versus 638px in one-pane mode; panel widths are 390px versus 744px.
 
 - `npm run check:source` — PASS; 49 JavaScript modules syntax-checked/imported, no truncation markers.
 - `npm test` — PASS; 191 tests, 0 failed.
@@ -67,14 +69,14 @@ The existing NAS `gemini-task` text API wrapper returned a valid response in one
 
 ## Open the prototype
 
-From the repository root, serve the static repository on loopback and open `http://127.0.0.1:4173/prototype/ui-responsive/`. The prototype has no backend dependency. On the NAS, wrap the shell command as required by local operating procedure:
+The allowlisted preview server exposes only the prototype HTML/CSS/JS and the existing public stylesheet; it rejects API and repository paths and sends `connect-src 'none'`. On the NAS, bind it to loopback for local viewing or the current Tailscale IPv4 to view from an authorized tailnet device. Use the wrapper for the local command as required by NAS operating procedure:
 
 ```sh
-/home/admin/bin/copyout 'cd /vol1/Docker/.codex-admin/worktrees/web-notes-ui-prototype-20261029 && python3 -m http.server 4173 --bind 127.0.0.1'
+/home/admin/bin/copyout 'cd /vol1/Docker/.codex-admin/worktrees/web-notes-ui-prototype-20261029 && node scripts/serve-ui-prototype.mjs 127.0.0.1'
 ```
 
-The command is intended for a local NAS browser. Use a trusted local browser session or SSH tunnel if viewing from another device; do not expose it publicly.
+For the existing NAS Tailscale interface, the tested NAS address is `100.94.158.94`; use `http://100.94.158.94:4173/prototype/ui-responsive/` while the preview server is running. The listener binds only that tailnet address and serves only synthetic UI assets. The Tailscale CLI daemon socket is not visible in this shell, so the tailnet IP/interface is observed but peer ACL/browser reachability cannot be checked from the NAS process itself. The preview is plain HTTP carried over Tailscale’s encrypted tunnel; do not port-forward it to the public Internet.
 
 ## Review gate
 
-This remains a prototype branch. No merge or Production deployment was performed. Review phone one-handed use, tablet portrait split width, landscape editor width, editor keyboard avoidance, and desktop code/text density before deciding whether to port any design to the real Firestore UI. Backend behavior and Production data were not exercised or modified.
+This remains a prototype branch. The original UI commit is `491364b475e442119d03bfaad6d3b1b795315c1a`; a follow-up commit adds the iPad comparison and restricted preview server. The NAS GitHub CLI is absent and non-interactive `git push` failed because no Git HTTPS credential helper is available; the exact commit is not pushed yet. No merge or Production deployment was performed. Review phone one-handed use, tablet portrait split width, landscape editor width, editor keyboard avoidance, and desktop code/text density before deciding whether to port any design to the real Firestore UI. Backup/restore evidence from 2026-10-29 is recorded separately in [`BACKUP-CRON-VERIFICATION-20261029.md`](BACKUP-CRON-VERIFICATION-20261029.md). Backend behavior and Production data were not exercised or modified.

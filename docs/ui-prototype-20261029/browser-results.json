@@ -13,6 +13,7 @@
       ],
       "list": 0,
       "editor": 390,
+      "bodyWidth": 318,
       "editorVisible": true,
       "titleHeight": 97,
       "titleScroll": 97,
@@ -33,6 +34,7 @@
       ],
       "list": 290,
       "editor": 390,
+      "bodyWidth": 310,
       "editorVisible": true,
       "titleHeight": 90,
       "titleScroll": 90,
@@ -53,6 +55,7 @@
       ],
       "list": 340,
       "editor": 561,
+      "bodyWidth": 416,
       "editorVisible": true,
       "titleHeight": 122,
       "titleScroll": 122,
@@ -73,6 +76,7 @@
       ],
       "list": 340,
       "editor": 868,
+      "bodyWidth": 692,
       "editorVisible": true,
       "titleHeight": 86,
       "titleScroll": 86,
@@ -82,6 +86,19 @@
       "touchControls": true
     }
   ],
+  "ipadPortraitComparison": {
+    "viewport": "744x1133 CSS px",
+    "twoPane": {
+      "pane": "folders + list + editor",
+      "editorPaneWidth": 390,
+      "editableBodyWidth": 310
+    },
+    "onePane": {
+      "pane": "list/editor switch, folders in drawer",
+      "editorPaneWidth": 744,
+      "editableBodyWidth": 638
+    }
+  },
   "interactions": [
     "synthetic draft persisted across reload",
     "search and open",
