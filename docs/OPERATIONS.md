@@ -175,4 +175,6 @@ the Git-main alias point to this deployment. Rollback target:
 briefly assigned the default secondary alias while staging; it was immediately
 restored to the previous deployment and all aliases were read back before
 candidate qualification and final promotion. Full filtered evidence and exact
-alias map are in [release verification](SPEED-AND-DRAFTS-20261029.md).
+alias map are in [release verification](SPEED-AND-DRAFTS-20261029.md). The
+temporary Vercel share-link bypass used by the protected-URL check was revoked;
+the final alias readback has no protection-bypass entries.
