@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {reusableNote,NoteCache} from '../public/cache.js';
+import {reusableNote,NoteCache,MAX_CACHED_NOTE_BYTES,MAX_CACHED_CONTENT_BYTES,MAX_CACHED_NOTES,MAX_CACHED_LIST_BYTES,MAX_CACHED_LIST_NOTES} from '../public/cache.js';
 test('cached content must match both ID and revision; absent, moved or newer rows invalidate it',()=>{
  const note={id:'one',revision:'r1',text:'private'};
  assert.equal(reusableNote(note,{id:'one',revision:'r1'}),true);
@@ -8,5 +8,8 @@ test('cached content must match both ID and revision; absent, moved or newer row
 });
 test('unauthenticated cache access does not open IndexedDB',async()=>{
  const cache=new NoteCache();cache.tx=()=>{throw Error('must not open storage');};
- assert.equal(await cache.get(null),null);await cache.put(null,{text:'never written'});
+ assert.equal(await cache.get(null),null);await cache.put(null,{text:'never written'});await cache.delete(null);
+});
+test('private acknowledged cache has explicit storage bounds',()=>{
+ assert.equal(MAX_CACHED_NOTE_BYTES,256*1024);assert.equal(MAX_CACHED_CONTENT_BYTES,1024*1024);assert.equal(MAX_CACHED_NOTES,12);assert.equal(MAX_CACHED_LIST_BYTES,512*1024);assert.equal(MAX_CACHED_LIST_NOTES,1000);
 });

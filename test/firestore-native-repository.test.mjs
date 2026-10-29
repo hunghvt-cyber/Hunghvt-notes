@@ -26,7 +26,7 @@ class Snapshot{
  data(){return copy(this.row);}
 }
 class FakeFirestore{
- constructor(){this.rows=new Map();this.collectionReads=0;this.attempts=0;}
+ constructor(){this.rows=new Map();this.collectionReads=0;this.attempts=0;this.documentReads=[];}
  collection(name){return new CollectionRef(this,name);}
  async runTransaction(fn,{maxAttempts=5}={}){
   for(let attempt=0;attempt<maxAttempts;attempt++){
@@ -46,7 +46,7 @@ class FakeFirestore{
       this.collectionReads++;
      return {docs:rows,empty:rows.length===0,size:rows.length};
      }
-     const entry=this.rows.get(ref.path);reads.set(ref.path,entry?.version??0);return new Snapshot(ref.path,entry,this);
+     this.documentReads.push(ref.path);const entry=this.rows.get(ref.path);reads.set(ref.path,entry?.version??0);return new Snapshot(ref.path,entry,this);
     },
     set:(ref,data)=>writes.push({kind:'set',path:ref.path,data:copy(data)}),
     create:(ref,data)=>writes.push({kind:'create',path:ref.path,data:copy(data)}),
@@ -75,6 +75,23 @@ class FakeFirestore{
 const rid=n=>`00000000-0000-4000-8000-${String(n).padStart(12,'0')}`;
 const note=(text='hello')=>({title:'Test',text,checklist:[],pinned:false,folder:'Inbox'});
 const setup=async db=>{const repo=new FirestoreNativeRepository(db,{vaultId:'test-vault'});await repo.initialize({epoch:'0000000000000001',folders:['Inbox']});return repo;};
+
+test('ordinary note reads skip history versions and prefetch refuses oversized content',async()=>{
+ const db=new FakeFirestore(),repo=await setup(db),id=rid(90);let saved=await repo.save(id,note('small'),null,rid(190));for(let i=0;i<5;i++)saved=await repo.save(id,note('older '+i),saved.revision,rid(191+i));
+ db.collectionReads=0;const opened=await repo.read(id,{includeHistory:false});assert.deepEqual(opened.history,[]);assert.equal(db.collectionReads,0);
+ db.collectionReads=0;const history=await repo.read(id);assert.equal(history.history.length,5);assert.equal(db.collectionReads,1);
+ db.collectionReads=0;const skipped=await repo.read(id,{includeHistory:false,maxBytes:1});assert.deepEqual(skipped,{prefetchSkipped:true,revision:saved.revision});assert.equal(db.collectionReads,0);
+ const largeId=rid(91),large=await repo.save(largeId,note('x'.repeat(100000)),null,rid(199)),before=db.documentReads.length;const largeSkipped=await repo.read(largeId,{includeHistory:false,maxBytes:64*1024});assert.deepEqual(largeSkipped,{prefetchSkipped:true,revision:large.revision});assert.equal(db.documentReads.slice(before).some(path=>path.includes('/chunks/')),false,'oversized prefetch must not read chunk documents');
+});
+
+test('Firestore list carries a 200-character preview from the metadata document without per-note reads',async()=>{
+ const db=new FakeFirestore(),repo=await setup(db),id=rid(92),text='x'.repeat(260);
+ await repo.save(id,note(text),null,rid(192));
+ const before=db.documentReads.length,rows=await repo.list();
+ assert.equal(rows.find(row=>row.id===id).text,'x'.repeat(200));
+ assert.equal(db.documentReads.length-before,1,'list reads the vault document and metadata query, not individual note bodies');
+ assert.equal(db.collectionReads,1);
+});
 
 test('native save uses per-note CAS and operation receipts; replay does not advance revision',async()=>{
  const db=new FakeFirestore(),repo=await setup(db);

@@ -11,7 +11,11 @@
 - [Lịch sử nghiên cứu/bàn giao đã chuyển từ ai-nas-lab](docs/history/ai-nas-lab/README.md).
 - [Quy tắc tiếp quản](AGENTS.md).
 
-Autosave gửi thay đổi lên Firestore; nhãn “Đã lưu” chỉ xuất hiện sau ACK hợp lệ. Thay đổi chưa được ACK chỉ còn trong RAM của trang đang mở, và có thể mất khi đóng hoặc tải lại trang. Trình duyệt không còn khôi phục persistent draft; database IndexedDB cũ được để nguyên, không đọc hay xóa. Cache danh sách/nội dung chỉ dùng để hiển thị trước khi xác nhận dữ liệu máy chủ.
+Autosave gửi thay đổi lên Firestore; nhãn “Đã lưu” chỉ xuất hiện sau ACK hợp lệ. Thay đổi chưa được ACK chỉ còn trong RAM của trang đang mở, và có thể mất khi đóng hoặc tải lại trang. Trình duyệt không còn khôi phục persistent draft; database IndexedDB cũ được để nguyên, không đọc hay xóa. Cache IndexedDB riêng chỉ chứa danh sách và nội dung đã được server xác nhận, theo scope tài khoản; sau xác thực, app có thể hiện bản cache trước rồi kiểm tra revision và quyền trên server. Bản cache cũ được đánh dấu chưa xác minh; cache không cấp quyền truy cập. Số đo tổng hợp mới nhất và giới hạn được ghi tại [cache performance](docs/CACHE-PERFORMANCE-20261029.json).
+
+Viewport prefetch/cache follow-up và blocker cloud qualification cho PR #34 được ghi tại [báo cáo ngày 29/10](docs/VIEWPORT-PREFETCH-20261029.md), cùng [bảng số đo đã lọc](docs/VIEWPORT-PREFETCH-20261029.json). Đây là candidate chưa deploy; không dùng số NAS/headless để khẳng định Production hoặc trải nghiệm thiết bị thật nhanh hơn.
+
+Profile khựng khi gõ tại [báo cáo typing/cloud](docs/TYPING-PROFILE-20261030.md) và kết quả blocker qualification tiếp theo tại [báo cáo PR #34 ngày 30/10](docs/PR34-CLOUD-QUALIFICATION-20261030.md). Candidate chưa được cloud-qualify; Production không đổi.
 
 ## Source và triển khai
 

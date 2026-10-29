@@ -1,0 +1,540 @@
+{
+  "date": "2026-10-29",
+  "kind": "FILTERED_SYNTHETIC_FIXTURE_BENCHMARK_NOT_PRODUCTION",
+  "fixture": {
+    "browser": "Chromium headless on NAS",
+    "api": "local Firestore-compatible handler with in-memory synthetic fixture",
+    "notes": "20 synthetic small notes with five revisions each and one 128 KiB synthetic note",
+    "samplesPerCase": 20,
+    "privacy": "No real Notes, content, IDs, sessions, tokens, credentials or secrets."
+  },
+  "method": {
+    "main": "origin/main frontend assets and current local handler; viewport prefetch disabled",
+    "candidate": "final local PR #34 source with 80 ms prefetch scheduling grace, concurrency 1, same fixture/harness",
+    "clock": "Wall action measures; browser requests/response bytes; in-handler server duration; dedicated click-to-text and two-rAF paint timestamps. A 20-sample p95 is the maximum order statistic and is noisy.",
+    "cancellations": "AbortError is a deliberate canceled request and is counted separately; HTTP/request errors are separate. Main/candidate fixtures are not Vercel/Production."
+  },
+  "measurements": [
+    {
+      "scenario": "navigation-list-cold-cache",
+      "main": {
+        "p50Ms": 341.6,
+        "p95Ms": 413.9,
+        "n": 20,
+        "requests": 60,
+        "foregroundRequests": 60,
+        "prefetchRequests": 0,
+        "cancelledRequests": 0,
+        "requestErrors": 0,
+        "responseBytes": 105660,
+        "foregroundResponseBytes": 105660,
+        "prefetchResponseBytes": 0,
+        "serverRequests": 60,
+        "foregroundServerRequests": 60,
+        "prefetchServerRequests": 0,
+        "serverMsP50": 9.1,
+        "serverMsP95": 15.2
+      },
+      "candidate": {
+        "p50Ms": 305,
+        "p95Ms": 345.8,
+        "n": 20,
+        "requests": 75,
+        "foregroundRequests": 40,
+        "prefetchRequests": 35,
+        "cancelledRequests": 0,
+        "requestErrors": 0,
+        "responseBytes": 113720,
+        "foregroundResponseBytes": 104040,
+        "prefetchResponseBytes": 9680,
+        "serverRequests": 92,
+        "foregroundServerRequests": 40,
+        "prefetchServerRequests": 52,
+        "serverMsP50": 14,
+        "serverMsP95": 24.2
+      },
+      "interpretation": "Navigation from reload through first list card; candidate includes allowed viewport prefetch."
+    },
+    {
+      "scenario": "navigation-list-warm-cache",
+      "main": {
+        "p50Ms": 283.1,
+        "p95Ms": 332.8,
+        "n": 20,
+        "requests": 60,
+        "foregroundRequests": 60,
+        "prefetchRequests": 0,
+        "cancelledRequests": 0,
+        "requestErrors": 0,
+        "responseBytes": 105660,
+        "foregroundResponseBytes": 105660,
+        "prefetchResponseBytes": 0,
+        "serverRequests": 60,
+        "foregroundServerRequests": 60,
+        "prefetchServerRequests": 0,
+        "serverMsP50": 7.3,
+        "serverMsP95": 16.8
+      },
+      "candidate": {
+        "p50Ms": 275.5,
+        "p95Ms": 332.8,
+        "n": 20,
+        "requests": 66,
+        "foregroundRequests": 40,
+        "prefetchRequests": 26,
+        "cancelledRequests": 0,
+        "requestErrors": 0,
+        "responseBytes": 108365,
+        "foregroundResponseBytes": 104040,
+        "prefetchResponseBytes": 4325,
+        "serverRequests": 71,
+        "foregroundServerRequests": 40,
+        "prefetchServerRequests": 31,
+        "serverMsP50": 10.1,
+        "serverMsP95": 18.3
+      },
+      "interpretation": "Navigation with authenticated local acknowledged cache."
+    },
+    {
+      "scenario": "scroll-to-last-card-preview",
+      "main": {
+        "p50Ms": 109,
+        "p95Ms": 131.6,
+        "n": 20,
+        "requests": 60,
+        "foregroundRequests": 60,
+        "prefetchRequests": 0,
+        "cancelledRequests": 0,
+        "requestErrors": 0,
+        "responseBytes": 105660,
+        "foregroundResponseBytes": 105660,
+        "prefetchResponseBytes": 0,
+        "serverRequests": 60,
+        "foregroundServerRequests": 60,
+        "prefetchServerRequests": 0,
+        "serverMsP50": 6.8,
+        "serverMsP95": 14.5
+      },
+      "candidate": {
+        "p50Ms": 113.3,
+        "p95Ms": 136.1,
+        "n": 20,
+        "requests": 68,
+        "foregroundRequests": 40,
+        "prefetchRequests": 28,
+        "cancelledRequests": 3,
+        "requestErrors": 0,
+        "responseBytes": 107841,
+        "foregroundResponseBytes": 104040,
+        "prefetchResponseBytes": 3801,
+        "serverRequests": 69,
+        "foregroundServerRequests": 40,
+        "prefetchServerRequests": 29,
+        "serverMsP50": 11.7,
+        "serverMsP95": 22.8
+      },
+      "interpretation": "Scroll to last card and wait for its already-rendered preview to be in viewport. No note click in this measurement window."
+    },
+    {
+      "scenario": "open-small-uncached",
+      "main": {
+        "p50Ms": 217.7,
+        "p95Ms": 265.4,
+        "n": 20,
+        "requests": 20,
+        "foregroundRequests": 20,
+        "prefetchRequests": 0,
+        "cancelledRequests": 0,
+        "requestErrors": 0,
+        "responseBytes": 17940,
+        "foregroundResponseBytes": 17940,
+        "prefetchResponseBytes": 0,
+        "serverRequests": 20,
+        "foregroundServerRequests": 20,
+        "prefetchServerRequests": 0,
+        "serverMsP50": 19.2,
+        "serverMsP95": 38.7
+      },
+      "candidate": {
+        "p50Ms": 189.4,
+        "p95Ms": 216,
+        "n": 20,
+        "requests": 33,
+        "foregroundRequests": 20,
+        "prefetchRequests": 13,
+        "cancelledRequests": 0,
+        "requestErrors": 0,
+        "responseBytes": 4751,
+        "foregroundResponseBytes": 1623,
+        "prefetchResponseBytes": 3128,
+        "serverRequests": 33,
+        "foregroundServerRequests": 20,
+        "prefetchServerRequests": 13,
+        "serverMsP50": 13.8,
+        "serverMsP95": 29.6
+      },
+      "interpretation": "Main and candidate prefetch-off are uncached reads; candidate full run may have prefetched a subset before click."
+    },
+    {
+      "scenario": "open-large-after-reload",
+      "main": {
+        "p50Ms": 233,
+        "p95Ms": 279.7,
+        "n": 20,
+        "requests": 21,
+        "foregroundRequests": 21,
+        "prefetchRequests": 0,
+        "cancelledRequests": 0,
+        "requestErrors": 0,
+        "responseBytes": 2625940,
+        "foregroundResponseBytes": 2625940,
+        "prefetchResponseBytes": 0,
+        "serverRequests": 20,
+        "foregroundServerRequests": 20,
+        "prefetchServerRequests": 0,
+        "serverMsP50": 16.5,
+        "serverMsP95": 26.5
+      },
+      "candidate": {
+        "p50Ms": 199.8,
+        "p95Ms": 242.6,
+        "n": 20,
+        "requests": 20,
+        "foregroundRequests": 20,
+        "prefetchRequests": 0,
+        "cancelledRequests": 0,
+        "requestErrors": 0,
+        "responseBytes": 1440,
+        "foregroundResponseBytes": 1440,
+        "prefetchResponseBytes": 0,
+        "serverRequests": 20,
+        "foregroundServerRequests": 20,
+        "prefetchServerRequests": 0,
+        "serverMsP50": 14.7,
+        "serverMsP95": 22.4
+      },
+      "interpretation": "Main reads full 128 KiB body; candidate case is already cached and performs revision validation only, so these are not equivalent open states."
+    },
+    {
+      "scenario": "open-small-after-reload-cache",
+      "main": {
+        "p50Ms": 150.7,
+        "p95Ms": 186.5,
+        "n": 20,
+        "requests": 20,
+        "foregroundRequests": 20,
+        "prefetchRequests": 0,
+        "cancelledRequests": 0,
+        "requestErrors": 0,
+        "responseBytes": 17940,
+        "foregroundResponseBytes": 17940,
+        "prefetchResponseBytes": 0,
+        "serverRequests": 20,
+        "foregroundServerRequests": 20,
+        "prefetchServerRequests": 0,
+        "serverMsP50": 13.1,
+        "serverMsP95": 29.3
+      },
+      "candidate": {
+        "p50Ms": 120.8,
+        "p95Ms": 295.1,
+        "n": 20,
+        "requests": 59,
+        "foregroundRequests": 20,
+        "prefetchRequests": 39,
+        "cancelledRequests": 1,
+        "requestErrors": 0,
+        "responseBytes": 8924,
+        "foregroundResponseBytes": 2351,
+        "prefetchResponseBytes": 6573,
+        "serverRequests": 48,
+        "foregroundServerRequests": 20,
+        "prefetchServerRequests": 28,
+        "serverMsP50": 10.6,
+        "serverMsP95": 23.4
+      },
+      "interpretation": "Acknowledged cache available after reload; action wall time includes automation/layout overhead."
+    },
+    {
+      "scenario": "typing-during-120ms-revalidation",
+      "main": {
+        "p50Ms": 73.2,
+        "p95Ms": 85.2,
+        "n": 20,
+        "requests": 60,
+        "foregroundRequests": 60,
+        "prefetchRequests": 0,
+        "cancelledRequests": 0,
+        "requestErrors": 0,
+        "responseBytes": 22312,
+        "foregroundResponseBytes": 22312,
+        "prefetchResponseBytes": 0,
+        "serverRequests": 41,
+        "foregroundServerRequests": 41,
+        "prefetchServerRequests": 0,
+        "serverMsP50": 124.3,
+        "serverMsP95": 135.1
+      },
+      "candidate": {
+        "p50Ms": 74.6,
+        "p95Ms": 403,
+        "n": 20,
+        "requests": 92,
+        "foregroundRequests": 54,
+        "prefetchRequests": 38,
+        "cancelledRequests": 12,
+        "requestErrors": 0,
+        "responseBytes": 29498,
+        "foregroundResponseBytes": 23326,
+        "prefetchResponseBytes": 6172,
+        "serverRequests": 65,
+        "foregroundServerRequests": 40,
+        "prefetchServerRequests": 25,
+        "serverMsP50": 25.1,
+        "serverMsP95": 147.5
+      },
+      "interpretation": "Two keystrokes while note/revalidation traffic is delayed 120 ms."
+    },
+    {
+      "scenario": "rapid-switch-3-notes-120ms-delay",
+      "main": {
+        "p50Ms": 340,
+        "p95Ms": 778.5,
+        "n": 20,
+        "requests": 53,
+        "foregroundRequests": 53,
+        "prefetchRequests": 0,
+        "cancelledRequests": 0,
+        "requestErrors": 0,
+        "responseBytes": 3816,
+        "foregroundResponseBytes": 3816,
+        "prefetchResponseBytes": 0,
+        "serverRequests": 53,
+        "foregroundServerRequests": 53,
+        "prefetchServerRequests": 0,
+        "serverMsP50": 130.6,
+        "serverMsP95": 141.5
+      },
+      "candidate": {
+        "p50Ms": 268.6,
+        "p95Ms": 391.1,
+        "n": 20,
+        "requests": 60,
+        "foregroundRequests": 60,
+        "prefetchRequests": 0,
+        "cancelledRequests": 40,
+        "requestErrors": 0,
+        "responseBytes": 4320,
+        "foregroundResponseBytes": 4320,
+        "prefetchResponseBytes": 0,
+        "serverRequests": 60,
+        "foregroundServerRequests": 60,
+        "prefetchServerRequests": 0,
+        "serverMsP50": 130.2,
+        "serverMsP95": 139.1
+      },
+      "interpretation": "Same three synthetic note targets prewarmed each sample. Prefetch is not active in the measured switch window; 40 candidate AbortError cancellations are expected stale work."
+    }
+  ],
+  "scenarioOnly": {
+    "candidateOpenUncachedPrefetchDisabled": {
+      "p50Ms": 195.8,
+      "p95Ms": 240.9,
+      "n": 20,
+      "requests": 21,
+      "foregroundRequests": 21,
+      "prefetchRequests": 0,
+      "cancelledRequests": 0,
+      "requestErrors": 0,
+      "responseBytes": 5080,
+      "foregroundResponseBytes": 5080,
+      "prefetchResponseBytes": 0,
+      "serverRequests": 20,
+      "foregroundServerRequests": 20,
+      "prefetchServerRequests": 0,
+      "serverMsP50": 19,
+      "serverMsP95": 42
+    },
+    "candidateOpenAfterSuccessfulPrefetch": {
+      "p50Ms": 111.9,
+      "p95Ms": 152,
+      "n": 20,
+      "requests": 104,
+      "foregroundRequests": 60,
+      "prefetchRequests": 44,
+      "cancelledRequests": 4,
+      "requestErrors": 0,
+      "responseBytes": 113196,
+      "foregroundResponseBytes": 105480,
+      "prefetchResponseBytes": 7716,
+      "serverRequests": 105,
+      "foregroundServerRequests": 60,
+      "prefetchServerRequests": 45,
+      "serverMsP50": 13.4,
+      "serverMsP95": 26.7,
+      "clickToEditorText": {
+        "lastClickToInputMs": {
+          "p50Ms": 11.9,
+          "p95Ms": 20.7,
+          "n": 20
+        },
+        "lastClickToPaintMs": {
+          "p50Ms": 24.8,
+          "p95Ms": 40,
+          "n": 20
+        }
+      },
+      "note": "The exact candidate prefetch-to-open scenario has no main equivalent because main has no prefetch. The bytes include list and prefetch warmup plus revision-only validation; click-to-paint excludes setup."
+    },
+    "candidateClickDuringInFlightPrefetch": {
+      "p50Ms": 131.1,
+      "p95Ms": 159.4,
+      "n": 20,
+      "requests": 105,
+      "foregroundRequests": 60,
+      "prefetchRequests": 45,
+      "cancelledRequests": 18,
+      "requestErrors": 0,
+      "responseBytes": 114471,
+      "foregroundResponseBytes": 108957,
+      "prefetchResponseBytes": 5514,
+      "serverRequests": 109,
+      "foregroundServerRequests": 60,
+      "prefetchServerRequests": 49,
+      "serverMsP50": 12.6,
+      "serverMsP95": 21.1,
+      "clickToEditorText": {
+        "lastClickToInputMs": {
+          "p50Ms": 39.5,
+          "p95Ms": 52.4,
+          "n": 20
+        },
+        "lastClickToPaintMs": {
+          "p50Ms": 58.1,
+          "p95Ms": 70.5,
+          "n": 20
+        }
+      },
+      "note": "20 controlled samples: hold the visible note prefetch request, click the same note, then release it. One in-flight content read is adopted; unrelated pending prefetch work is canceled."
+    },
+    "candidateScrollStandaloneRepeat": {
+      "p50Ms": 121.5,
+      "p95Ms": 157.5,
+      "n": 20,
+      "requests": 70,
+      "foregroundRequests": 40,
+      "prefetchRequests": 30,
+      "cancelledRequests": 4,
+      "requestErrors": 0,
+      "responseBytes": 108098,
+      "foregroundResponseBytes": 104040,
+      "prefetchResponseBytes": 4058,
+      "serverRequests": 70,
+      "foregroundServerRequests": 40,
+      "prefetchServerRequests": 30,
+      "serverMsP50": 13.3,
+      "serverMsP95": 23.5
+    }
+  },
+  "speculativePrefetchUse": [
+    {
+      "case": "cold list, no note click in this case",
+      "completedPrefetchRequests": 35,
+      "prefetchResponseBytes": 9680,
+      "cancelledRequests": 0,
+      "note": "These prefetched bytes had no click within that measured interaction window; they may be used by a later user action. This is not a claim that they were never used during the whole browser session."
+    },
+    {
+      "case": "warm list, no note click in this case",
+      "completedPrefetchRequests": 26,
+      "prefetchResponseBytes": 4325,
+      "cancelledRequests": 0,
+      "note": "These prefetched bytes had no click within that measured interaction window; they may be used by a later user action. This is not a claim that they were never used during the whole browser session."
+    },
+    {
+      "case": "scroll interaction, no note click in this case",
+      "completedPrefetchRequests": 28,
+      "prefetchResponseBytes": 3801,
+      "cancelledRequests": 3,
+      "note": "These prefetched bytes had no click within that measured interaction window; they may be used by a later user action. This is not a claim that they were never used during the whole browser session."
+    }
+  ],
+  "targets": {
+    "cachedListP95Ms": {
+      "target": 300,
+      "coldCandidate": 345.8,
+      "warmCandidate": 332.8,
+      "mainWarm": 332.8,
+      "result": "Not met in the matched full run: candidate cold and warm p95 both exceed 300 ms."
+    },
+    "cachedOpenP95Ms": {
+      "target": 100,
+      "broadAfterReloadCandidate": 295.1,
+      "prefetchedClickToPaintP95": 40,
+      "inflightClickToPaintP95": 70.5,
+      "result": "Broad wall action exceeds 100 ms; dedicated already-prefetched and adopted-inflight editor paint profiles are below 100 ms in this fixture. This does not establish physical-device performance."
+    },
+    "typingP95Ms": {
+      "target": 100,
+      "main": 85.2,
+      "candidate": 403,
+      "result": "Not met by the full candidate run; large-tail variance is material."
+    }
+  },
+  "previewFirestoreCost": "Preview is extended from 100 to 200 characters in the existing authorized metadata/list query. There is no separate per-note preview request and no additional Firestore document read; bytes stored/transferred and future metadata write sizes increase. Existing stored 100-character previews are not bulk migrated and grow on the next note save.",
+  "cloudQualification": {
+    "status": "BLOCKED",
+    "evidence": "Canonical Vercel project has no isolated Preview test environment; retired notes-firestore-exact-082 project is absent; current project env inventory is Production-only. No candidate note/history read was performed via Vercel OIDC.",
+    "release": "Keep PR draft and Production aliases unchanged. Do not substitute NAS/fixture evidence."
+  },
+  "reviews": {
+    "key1": {
+      "model": "gemini-3.5-flash-lite",
+      "role": "independent path analysis/design options",
+      "result": "Recommended IntersectionObserver prefetch bounded to visible/nearby rows; click adopts same in-flight content read; keep foreground operations outside background serialized work. Confirmed old fixed first-eight strategy and 100-character list summaries from supplied code.",
+      "accepted": "Viewport observation, in-flight adoption and foreground/background isolation were independently verified and implemented."
+    },
+    "key2": {
+      "model": "gemini-3.5-flash-lite",
+      "role": "independent concurrency/cache/staleness analysis",
+      "result": "Recommended scroll-direction prioritization and stale/scope guards. Claimed RequestLane was concurrency one for prefetch.",
+      "accepted": "Scroll direction and stale/scope protections checked in source and adopted.",
+      "rejected": "The RequestLane characterization was imprecise: prefetch already ran sequentially but occupied the API lane. Measurements showed foreground contention; candidate background reads bypass that lane and can be canceled/adopted."
+    },
+    "key3": {
+      "model": "gemini-3.5-flash-lite",
+      "role": "independent cache isolation and ACK analysis",
+      "result": "Highlighted scope isolation, cache freshness and ACK integrity; suggested extra IME/selection guard. Also cited sub-180 ms cached-open as supporting evidence.",
+      "accepted": "Cache-only-server-ACK, revision scope and dirty-editor protection were verified; existing IME guard retained.",
+      "rejected": "Sub-180 ms did not measure the comparable navigation-to-editor path and was excluded from performance claims."
+    },
+    "key4": {
+      "model": "gemini-3.5-flash-lite",
+      "role": "final code, race, cache isolation and data-loss review",
+      "result": "No code-level release blocker found. Confirmed 200-character metadata preview, ACK/scoped cache, logout purge, viewport observer, dirty/IME guards and CAS preservation.",
+      "accepted": "Final browser/source evidence agrees; keep explicit active note-ID check and cancellation catch.",
+      "clarified": "Gemini described the 40/session budget as 40 concurrent prefetches; source actually enforces concurrency 1 through prefetchRunning. Forty is the maximum number of starts, not simultaneous requests."
+    },
+    "key5": {
+      "model": "gemini-3.5-flash-lite",
+      "role": "final requirements, tests and benchmark review",
+      "result": "Confirmed matched synthetic fixture coverage, and identified non-equivalent main/candidate large-note state; final report labels it. Confirmed warm/cold list, broad cached-open and typing p95 targets are not met. Recommended draft/no promotion pending OIDC and latency-tail improvements.",
+      "accepted": "AbortError cancellation is separated from request failures; preserve the explicit limits and no-production claim.",
+      "rejected": "Its initial claim that the prefetch promise itself lacked a rejection sink was inaccurate; the openNote caller-await path needed and received a catch. Quota/corruption coverage already exists.",
+      "remaining": "Offline-to-online prefetch queue resume has no dedicated integration test; report as a remaining test gap, not as evidence of a runtime fault."
+    }
+  },
+  "releaseTests": {
+    "source": "pass; 49 files syntax/import/truncation checks",
+    "offline": "193/193 passed locally on Node 22.23.4",
+    "browser": "33/33 passed on Chromium headless/NAS synthetic fixture after final viewport scheduler change",
+    "retryLoad": "passed simulated fake-WebDAV virtual-time harness; not live service capacity",
+    "focused": "bounded viewport/adopted read, cached revalidation/open/save, cache-first dirty editor, stale response, quota/corruption, logout/offline, 20-sample prefetch states",
+    "cloud": "Vercel OIDC isolated-vault qualification not run; release-blocking"
+  },
+  "deviceValidation": {
+    "S25Ultra": "not tested",
+    "iPad": "not tested"
+  },
+  "conclusion": "The candidate improves the cached paint path in the dedicated synthetic prefetch cases and reduces old foreground-lane waiting, but the matched full run is noisy: warm-list p95 does not improve, scroll is close/slightly slower, typing has a large p95 tail, and broad cached-open action exceeds 100 ms. No stable overall Production speedup or 8/10 Google Keep experience is established."
+}
