@@ -107,3 +107,17 @@ PR [#26](https://github.com/hunghvt-cyber/web-notes/pull/26) merged as `53cd7ddc
 ## Visual viewport menu follow-up — 2026-10-29
 
 After the initial UI polish release, Gemini review through the executable NAS wrapper identified a reproducible narrow-visual-viewport overflow in the portaled action menu. The fix was merged in PR [#27](https://github.com/hunghvt-cyber/web-notes/pull/27) as `3398d29deff5b32fad2f14b4349bc8a622bf2695`; CI run [#446](https://github.com/hunghvt-cyber/web-notes/actions/runs/40834744233) passed test/browser. Production deployment `dpl_EqVyaCg6bsmuHuqFKvXRgYavceGf` reached READY from that SHA and serves both canonical app aliases. Read-only app asset and health requests returned HTTP 200; Firestore read PASS. Prior READY deployment `dpl_Gu1BG8sCAYJe2Y633TjAhkSHhqMZ` (source `53cd7ddc05d64139983caa050b098ea001caeeb3`) is the rollback target. Source/offline/browser verification: 48 modules, 191/191 tests, 18/18 scenarios. Full wrapper-access clarification, the two filtered review outcomes, pre-fix failing bounds, post-fix measurements, and device-testing limits are in [responsive UI integration](RESPONSIVE-UI-INTEGRATION-20261029.md). No production Notes were mutated.
+
+
+## Production paste hang triage — 2026-10-29
+
+The 500 KB paste hang was reproduced with synthetic clipboard content in
+Chromium, but “Aw, Snap” itself was not reproduced. Measurements showed the
+native textarea paste path stalled on both current and pre-responsive assets;
+the fix inserts supported plain-text content once, routes it through the
+existing draft/autosave flow, and coalesces draft snapshots. At 500 KB the
+handler now returns in 859 ms; a subsequent edit still takes about 4.2 s in
+headless Chromium. The actual synthetic store returns its existing 413 for
+the 1 MB case and the draft survives reload. No backend/auth/schema or
+production Notes were changed. Full measurements, Gemini review outcomes,
+limitations, and release/rollback record: [paste crash triage](PASTE-CRASH-TRIAGE-20261029.md).

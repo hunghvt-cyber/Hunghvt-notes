@@ -35,6 +35,10 @@ test('typing while the old acknowledged draft is being removed survives cleanup'
  const gate=wait(),began=wait(),files=new Map();const vault={async put(v){files.set(v.key,clone(v));},async remove(k){began.resolve();await gate.promise;files.delete(k);}};const {d}=setup(async p=>ack(p),{vault});
  await d.edit({text:'A'});const saving=d.flush();await began.promise;const editing=d.edit({text:'B'});gate.resolve();await Promise.all([saving,editing]);assert.equal(d.note.text,'B');assert.equal(d.dirty,true);assert.equal(files.get(d.key).note.text,'B');
 });
+test('rapid large-text edits coalesce in-flight draft snapshots and persist the latest exact value',async()=>{
+ const began=wait(),gate=wait(),snapshots=[];let puts=0;const vault={async put(value){const snapshot=clone(value);puts++;if(puts===1){began.resolve();await gate.promise;}snapshots.push(snapshot);},async remove(){}};const {d}=setup(async p=>ack(p),{vault});
+ const firstText='a'.repeat(500_000),latestText='latest '.repeat(60_000);const first=d.edit({text:firstText});await began.promise;const middle=d.edit({text:'middle '.repeat(60_000)}),latest=d.edit({text:latestText});assert.equal(puts,1);gate.resolve();await Promise.all([first,middle,latest]);assert.equal(puts,2);assert.equal(snapshots[0].note.text,firstText);assert.equal(snapshots[1].note.text,latestText);assert.equal(d.persisted,true);assert.equal(d.dirty,true);
+});
 
 test('only safe GET requests retry BUSY with a bounded jittered delay',async()=>{
  const {apiClient}=await import('../public/sync.js');let calls=0;const waits=[];

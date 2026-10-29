@@ -3,7 +3,7 @@ export class DraftVault{
  constructor(){this.db=null;}
  async open(){if(this.db)return this;this.db=await new Promise((resolve,reject)=>{const r=indexedDB.open('hunghvt-notes-drafts-v1',1);r.onupgradeneeded=()=>r.result.createObjectStore('drafts',{keyPath:'key'});r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);r.onblocked=()=>reject(Error('DRAFT_STORAGE_BLOCKED'));});return this;}
  async tx(mode,fn){await this.open();return new Promise((resolve,reject)=>{const t=this.db.transaction('drafts',mode),r=fn(t.objectStore('drafts'));t.oncomplete=()=>resolve(r?.result);t.onabort=()=>reject(t.error??Error('DRAFT_STORAGE_FAILED'));t.onerror=()=>reject(t.error??Error('DRAFT_STORAGE_FAILED'));});}
- put(d){return this.tx('readwrite',s=>s.put(clone(d)));}
+ put(d){return this.tx('readwrite',s=>s.put(d));}
  remove(key){return this.tx('readwrite',s=>s.delete(key));}
  async list(scope){return (await this.tx('readonly',s=>s.getAll())).filter(d=>d.scope===scope).sort((a,b)=>b.updatedAt-a.updatedAt);}
 }
@@ -12,12 +12,19 @@ export class SyncDraft{
   this.uuid=uuid;this.scope=scope;this.vault=vault;this.send=send;this.onChange=onChange;
   this.key=uuid();this.note=clone(restored?.note??note);this.baseRevision=restored?.baseRevision??note.revision??null;
   this.version=restored?.version??0;this.pending=clone(restored?.pending??null);this.dirty=!!restored;this.status=restored?'draft':'clean';this.error=null;this.persisted=false;
-  this.writes=Promise.resolve();this.running=null;this.disposed=false;
+  this.writes=Promise.resolve();this.writeInFlight=null;this.writeAgain=false;this.running=null;this.disposed=false;
  }
- record(){return {key:this.key,scope:this.scope,note:clone(this.note),baseRevision:this.baseRevision,version:this.version,pending:clone(this.pending),updatedAt:Date.now()};}
+ record(){return {key:this.key,scope:this.scope,note:this.note,baseRevision:this.baseRevision,version:this.version,pending:this.pending,updatedAt:Date.now()};}
  emit(){this.onChange(this);}
- async persist(){const record=this.record();const task=this.writes.catch(()=>{}).then(()=>this.vault.put(record));this.writes=task;try{await task;this.persisted=true;}catch(e){this.persisted=false;this.status='local-error';this.error=e;this.emit();throw e;}this.emit();}
- edit(patch){Object.assign(this.note,clone(patch));this.version++;this.dirty=true;if(this.status!=='conflict')this.status='draft';this.error=null;this.persisted=false;const saved=this.persist();this.emit();return saved;}
+ persist(){
+  if(this.writeInFlight){this.writeAgain=true;return this.writeInFlight;}
+  const task=(async()=>{try{
+   do{this.writeAgain=false;const version=this.version;await this.vault.put(this.record());if(this.version!==version)this.writeAgain=true;}while(this.writeAgain);
+   this.persisted=true;this.emit();
+  }catch(e){this.writeAgain=false;this.persisted=false;this.status='local-error';this.error=e;this.emit();throw e;}})();
+  const completed=task.finally(()=>{if(this.writeInFlight===completed)this.writeInFlight=null;});this.writeInFlight=completed;this.writes=completed;return completed;
+ }
+ edit(patch){const snapshot={};for(const [key,value] of Object.entries(patch))snapshot[key]=value&&typeof value==='object'?clone(value):value;Object.assign(this.note,snapshot);this.version++;this.dirty=true;if(this.status!=='conflict')this.status='draft';this.error=null;this.persisted=false;const saved=this.persist();this.emit();return saved;}
  async flush(){
   if(this.disposed||!this.dirty)return;
   if(this.status==='conflict')throw Error('CONFLICT_REQUIRES_REVIEW');
