@@ -11,11 +11,12 @@ function positionActionMenu(menu,panel){
  const anchor=menu.querySelector(':scope > summary')?.getBoundingClientRect();if(!anchor)return;
  const zoom=Number.parseFloat(getComputedStyle(document.documentElement).zoom)||1,vv=window.visualViewport,left=vv?.offsetLeft??0,top=vv?.offsetTop??0,right=left+(vv?.width??document.documentElement.clientWidth),bottom=top+(vv?.height??document.documentElement.clientHeight),gap=8;
  panel.style.left='0px';panel.style.top='0px';panel.style.right='auto';panel.style.bottom='auto';
+ const availableWidth=Math.max(0,right-left-gap*2)/zoom;panel.style.maxWidth=availableWidth+'px';panel.style.minWidth=Math.min(220,availableWidth)+'px';
  const width=panel.getBoundingClientRect().width,spaceBelow=bottom-anchor.bottom-gap,spaceAbove=anchor.top-top-gap,needed=panel.scrollHeight*zoom,useBelow=needed<=spaceBelow||spaceBelow>=spaceAbove,space=useBelow?spaceBelow:spaceAbove;
  panel.style.maxHeight=Math.max(72,Math.min(620,(space-gap)/zoom))+'px';
  const height=panel.getBoundingClientRect().height;let x=anchor.right-width;
  if(x<left+gap&&anchor.left+width<=right-gap)x=anchor.left;
- x=Math.max(left+gap,Math.min(x,right-width-gap));
+ x=Math.max(left+gap,Math.min(x,Math.max(left+gap,right-width-gap)));
  let y=useBelow?anchor.bottom+gap:anchor.top-height-gap;
  y=Math.max(top+gap,Math.min(y,bottom-height-gap));
  panel.style.left=Math.round(x/zoom)+'px';panel.style.top=Math.round(y/zoom)+'px';

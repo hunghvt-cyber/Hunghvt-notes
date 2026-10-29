@@ -102,6 +102,20 @@
       }
     },
     {
+      "scenario": "narrow-visual-viewport-emulation",
+      "x": 108,
+      "right": 312,
+      "width": 204,
+      "y": 157,
+      "bottom": 272,
+      "viewport": {
+        "left": 100,
+        "right": 320,
+        "top": 20,
+        "bottom": 280
+      }
+    },
+    {
       "scenario": "after-container-scroll",
       "viewport": {
         "width": 1440,
