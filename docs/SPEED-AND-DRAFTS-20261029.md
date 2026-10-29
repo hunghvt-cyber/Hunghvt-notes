@@ -50,3 +50,49 @@ The browser timing remains synthetic and noisy; it does not establish a Producti
 Gemini wrapper lượt hai đã nhận diff frontend/test/docs đã lọc cùng kết quả source check, 190/190 offline test, 23/23 browser smoke và số đo synthetic. Nó nêu blocker rằng `hold({navigation:true})` thử save trước `confirm()`, và đề nghị test navigation offline. Tôi bác bỏ blocker sau đối chiếu với yêu cầu: đây là autosave đồng bộ khi người dùng chủ động điều hướng; chỉ khi ACK không đến mới hỏi có tiếp tục với dữ liệu chỉ còn trong RAM hay không. Khi offline, `save()` không gửi request; browser test bổ sung xác nhận đóng editor hiển thị cảnh báo, dismiss giữ nguyên nội dung/editor và không phát sinh POST. Reload cũng kích hoạt `beforeunload`.
 
 Các nhận xét Gemini về xóa hoàn toàn `DraftVault`, giữ IndexedDB legacy nguyên trạng, giữ retry payload/clientOpId khi timeout, xác nhận CAS và cảnh báo `beforeunload` được chấp nhận. Nó đánh giá cache revision và request stale handling phù hợp, đồng thời kết luận số đo không đủ chứng minh tăng tốc Production; kết luận này được chấp nhận. Mô tả của Gemini về “abort signals” không khớp diff hiện hành (candidate chỉ loại task GET stale khi còn trong RequestLane; request đã chạy vẫn hoàn tất và bị chặn ghi đè bởi sequence/session guard), nên không dùng mô tả đó làm bằng chứng. Không có blocker còn mở theo review sau test bổ sung.
+
+## Follow-up candidate cache-first — 2026-10-29
+
+Phần phía trên là hồ sơ release trước (`d735659`/Production `dpl_2bPR3FTkbDabFjmNu7BwcEofEfUu`). Nó không mô tả candidate tiếp theo. Candidate hiện hành bắt đầu tại `d735659d1457f5aa2144ed45fb1aaa9ca07ec495`, chưa merge/deploy. So sánh mới dùng cùng Chromium headless/NAS, 20 mẫu, 20 note nhỏ có 5 revision lịch sử và một note tổng hợp 128 KiB. App/API handler dùng fixture in-memory tương thích Firestore; timing từ navigation/action đến render tách khỏi fetch/handler, bytes và prefetch. Không chứa nội dung, ID, session hay secret. Chi tiết đã lọc ở [CACHE-PERFORMANCE-20261029.json](CACHE-PERFORMANCE-20261029.json).
+
+| Kịch bản | Main p50/p95 ms | Candidate p50/p95 ms | Main → candidate response bytes | Kết quả ngưỡng đề xuất |
+|---|---:|---:|---:|---|
+| Mở app, cache danh sách trống | 330.3/381.5 | 302.7/398.1 | 103,660 → 108,660 | p95 >300 ms |
+| Mở app, cache danh sách có sẵn | 293.4/371.6 | 271.5/293.4 | 103,660 → 105,090 (trong đó 3,050 prefetch) | p95 ≤300 ms trên fixture này |
+| Mở note nhỏ chưa cache trong phiên | 206.7/247.2 | 198.7/250.6 | 17,940 → 5,080 | p95 >100 ms |
+| Mở note 128 KiB đã cache sau reload | 234.2/269.9 | 204.0/231.2 | 2,625,940 → 1,440 | p95 >100 ms |
+| Mở note nhỏ đã cache sau reload | 142.5/194.3 | 140.3/174.3 | 17,940 → 7,950 (3,799 foreground; 4,151 prefetch) | p95 >100 ms |
+| Gõ khi kiểm revision trễ 120 ms | 73.8/101.1 | 70.6/87.1 | 22,312 → 25,880 | p95 ≤100 ms trên fixture này |
+| Chuyển nhanh 3 note, read trễ 120 ms | 348.7/390.9 | 521.7/552.6 | 4,320 → 8,454 | chậm hơn baseline; ngưỡng >100 ms |
+
+Mỗi phép đo có n=20. Candidate list warm loại một lượt health GET dư và có thể hiển thị snapshot cache sau xác thực; p95 đạt 293.4 ms trong môi trường này. Candidate bỏ history khỏi content GET thường, nhưng history vẫn được tải khi mở UI lịch sử. Cache tối đa 12 note/1 MiB, mỗi note 256 KiB; prefetch tối đa 2 note/phiên auth, tuần tự, 64 KiB/note. Prefetch tạo thêm request ở kịch bản mở app và bị hủy khi thao tác người dùng cần ưu tiên. Candidate ghi 1 `AbortError` khi open small sau reload do hủy prefetch; không có HTTP lỗi. Quick switch thua baseline rõ trong lần so sánh này; không che số liệu đó bằng trung bình chung.
+
+Giới hạn: cold cache vẫn có p95 398.1 ms; mở note cache còn p50 140.3 ms; quick switch candidate p50 521.7 ms. Các số NAS/headless/fixture không phải độ trễ Vercel OIDC hoặc thiết bị thật, và không chứng minh tăng tốc Production/đạt 8/10 Google Keep. Mục tiêu cảm nhận ở S25 Ultra và iPad chưa được kiểm tra.
+
+Candidate giữ bỏ persistent draft: chỉ nội dung ACK được cache; draft chưa ACK ở RAM, IndexedDB legacy được giữ nguyên nhưng không đọc/ghi/xóa; `SyncDraft`, CAS, `clientOpId`, retry, conflict và ACK vẫn hoạt động. Local full offline test 192/192, browser smoke 31/31, retry/load harness đạt và source check đạt trên Node 22.23.4. CI Node 24 chưa chạy trên candidate SHA. Gemini lượt 1 phân tích source trước sửa; các nhận xét đã được kiểm chứng với source. Lượt 2 hoạt động qua wrapper và trả verdict không promote.
+
+ Không deploy Production: candidate thay đổi đường đọc Firestore, nhưng chưa có vault thử cô lập để chạy chính route đọc note/history qua Vercel runtime + OIDC. Health endpoint hoặc fixture NAS không đủ chứng minh đường đó; không dùng Notes thật/session để test. Deployment hiện hành và các alias chưa đổi; rollback target hiện hành vẫn `dpl_9Tg1qnrqSKNHaNoKG1knMcMVxCst` nếu release trước cần hoàn nguyên.
+
+### Gemini lượt 1 — phân tích trước sửa
+
+Gemini wrapper được kiểm tra và hoạt động. Gemini đọc source liên quan cùng
+timings synthetic đã lọc. Nó chỉ đúng rằng `openSequence` chặn response cũ,
+`RequestLane` ưu tiên save và có thể bỏ GET stale còn đang chờ, và thay đổi chưa
+ACK chỉ ở RAM. Source kiểm chứng thêm rằng map nội dung trong RAM chưa có giới
+hạn; candidate thêm LRU/bounds và giới hạn prefetch.
+
+Gemini mô tả IndexedDB hiện tại như nơi đã lưu body chưa ACK; nhận xét đó sai:
+source ban đầu không gọi database draft bền, và app chỉ có cache list preview.
+Gemini cũng bỏ sót rằng API/Firestore ordinary open đọc 5 history versions.
+Codex xác minh qua `public/app.js`, `lib/preview-api.mjs` và
+`lib/firestore-native-repository.mjs`; do đó đề xuất tách history và chỉ cache
+ACKed content được áp dụng dựa trên source/tests, không dựa theo các giả định
+sai này. Không gửi note data, session hoặc secrets.
+
+### Gemini lượt 2 — review cuối
+
+Wrapper `/home/admin/bin/gemini-task --help` hoạt động; Gemini nhận source diff và report chỉ có fixture tổng hợp/metrics đã lọc. Gemini verdict **không promote** vì route note/history chưa qualify trên Vercel OIDC và quick-switch candidate chậm hơn. Chấp nhận cả hai kết luận về quyết định phát hành: thiếu cloud evidence là blocker, và quick-switch 521.7/552.6 ms so với 348.7/390.9 ms cần được điều tra, không được che bằng warm-list/typing tốt hơn.
+
+Gemini chấp nhận việc skip history cho open thường, giữ transaction revision/ACL, dirty editor/IME guard và cache scope/clear sau logout hoặc auth hết hạn; đối chiếu code cùng test tương ứng cho thấy các nhận xét này phù hợp. Bác bỏ giải thích nguyên nhân Gemini đưa ra rằng hủy prefetch làm “head-of-line blocking qua IDB lookup”: lần mở cache lấy từ Map trong RAM, `abortPrefetch()` không await request, và guard sequence chặn response cũ. Report chỉ đo chênh lệch, chưa tách thời gian DOM/input/click và chưa chứng minh nguyên nhân. Giữ regression đo được như blocker cho việc promote, nhưng cần profiler/device run tiếp theo trước khi quy lỗi cho cancellation hoặc thay đổi cơ chế.
+
+Giới hạn bổ sung: CompositionEvent trong browser smoke là mô phỏng; không chứng minh bàn phím IME thật trên Android/iPadOS. Không có Node 24 local; CI trên candidate chưa chạy. Không kiểm tra Vercel OIDC note/history bằng dữ liệu tổng hợp vì chưa có vault test scope cô lập; không dùng Production session/dữ liệu để lấp khoảng trống này.

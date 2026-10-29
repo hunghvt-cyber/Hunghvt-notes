@@ -8,5 +8,12 @@ export class NoteCache {
  }
  async get(scope){return scope?await this.tx('readonly',s=>s.get(scope)):null;}
  async put(scope,value){if(scope)await this.tx('readwrite',s=>s.put({...value,scope}));}
+ async delete(scope){if(scope)await this.tx('readwrite',s=>s.delete(scope));}
+ async clearAll(){await this.tx('readwrite',s=>s.clear());}
 }
 export function reusableNote(note,row){return !!note&&!!row&&note.id===row.id&&note.revision===row.revision;}
+export const MAX_CACHED_NOTE_BYTES=256*1024;
+export const MAX_CACHED_CONTENT_BYTES=1024*1024;
+export const MAX_CACHED_NOTES=12;
+export const MAX_CACHED_LIST_BYTES=512*1024;
+export const MAX_CACHED_LIST_NOTES=1000;

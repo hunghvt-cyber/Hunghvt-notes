@@ -178,3 +178,39 @@ candidate qualification and final promotion. Full filtered evidence and exact
 alias map are in [release verification](SPEED-AND-DRAFTS-20261029.md). The
 temporary Vercel share-link bypass used by the protected-URL check was revoked;
 the final alias readback has no protection-bypass entries.
+
+## Follow-up candidate: cache-first và mở note — 2026-10-29
+
+Đây là candidate trên nhánh `codex/cache-first-note-cache-20261029`, bắt đầu
+từ `main` tại `d735659d1457f5aa2144ed45fb1aaa9ca07ec495`. Chưa merge và chưa
+deploy. Dữ liệu IndexedDB dùng để cache chỉ là snapshot đã được server ACK,
+scoped theo auth; client xác thực trước khi đọc, hiện bản cache với trạng thái
+chưa kiểm tra, rồi đối chiếu revision. Cache không cấp quyền. Draft chưa ACK
+chỉ ở RAM; database draft legacy không được mở, di chuyển hay xóa. Giới hạn
+cache hiện hành là 12 nội dung, 1 MiB tổng nội dung, 256 KiB mỗi note và tối
+đa 1.000 hàng danh sách/512 KiB.
+
+Candidate đọc nội dung hiện tại mà không tải history; history chỉ tải khi
+người dùng mở mục lịch sử. Prefetch chỉ xét một số note đầu danh sách, tối đa
+2 note/phiên auth, tuần tự, và bỏ note trên 64 KiB trước khi đọc chunks.
+Firestore native, CAS, ACK, `clientOpId`, retry và ACL không bị bỏ qua.
+
+So sánh 20 mẫu mỗi trường hợp bằng Chromium headless trên NAS với fixture
+tổng hợp, không có Notes thật: warm list 293.4/371.6 → 271.5/293.4 ms p50/p95;
+cached small note 142.5/194.3 → 140.3/174.3 ms; cached 128 KiB note
+234.2/269.9 → 204/231.2 ms; typing khi revalidation trễ 120 ms
+73.8/101.1 → 70.6/87.1 ms; quick switch trễ 120 ms
+348.7/390.9 → 521.7/552.6 ms. Cold-cache list p95 tăng 381.5 → 398.1 ms.
+Đọc cached large note giảm 2,625,940 xuống 1,440 response bytes/20 lần;
+warm list dùng thêm prefetch giới hạn (26 prefetch request/20 lần). Vì mở note
+còn trên 100 ms và quick switch chậm hơn fixture baseline, không kết luận app
+đã nhanh hơn tổng thể hay đạt trải nghiệm 8/10. Xem [bảng số đo đầy đủ đã
+lọc](CACHE-PERFORMANCE-20261029.json).
+
+Offline/source/browser tests chạy local bằng Node 22.23.4; CI Node 24 và
+Vercel Production chưa được qualify cho candidate. Cloud gate còn thiếu là
+đường đọc note/history qua Firestore thật bằng Vercel OIDC với vault thử cô
+lập và dữ liệu tổng hợp. Không dùng Production Notes/session để thay thế và
+không promote alias cho tới khi có bằng chứng an toàn cho đường đọc đó.
+Health-only probe không chứng minh API đọc note. S25 Ultra/iPad thật chưa
+được đo; deployment/rollback hiện tại tiếp tục là bản cũ.
