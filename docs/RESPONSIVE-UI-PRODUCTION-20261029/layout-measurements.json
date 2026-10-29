@@ -38,6 +38,18 @@
       "titleHeight": 245
     },
     {
+      "width": 1280,
+      "height": 720,
+      "name": "desktop-small",
+      "folders": 232,
+      "list": 340,
+      "editor": 660,
+      "writingArea": 515,
+      "title": 515,
+      "editorScroll": 658,
+      "titleHeight": 302
+    },
+    {
       "width": 1440,
       "height": 900,
       "name": "desktop",
@@ -48,6 +60,18 @@
       "title": 659,
       "editorScroll": 818,
       "titleHeight": 259
+    },
+    {
+      "width": 1920,
+      "height": 1080,
+      "name": "desktop-wide",
+      "folders": 232,
+      "list": 340,
+      "editor": 1300,
+      "writingArea": 748,
+      "title": 748,
+      "editorScroll": 1298,
+      "titleHeight": 216
     }
   ]
 }
