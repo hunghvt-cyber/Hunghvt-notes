@@ -15,7 +15,7 @@ Autosave gửi thay đổi lên Firestore; nhãn “Đã lưu” chỉ xuất hi
 
 Viewport prefetch/cache follow-up và blocker cloud qualification cho PR #34 được ghi tại [báo cáo ngày 29/10](docs/VIEWPORT-PREFETCH-20261029.md), cùng [bảng số đo đã lọc](docs/VIEWPORT-PREFETCH-20261029.json). Đây là candidate chưa deploy; không dùng số NAS/headless để khẳng định Production hoặc trải nghiệm thiết bị thật nhanh hơn.
 
-Profile khựng khi gõ và readback OIDC ngày 30/10 được ghi tại [báo cáo typing/cloud](docs/TYPING-PROFILE-20261030.md) và [JSON đã lọc](docs/TYPING-PROFILE-20261030.json). Không có sửa app/deploy trong lượt này; PR #34 tiếp tục draft do Preview WIF/Firestore chưa được qualify.
+Profile khựng khi gõ tại [báo cáo typing/cloud](docs/TYPING-PROFILE-20261030.md) và kết quả blocker qualification tiếp theo tại [báo cáo PR #34 ngày 30/10](docs/PR34-CLOUD-QUALIFICATION-20261030.md). Candidate chưa được cloud-qualify; Production không đổi.
 
 ## Source và triển khai
 

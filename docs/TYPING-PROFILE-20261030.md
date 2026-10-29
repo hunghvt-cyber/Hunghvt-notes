@@ -34,13 +34,13 @@ Wrapper `/home/admin/bin/gemini-task` đã kiểm tra qua `--help` và dùng đ�
 
 Các kiểm tra chỉ đọc ngày 30/10 cho kết quả:
 
-- Vercel project/deployment metadata đọc được; Vercel CLI không có trong môi trường. Vercel MCP không cung cấp thao tác liệt kê environment variables, nên không xác minh giá trị env OIDC của Preview qua công cụ hiện có.
+- Vercel CLI không có trong môi trường. Đính chính readback ban đầu: lần kiểm tra lại ngày 30/10 xác nhận Vercel MCP có `filter_project_envs`; chỉ đọc metadata, không xuất giá trị env. Các app env hiện tại chỉ target Production, query branch Preview của PR #34 rỗng, project có 0 custom environments. Cấu hình OIDC Preview cho candidate không tồn tại.
 - `/home/admin/bin/notes-gcloud --version` chạy; lệnh `gcloud iam workload-identity-pools list` thất bại vì không có active gcloud CLI account. Đã chuyển sang read-only Cloud Resource Manager/IAM API bằng dedicated ADC có sẵn; các API read trả HTTP 200. Không sửa IAM.
 - Pool `vercel-notes-preview` có state ACTIVE nhưng trường `disabled: true`. Provider `notes-preview` issuer `https://oidc.vercel.com/hunghvt`, subject condition là Preview environment của project `hunghvt-notes`.
 - Service account `notes-preview-firestore@notes-lab-56f0f.iam.gserviceaccount.com` tồn tại nhưng policy không có binding. Project IAM hiện chỉ gán `roles/datastore.user` cho Production service account với điều kiện default database; không có binding cho Preview SA.
 - Firestore IAM boundary khả dụng là database-wide, không phải từng synthetic vault. Không có quyền/database scope được duyệt để dựng vault cô lập với identity Preview hiện tại.
 
-Do WIF pool bị disable và Preview SA không có quyền impersonation/data, Preview token không thể hoàn tất exchange/read. Không tạo deployment/vault và không thử read/history qua OIDC khi trạng thái này chưa được khôi phục; không nới quyền hoặc bật billing. Cần cloud owner khôi phục Preview WIF và binding least-privilege đã duyệt ở database scope, cung cấp cách xác minh cấu hình OIDC env bằng công cụ được cấp, rồi chạy quyền đọc, revision, lazy history và cleanup trên vault tổng hợp. Không có vault hoặc deployment tạm nào được tạo nên không có cleanup pending. NAS ADC/fixture và lịch sử qualification 27/10 không thay thế trạng thái cloud hiện tại.
+Pool Preview hiện hữu bị disable và Preview SA không có quyền; không được bật lại pool hoặc cấp quyền vào database Production. Read-only inventory thấy Notes Lab chỉ có database `(default)` ở Production; project billing tắt. Bốn project khác từ chối quyền xem Firestore; project `home-ai-55a88` có database nhưng là ứng dụng không liên quan, không được dùng. Tạo project test riêng không billing đã được thử nhưng Cloud Resource Manager từ chối do vượt project quota; operation kết thúc lỗi, project không được tạo. Không tạo deployment/vault hoặc thử note/history qua OIDC, không sửa IAM/env, không bật billing. Chi tiết inventory, quota error và đường admin tối thiểu nằm trong [báo cáo qualification PR #34](PR34-CLOUD-QUALIFICATION-20261030.md).
 
 ## Release gate
 
