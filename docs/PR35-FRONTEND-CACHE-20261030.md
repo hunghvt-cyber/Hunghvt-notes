@@ -52,6 +52,8 @@ Wrapper `/home/admin/bin/gemini-task --help` succeeded. Keys 4 and 5 used `gemin
 
 ## Release status and rollback
 
-At authoring time this is a separate PR candidate from `main`; no merge or deployment has occurred. Keep Production on `dpl_2bPR3FTkbDabFjmNu7BwcEofEfUu` until CI and the final release verification pass. Since the existing Vercel project is not Git-connected, merging `main` does not deploy by itself. Before any deployment, confirm project plan/free usage, exact source SHA/tree, auto-alias behavior, and current three-alias readback. Do not link billing, enable billing, or start a paid trial. If deployed, record the exact new deployment and all three aliases; rollback to `dpl_2bPR3FTkbDabFjmNu7BwcEofEfUu`, reassigning each alias explicitly if needed.
+CI run `40975554160` completed successfully for exact PR head `14bc9eed74ddb360273a3076d39a76c09ef6e9cf`: source/unit and browser jobs both passed. The PR remains separate from `main`; no merge or deployment has occurred. Production remains on `dpl_2bPR3FTkbDabFjmNu7BwcEofEfUu`.
+
+Production deployment is held on one cost-verification blocker: the available Vercel project/team read APIs expose neither plan nor remaining no-cost entitlement; the billing-charges API returned `costs_not_found`. No deployment was attempted because that cannot establish that this release is free. Do not link billing, enable billing, or start a paid trial. The free-only path is a read-only confirmation of the existing plan and available free entitlement by the account owner, with no account change; then recheck exact source SHA/tree, auto-alias behavior, and all three aliases before deciding promotion. If deployed, record the exact deployment and aliases; rollback to `dpl_2bPR3FTkbDabFjmNu7BwcEofEfUu`, reassigning each alias explicitly if needed.
 
 No S25 Ultra or iPad device test has been performed. User acceptance of the UX remains outstanding; do not claim “8/10 Google Keep”.
