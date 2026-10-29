@@ -4,33 +4,33 @@
   "timing": "action wall time; browser fetch time; in-handler server duration; remaining action time includes paint/layout and test harness",
   "summary": {
     "listCold": {
-      "p50Ms": 782.3,
-      "p95Ms": 782.3,
+      "p50Ms": 1339.9,
+      "p95Ms": 1339.9,
       "n": 1
     },
     "listWarm": {
-      "p50Ms": 298.3,
-      "p95Ms": 326.4,
+      "p50Ms": 273.1,
+      "p95Ms": 311.7,
       "n": 6
     },
     "openSmallCold": {
-      "p50Ms": 207.5,
-      "p95Ms": 242.9,
+      "p50Ms": 180.2,
+      "p95Ms": 239.7,
       "n": 7
     },
     "openLargeCold": {
-      "p50Ms": 202.9,
-      "p95Ms": 256.1,
+      "p50Ms": 210.8,
+      "p95Ms": 254.2,
       "n": 7
     },
     "openSmallWarm": {
-      "p50Ms": 198.7,
-      "p95Ms": 229.9,
+      "p50Ms": 188.4,
+      "p95Ms": 244.9,
       "n": 7
     },
     "quickSwitch": {
-      "p50Ms": 408.3,
-      "p95Ms": 459.2,
+      "p50Ms": 444.4,
+      "p95Ms": 476.8,
       "n": 7
     }
   },
@@ -42,209 +42,35 @@
           "route": "health",
           "method": "GET",
           "shape": "other",
-          "durationMs": 121.29999995231628,
+          "durationMs": 78.40000003576279,
           "status": 200
         },
         {
           "route": "auth",
           "method": "GET",
           "shape": "other",
-          "durationMs": 49.5,
+          "durationMs": 42.30000001192093,
           "status": 200
-        },
-        {
-          "route": "auth",
-          "method": "POST",
-          "shape": "other",
-          "durationMs": 80.10000002384186,
-          "status": 200
-        },
-        {
-          "route": "auth",
-          "method": "GET",
-          "shape": "other",
-          "durationMs": 50.19999998807907,
-          "status": 200
-        },
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "list-with-folders",
-          "durationMs": 50.39999997615814,
-          "status": 200
-        }
-      ],
-      "server": [
-        {
-          "route": "health",
-          "method": "GET",
-          "shape": "other",
-          "status": 200,
-          "serverMs": 36
-        },
-        {
-          "route": "auth",
-          "method": "GET",
-          "shape": "other",
-          "status": 200,
-          "serverMs": 7.5
         },
         {
           "route": "auth",
           "method": "POST",
           "shape": "other",
-          "status": 200,
-          "serverMs": 41.7
-        },
-        {
-          "route": "auth",
-          "method": "GET",
-          "shape": "other",
-          "status": 200,
-          "serverMs": 11.2
-        },
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "list-with-folders",
-          "status": 200,
-          "serverMs": 37.9
-        }
-      ]
-    },
-    {
-      "operation": "openSmallCold",
-      "api": [
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "content-read",
-          "durationMs": 70.89999997615814,
-          "status": 200
-        }
-      ],
-      "server": [
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "content-read",
-          "status": 200,
-          "serverMs": 22.3
-        }
-      ]
-    },
-    {
-      "operation": "openSmallWarm",
-      "api": [],
-      "server": [
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "known-revision-read",
-          "status": 200,
-          "serverMs": 19.4
-        }
-      ]
-    },
-    {
-      "operation": "openLargeCold",
-      "api": [
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "known-revision-read",
-          "durationMs": 54.5,
-          "status": 200
-        },
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "content-read",
-          "durationMs": 51.10000002384186,
-          "status": 200
-        }
-      ],
-      "server": [
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "content-read",
-          "status": 200,
-          "serverMs": 26
-        }
-      ]
-    },
-    {
-      "operation": "quickSwitch",
-      "api": [
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "known-revision-read",
-          "durationMs": 44.700000047683716,
-          "status": 200
-        },
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "content-read",
-          "durationMs": 28.599999964237213,
-          "status": 200
-        },
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "content-read",
-          "durationMs": 34.299999952316284,
-          "status": 200
-        }
-      ],
-      "server": [
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "known-revision-read",
-          "status": 200,
-          "serverMs": 15.1
-        },
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "content-read",
-          "status": 200,
-          "serverMs": 15.7
-        },
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "content-read",
-          "status": 200,
-          "serverMs": 19.2
-        }
-      ]
-    },
-    {
-      "operation": "listWarm",
-      "api": [
-        {
-          "route": "health",
-          "method": "GET",
-          "shape": "other",
-          "durationMs": 56.69999998807907,
+          "durationMs": 116,
           "status": 200
         },
         {
           "route": "auth",
           "method": "GET",
           "shape": "other",
-          "durationMs": 40.5,
+          "durationMs": 92.10000002384186,
           "status": 200
         },
         {
           "route": "notes",
           "method": "GET",
           "shape": "list-with-folders",
-          "durationMs": 28.80000001192093,
+          "durationMs": 55.799999952316284,
           "status": 200
         }
       ],
@@ -254,164 +80,10 @@
           "method": "GET",
           "shape": "other",
           "status": 200,
-          "serverMs": 6.4
+          "serverMs": 19.9
         },
         {
           "route": "auth",
-          "method": "GET",
-          "shape": "other",
-          "status": 200,
-          "serverMs": 7.8
-        },
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "list-with-folders",
-          "status": 200,
-          "serverMs": 15.5
-        }
-      ]
-    },
-    {
-      "operation": "openSmallCold",
-      "api": [
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "content-read",
-          "durationMs": 78.5,
-          "status": 200
-        }
-      ],
-      "server": [
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "content-read",
-          "status": 200,
-          "serverMs": 26.9
-        }
-      ]
-    },
-    {
-      "operation": "openSmallWarm",
-      "api": [
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "known-revision-read",
-          "durationMs": 49.19999998807907,
-          "status": 200
-        }
-      ],
-      "server": [
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "known-revision-read",
-          "status": 200,
-          "serverMs": 27.3
-        }
-      ]
-    },
-    {
-      "operation": "openLargeCold",
-      "api": [
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "content-read",
-          "durationMs": 60.09999996423721,
-          "status": 200
-        }
-      ],
-      "server": [
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "content-read",
-          "status": 200,
-          "serverMs": 30.5
-        }
-      ]
-    },
-    {
-      "operation": "quickSwitch",
-      "api": [
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "known-revision-read",
-          "durationMs": 24.799999952316284,
-          "status": 200
-        },
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "content-read",
-          "durationMs": 46.09999996423721,
-          "status": 200
-        },
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "content-read",
-          "durationMs": 39.40000003576279,
-          "status": 200
-        }
-      ],
-      "server": [
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "known-revision-read",
-          "status": 200,
-          "serverMs": 9.1
-        },
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "content-read",
-          "status": 200,
-          "serverMs": 24.2
-        },
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "content-read",
-          "status": 200,
-          "serverMs": 14.4
-        }
-      ]
-    },
-    {
-      "operation": "listWarm",
-      "api": [
-        {
-          "route": "health",
-          "method": "GET",
-          "shape": "other",
-          "durationMs": 36.40000003576279,
-          "status": 200
-        },
-        {
-          "route": "auth",
-          "method": "GET",
-          "shape": "other",
-          "durationMs": 49.19999998807907,
-          "status": 200
-        },
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "list-with-folders",
-          "durationMs": 25,
-          "status": 200
-        }
-      ],
-      "server": [
-        {
-          "route": "health",
           "method": "GET",
           "shape": "other",
           "status": 200,
@@ -419,17 +91,24 @@
         },
         {
           "route": "auth",
+          "method": "POST",
+          "shape": "other",
+          "status": 200,
+          "serverMs": 54.5
+        },
+        {
+          "route": "auth",
           "method": "GET",
           "shape": "other",
           "status": 200,
-          "serverMs": 11.3
+          "serverMs": 24.6
         },
         {
           "route": "notes",
           "method": "GET",
           "shape": "list-with-folders",
           "status": 200,
-          "serverMs": 7.7
+          "serverMs": 41.6
         }
       ]
     },
@@ -440,500 +119,17 @@
           "route": "notes",
           "method": "GET",
           "shape": "content-read",
-          "durationMs": 82.70000004768372,
-          "status": 200
-        }
-      ],
-      "server": [
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "content-read",
-          "status": 200,
-          "serverMs": 13.4
-        }
-      ]
-    },
-    {
-      "operation": "openSmallWarm",
-      "api": [
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "known-revision-read",
-          "durationMs": 41.299999952316284,
-          "status": 200
-        }
-      ],
-      "server": [
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "known-revision-read",
-          "status": 200,
-          "serverMs": 19
-        }
-      ]
-    },
-    {
-      "operation": "openLargeCold",
-      "api": [
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "content-read",
-          "durationMs": 62.19999998807907,
-          "status": 200
-        }
-      ],
-      "server": [
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "content-read",
-          "status": 200,
-          "serverMs": 24
-        }
-      ]
-    },
-    {
-      "operation": "quickSwitch",
-      "api": [
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "known-revision-read",
-          "durationMs": 37.09999996423721,
-          "status": 200
-        },
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "content-read",
-          "durationMs": 36.39999997615814,
-          "status": 200
-        },
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "content-read",
-          "durationMs": 63.299999952316284,
-          "status": 200
-        }
-      ],
-      "server": [
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "known-revision-read",
-          "status": 200,
-          "serverMs": 10.8
-        },
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "content-read",
-          "status": 200,
-          "serverMs": 13.4
-        },
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "content-read",
-          "status": 200,
-          "serverMs": 34.6
-        }
-      ]
-    },
-    {
-      "operation": "listWarm",
-      "api": [
-        {
-          "route": "health",
-          "method": "GET",
-          "shape": "other",
-          "durationMs": 71,
-          "status": 200
-        },
-        {
-          "route": "auth",
-          "method": "GET",
-          "shape": "other",
-          "durationMs": 41.5,
-          "status": 200
-        },
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "list-with-folders",
-          "durationMs": 30.30000001192093,
-          "status": 200
-        }
-      ],
-      "server": [
-        {
-          "route": "health",
-          "method": "GET",
-          "shape": "other",
-          "status": 200,
-          "serverMs": 11.5
-        },
-        {
-          "route": "auth",
-          "method": "GET",
-          "shape": "other",
-          "status": 200,
-          "serverMs": 6.4
-        },
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "list-with-folders",
-          "status": 200,
-          "serverMs": 13.8
-        }
-      ]
-    },
-    {
-      "operation": "openSmallCold",
-      "api": [
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "content-read",
-          "durationMs": 40.299999952316284,
-          "status": 200
-        }
-      ],
-      "server": [
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "content-read",
-          "status": 200,
-          "serverMs": 13.6
-        }
-      ]
-    },
-    {
-      "operation": "openSmallWarm",
-      "api": [
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "known-revision-read",
-          "durationMs": 23.19999998807907,
-          "status": 200
-        }
-      ],
-      "server": [
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "known-revision-read",
-          "status": 200,
-          "serverMs": 7.3
-        }
-      ]
-    },
-    {
-      "operation": "openLargeCold",
-      "api": [
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "content-read",
-          "durationMs": 45.700000047683716,
-          "status": 200
-        }
-      ],
-      "server": [
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "content-read",
-          "status": 200,
-          "serverMs": 21.7
-        }
-      ]
-    },
-    {
-      "operation": "quickSwitch",
-      "api": [
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "known-revision-read",
-          "durationMs": 34.69999998807907,
-          "status": 200
-        },
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "content-read",
-          "durationMs": 25.5,
-          "status": 200
-        },
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "content-read",
-          "durationMs": 25.600000023841858,
-          "status": 200
-        }
-      ],
-      "server": [
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "known-revision-read",
-          "status": 200,
-          "serverMs": 14.5
-        },
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "content-read",
-          "status": 200,
-          "serverMs": 12.5
-        },
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "content-read",
-          "status": 200,
-          "serverMs": 11.7
-        }
-      ]
-    },
-    {
-      "operation": "listWarm",
-      "api": [
-        {
-          "route": "health",
-          "method": "GET",
-          "shape": "other",
-          "durationMs": 31.5,
-          "status": 200
-        },
-        {
-          "route": "auth",
-          "method": "GET",
-          "shape": "other",
-          "durationMs": 32.30000001192093,
-          "status": 200
-        }
-      ],
-      "server": [
-        {
-          "route": "health",
-          "method": "GET",
-          "shape": "other",
-          "status": 200,
-          "serverMs": 6.2
-        },
-        {
-          "route": "auth",
-          "method": "GET",
-          "shape": "other",
-          "status": 200,
-          "serverMs": 7.3
-        },
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "list-with-folders",
-          "status": 200,
-          "serverMs": 9.4
-        }
-      ]
-    },
-    {
-      "operation": "openSmallCold",
-      "api": [
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "list-with-folders",
-          "durationMs": 28.30000001192093,
-          "status": 200
-        },
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "content-read",
-          "durationMs": 69.09999996423721,
-          "status": 200
-        }
-      ],
-      "server": [
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "content-read",
-          "status": 200,
-          "serverMs": 11.9
-        }
-      ]
-    },
-    {
-      "operation": "openSmallWarm",
-      "api": [
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "known-revision-read",
-          "durationMs": 54.80000001192093,
-          "status": 200
-        }
-      ],
-      "server": [
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "known-revision-read",
-          "status": 200,
-          "serverMs": 26
-        }
-      ]
-    },
-    {
-      "operation": "openLargeCold",
-      "api": [
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "content-read",
-          "durationMs": 53.19999998807907,
-          "status": 200
-        }
-      ],
-      "server": [
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "content-read",
-          "status": 200,
-          "serverMs": 27.7
-        }
-      ]
-    },
-    {
-      "operation": "quickSwitch",
-      "api": [
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "known-revision-read",
-          "durationMs": 39.80000001192093,
-          "status": 200
-        },
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "content-read",
-          "durationMs": 32,
-          "status": 200
-        },
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "content-read",
-          "durationMs": 28.5,
-          "status": 200
-        }
-      ],
-      "server": [
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "known-revision-read",
-          "status": 200,
-          "serverMs": 13.2
-        },
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "content-read",
-          "status": 200,
-          "serverMs": 14.3
-        },
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "content-read",
-          "status": 200,
-          "serverMs": 13.8
-        }
-      ]
-    },
-    {
-      "operation": "listWarm",
-      "api": [
-        {
-          "route": "health",
-          "method": "GET",
-          "shape": "other",
-          "durationMs": 57.90000003576279,
-          "status": 200
-        },
-        {
-          "route": "auth",
-          "method": "GET",
-          "shape": "other",
           "durationMs": 37.69999998807907,
           "status": 200
         }
       ],
       "server": [
         {
-          "route": "health",
-          "method": "GET",
-          "shape": "other",
-          "status": 200,
-          "serverMs": 5.4
-        },
-        {
-          "route": "auth",
-          "method": "GET",
-          "shape": "other",
-          "status": 200,
-          "serverMs": 7.3
-        },
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "list-with-folders",
-          "status": 200,
-          "serverMs": 21.8
-        }
-      ]
-    },
-    {
-      "operation": "openSmallCold",
-      "api": [
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "list-with-folders",
-          "durationMs": 35.5,
-          "status": 200
-        },
-        {
-          "route": "notes",
-          "method": "GET",
-          "shape": "content-read",
-          "durationMs": 25.5,
-          "status": 200
-        }
-      ],
-      "server": [
-        {
           "route": "notes",
           "method": "GET",
           "shape": "content-read",
           "status": 200,
-          "serverMs": 8.5
+          "serverMs": 19.6
         }
       ]
     },
@@ -944,7 +140,7 @@
           "route": "notes",
           "method": "GET",
           "shape": "known-revision-read",
-          "durationMs": 30.799999952316284,
+          "durationMs": 55.60000002384186,
           "status": 200
         }
       ],
@@ -954,7 +150,7 @@
           "method": "GET",
           "shape": "known-revision-read",
           "status": 200,
-          "serverMs": 7.1
+          "serverMs": 19.9
         }
       ]
     },
@@ -965,7 +161,7 @@
           "route": "notes",
           "method": "GET",
           "shape": "content-read",
-          "durationMs": 36.89999997615814,
+          "durationMs": 61,
           "status": 200
         }
       ],
@@ -975,7 +171,7 @@
           "method": "GET",
           "shape": "content-read",
           "status": 200,
-          "serverMs": 17.5
+          "serverMs": 31.8
         }
       ]
     },
@@ -986,21 +182,21 @@
           "route": "notes",
           "method": "GET",
           "shape": "known-revision-read",
-          "durationMs": 25.30000001192093,
+          "durationMs": 54.40000003576279,
           "status": 200
         },
         {
           "route": "notes",
           "method": "GET",
           "shape": "content-read",
-          "durationMs": 27.100000023841858,
+          "durationMs": 36,
           "status": 200
         },
         {
           "route": "notes",
           "method": "GET",
           "shape": "content-read",
-          "durationMs": 39.5,
+          "durationMs": 46.19999998807907,
           "status": 200
         }
       ],
@@ -1010,21 +206,21 @@
           "method": "GET",
           "shape": "known-revision-read",
           "status": 200,
-          "serverMs": 9.3
+          "serverMs": 23.9
         },
         {
           "route": "notes",
           "method": "GET",
           "shape": "content-read",
           "status": 200,
-          "serverMs": 10.3
+          "serverMs": 22.9
         },
         {
           "route": "notes",
           "method": "GET",
           "shape": "content-read",
           "status": 200,
-          "serverMs": 15.8
+          "serverMs": 28.4
         }
       ]
     },
@@ -1035,21 +231,21 @@
           "route": "health",
           "method": "GET",
           "shape": "other",
-          "durationMs": 32.60000002384186,
+          "durationMs": 68.10000002384186,
           "status": 200
         },
         {
           "route": "auth",
           "method": "GET",
           "shape": "other",
-          "durationMs": 31.899999976158142,
+          "durationMs": 30.19999998807907,
           "status": 200
         },
         {
           "route": "notes",
           "method": "GET",
           "shape": "list-with-folders",
-          "durationMs": 20.69999998807907,
+          "durationMs": 23.399999976158142,
           "status": 200
         }
       ],
@@ -1059,14 +255,14 @@
           "method": "GET",
           "shape": "other",
           "status": 200,
-          "serverMs": 10.3
+          "serverMs": 11.3
         },
         {
           "route": "auth",
           "method": "GET",
           "shape": "other",
           "status": 200,
-          "serverMs": 5.7
+          "serverMs": 7.2
         },
         {
           "route": "notes",
@@ -1084,7 +280,7 @@
           "route": "notes",
           "method": "GET",
           "shape": "content-read",
-          "durationMs": 35.60000002384186,
+          "durationMs": 81.69999998807907,
           "status": 200
         }
       ],
@@ -1094,7 +290,7 @@
           "method": "GET",
           "shape": "content-read",
           "status": 200,
-          "serverMs": 16
+          "serverMs": 12.9
         }
       ]
     },
@@ -1105,7 +301,7 @@
           "route": "notes",
           "method": "GET",
           "shape": "known-revision-read",
-          "durationMs": 39,
+          "durationMs": 37,
           "status": 200
         }
       ],
@@ -1115,7 +311,7 @@
           "method": "GET",
           "shape": "known-revision-read",
           "status": 200,
-          "serverMs": 17.8
+          "serverMs": 15.7
         }
       ]
     },
@@ -1126,7 +322,7 @@
           "route": "notes",
           "method": "GET",
           "shape": "content-read",
-          "durationMs": 34.89999997615814,
+          "durationMs": 54.59999996423721,
           "status": 200
         }
       ],
@@ -1136,7 +332,7 @@
           "method": "GET",
           "shape": "content-read",
           "status": 200,
-          "serverMs": 15.7
+          "serverMs": 25.3
         }
       ]
     },
@@ -1147,21 +343,21 @@
           "route": "notes",
           "method": "GET",
           "shape": "known-revision-read",
-          "durationMs": 41.5,
+          "durationMs": 44.30000001192093,
           "status": 200
         },
         {
           "route": "notes",
           "method": "GET",
           "shape": "content-read",
-          "durationMs": 25.80000001192093,
+          "durationMs": 31.69999998807907,
           "status": 200
         },
         {
           "route": "notes",
           "method": "GET",
           "shape": "content-read",
-          "durationMs": 24.5,
+          "durationMs": 45.89999997615814,
           "status": 200
         }
       ],
@@ -1171,21 +367,826 @@
           "method": "GET",
           "shape": "known-revision-read",
           "status": 200,
-          "serverMs": 19.3
+          "serverMs": 19.7
         },
         {
           "route": "notes",
           "method": "GET",
           "shape": "content-read",
           "status": 200,
-          "serverMs": 11.7
+          "serverMs": 18.6
         },
         {
           "route": "notes",
           "method": "GET",
           "shape": "content-read",
           "status": 200,
-          "serverMs": 11.2
+          "serverMs": 29.4
+        }
+      ]
+    },
+    {
+      "operation": "listWarm",
+      "api": [
+        {
+          "route": "health",
+          "method": "GET",
+          "shape": "other",
+          "durationMs": 65.20000004768372,
+          "status": 200
+        },
+        {
+          "route": "auth",
+          "method": "GET",
+          "shape": "other",
+          "durationMs": 37.799999952316284,
+          "status": 200
+        },
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "list-with-folders",
+          "durationMs": 21.5,
+          "status": 200
+        }
+      ],
+      "server": [
+        {
+          "route": "health",
+          "method": "GET",
+          "shape": "other",
+          "status": 200,
+          "serverMs": 5.1
+        },
+        {
+          "route": "auth",
+          "method": "GET",
+          "shape": "other",
+          "status": 200,
+          "serverMs": 7.5
+        },
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "list-with-folders",
+          "status": 200,
+          "serverMs": 9.6
+        }
+      ]
+    },
+    {
+      "operation": "openSmallCold",
+      "api": [
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "content-read",
+          "durationMs": 74.30000001192093,
+          "status": 200
+        }
+      ],
+      "server": [
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "content-read",
+          "status": 200,
+          "serverMs": 9.7
+        }
+      ]
+    },
+    {
+      "operation": "openSmallWarm",
+      "api": [
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "known-revision-read",
+          "durationMs": 32.5,
+          "status": 200
+        }
+      ],
+      "server": [
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "known-revision-read",
+          "status": 200,
+          "serverMs": 15.5
+        }
+      ]
+    },
+    {
+      "operation": "openLargeCold",
+      "api": [
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "content-read",
+          "durationMs": 42.5,
+          "status": 200
+        }
+      ],
+      "server": [
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "content-read",
+          "status": 200,
+          "serverMs": 17.3
+        }
+      ]
+    },
+    {
+      "operation": "quickSwitch",
+      "api": [
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "known-revision-read",
+          "durationMs": 45.700000047683716,
+          "status": 200
+        },
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "content-read",
+          "durationMs": 29.80000001192093,
+          "status": 200
+        },
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "content-read",
+          "durationMs": 35.19999998807907,
+          "status": 200
+        }
+      ],
+      "server": [
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "known-revision-read",
+          "status": 200,
+          "serverMs": 17.7
+        },
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "content-read",
+          "status": 200,
+          "serverMs": 14.8
+        },
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "content-read",
+          "status": 200,
+          "serverMs": 19.1
+        }
+      ]
+    },
+    {
+      "operation": "listWarm",
+      "api": [
+        {
+          "route": "health",
+          "method": "GET",
+          "shape": "other",
+          "durationMs": 60.69999998807907,
+          "status": 200
+        },
+        {
+          "route": "auth",
+          "method": "GET",
+          "shape": "other",
+          "durationMs": 35.60000002384186,
+          "status": 200
+        },
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "list-with-folders",
+          "durationMs": 36.200000047683716,
+          "status": 200
+        }
+      ],
+      "server": [
+        {
+          "route": "health",
+          "method": "GET",
+          "shape": "other",
+          "status": 200,
+          "serverMs": 7.9
+        },
+        {
+          "route": "auth",
+          "method": "GET",
+          "shape": "other",
+          "status": 200,
+          "serverMs": 6.7
+        },
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "list-with-folders",
+          "status": 200,
+          "serverMs": 22.2
+        }
+      ]
+    },
+    {
+      "operation": "openSmallCold",
+      "api": [
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "content-read",
+          "durationMs": 71.19999998807907,
+          "status": 200
+        }
+      ],
+      "server": [
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "content-read",
+          "status": 200,
+          "serverMs": 11.6
+        }
+      ]
+    },
+    {
+      "operation": "openSmallWarm",
+      "api": [
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "known-revision-read",
+          "durationMs": 32.90000003576279,
+          "status": 200
+        }
+      ],
+      "server": [
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "known-revision-read",
+          "status": 200,
+          "serverMs": 13.5
+        }
+      ]
+    },
+    {
+      "operation": "openLargeCold",
+      "api": [
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "content-read",
+          "durationMs": 42.89999997615814,
+          "status": 200
+        }
+      ],
+      "server": [
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "content-read",
+          "status": 200,
+          "serverMs": 17.2
+        }
+      ]
+    },
+    {
+      "operation": "quickSwitch",
+      "api": [
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "known-revision-read",
+          "durationMs": 48.19999998807907,
+          "status": 200
+        },
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "content-read",
+          "durationMs": 34.89999997615814,
+          "status": 200
+        },
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "content-read",
+          "durationMs": 45.89999997615814,
+          "status": 200
+        }
+      ],
+      "server": [
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "known-revision-read",
+          "status": 200,
+          "serverMs": 19.8
+        },
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "content-read",
+          "status": 200,
+          "serverMs": 12.8
+        },
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "content-read",
+          "status": 200,
+          "serverMs": 27.9
+        }
+      ]
+    },
+    {
+      "operation": "listWarm",
+      "api": [
+        {
+          "route": "health",
+          "method": "GET",
+          "shape": "other",
+          "durationMs": 64.70000004768372,
+          "status": 200
+        },
+        {
+          "route": "auth",
+          "method": "GET",
+          "shape": "other",
+          "durationMs": 31.5,
+          "status": 200
+        },
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "list-with-folders",
+          "durationMs": 29.80000001192093,
+          "status": 200
+        }
+      ],
+      "server": [
+        {
+          "route": "health",
+          "method": "GET",
+          "shape": "other",
+          "status": 200,
+          "serverMs": 7
+        },
+        {
+          "route": "auth",
+          "method": "GET",
+          "shape": "other",
+          "status": 200,
+          "serverMs": 5.6
+        },
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "list-with-folders",
+          "status": 200,
+          "serverMs": 14.6
+        }
+      ]
+    },
+    {
+      "operation": "openSmallCold",
+      "api": [
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "content-read",
+          "durationMs": 68.80000001192093,
+          "status": 200
+        }
+      ],
+      "server": [
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "content-read",
+          "status": 200,
+          "serverMs": 16.6
+        }
+      ]
+    },
+    {
+      "operation": "openSmallWarm",
+      "api": [
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "known-revision-read",
+          "durationMs": 33.5,
+          "status": 200
+        }
+      ],
+      "server": [
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "known-revision-read",
+          "status": 200,
+          "serverMs": 14.2
+        }
+      ]
+    },
+    {
+      "operation": "openLargeCold",
+      "api": [
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "content-read",
+          "durationMs": 57.19999998807907,
+          "status": 200
+        }
+      ],
+      "server": [
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "content-read",
+          "status": 200,
+          "serverMs": 28.2
+        }
+      ]
+    },
+    {
+      "operation": "quickSwitch",
+      "api": [
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "known-revision-read",
+          "durationMs": 24.899999976158142,
+          "status": 200
+        },
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "content-read",
+          "durationMs": 28.100000023841858,
+          "status": 200
+        },
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "content-read",
+          "durationMs": 37.69999998807907,
+          "status": 200
+        }
+      ],
+      "server": [
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "known-revision-read",
+          "status": 200,
+          "serverMs": 8
+        },
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "content-read",
+          "status": 200,
+          "serverMs": 13.5
+        },
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "content-read",
+          "status": 200,
+          "serverMs": 17.5
+        }
+      ]
+    },
+    {
+      "operation": "listWarm",
+      "api": [
+        {
+          "route": "health",
+          "method": "GET",
+          "shape": "other",
+          "durationMs": 66.69999998807907,
+          "status": 200
+        },
+        {
+          "route": "auth",
+          "method": "GET",
+          "shape": "other",
+          "durationMs": 37.19999998807907,
+          "status": 200
+        }
+      ],
+      "server": [
+        {
+          "route": "health",
+          "method": "GET",
+          "shape": "other",
+          "status": 200,
+          "serverMs": 5.3
+        },
+        {
+          "route": "auth",
+          "method": "GET",
+          "shape": "other",
+          "status": 200,
+          "serverMs": 6.6
+        },
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "list-with-folders",
+          "status": 200,
+          "serverMs": 8.3
+        }
+      ]
+    },
+    {
+      "operation": "openSmallCold",
+      "api": [
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "list-with-folders",
+          "durationMs": 22.80000001192093,
+          "status": 200
+        },
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "content-read",
+          "durationMs": 27.19999998807907,
+          "status": 200
+        }
+      ],
+      "server": [
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "content-read",
+          "status": 200,
+          "serverMs": 12.4
+        }
+      ]
+    },
+    {
+      "operation": "openSmallWarm",
+      "api": [
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "known-revision-read",
+          "durationMs": 30,
+          "status": 200
+        }
+      ],
+      "server": [
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "known-revision-read",
+          "status": 200,
+          "serverMs": 13.1
+        }
+      ]
+    },
+    {
+      "operation": "openLargeCold",
+      "api": [
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "content-read",
+          "durationMs": 54.5,
+          "status": 200
+        }
+      ],
+      "server": [
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "content-read",
+          "status": 200,
+          "serverMs": 24.6
+        }
+      ]
+    },
+    {
+      "operation": "quickSwitch",
+      "api": [
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "known-revision-read",
+          "durationMs": 30.100000023841858,
+          "status": 200
+        },
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "content-read",
+          "durationMs": 33.10000002384186,
+          "status": 200
+        },
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "content-read",
+          "durationMs": 44.19999998807907,
+          "status": 200
+        }
+      ],
+      "server": [
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "known-revision-read",
+          "status": 200,
+          "serverMs": 11.9
+        },
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "content-read",
+          "status": 200,
+          "serverMs": 17.3
+        },
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "content-read",
+          "status": 200,
+          "serverMs": 21.9
+        }
+      ]
+    },
+    {
+      "operation": "listWarm",
+      "api": [
+        {
+          "route": "health",
+          "method": "GET",
+          "shape": "other",
+          "durationMs": 62.89999997615814,
+          "status": 200
+        },
+        {
+          "route": "auth",
+          "method": "GET",
+          "shape": "other",
+          "durationMs": 32,
+          "status": 200
+        },
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "list-with-folders",
+          "durationMs": 25,
+          "status": 200
+        }
+      ],
+      "server": [
+        {
+          "route": "health",
+          "method": "GET",
+          "shape": "other",
+          "status": 200,
+          "serverMs": 11
+        },
+        {
+          "route": "auth",
+          "method": "GET",
+          "shape": "other",
+          "status": 200,
+          "serverMs": 6.5
+        },
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "list-with-folders",
+          "status": 200,
+          "serverMs": 7.3
+        }
+      ]
+    },
+    {
+      "operation": "openSmallCold",
+      "api": [
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "content-read",
+          "durationMs": 37.5,
+          "status": 200
+        }
+      ],
+      "server": [
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "content-read",
+          "status": 200,
+          "serverMs": 16.3
+        }
+      ]
+    },
+    {
+      "operation": "openSmallWarm",
+      "api": [
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "known-revision-read",
+          "durationMs": 38.69999998807907,
+          "status": 200
+        }
+      ],
+      "server": [
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "known-revision-read",
+          "status": 200,
+          "serverMs": 18
+        }
+      ]
+    },
+    {
+      "operation": "openLargeCold",
+      "api": [
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "content-read",
+          "durationMs": 55.19999998807907,
+          "status": 200
+        }
+      ],
+      "server": [
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "content-read",
+          "status": 200,
+          "serverMs": 21.8
+        }
+      ]
+    },
+    {
+      "operation": "quickSwitch",
+      "api": [
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "known-revision-read",
+          "durationMs": 33.80000001192093,
+          "status": 200
+        },
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "content-read",
+          "durationMs": 38.59999996423721,
+          "status": 200
+        },
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "content-read",
+          "durationMs": 24.200000047683716,
+          "status": 200
+        }
+      ],
+      "server": [
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "known-revision-read",
+          "status": 200,
+          "serverMs": 10
+        },
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "content-read",
+          "status": 200,
+          "serverMs": 13.3
+        },
+        {
+          "route": "notes",
+          "method": "GET",
+          "shape": "content-read",
+          "status": 200,
+          "serverMs": 9.1
         }
       ]
     }

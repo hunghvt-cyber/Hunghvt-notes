@@ -8,14 +8,14 @@
 
 | Hành động | Baseline p50/p95 ms (n) | Candidate p50/p95 ms (n) |
 |---|---:|---:|
-| Danh sách cold | 889/889 (1) | 782/782 (1) |
-| Danh sách warm | 312/363 (6) | 298/326 (6) |
-| Mở note nhỏ cold | 213/282 (7) | 208/243 (7) |
-| Mở note 128 KiB cold | 214/255 (7) | 203/256 (7) |
-| Mở note nhỏ warm | 191/245 (7) | 199/230 (7) |
-| Chuyển nhanh giữa note | 413/483 (7) | 408/459 (7) |
+| Danh sách cold | 889/889 (1) | 782–1,340/782–1,340 (1 mỗi lượt) |
+| Danh sách warm | 312/363 (6) | 273–298/312–374 (6 mỗi lượt) |
+| Mở note nhỏ cold | 213/282 (7) | 180–225/238–243 (7 mỗi lượt) |
+| Mở note 128 KiB cold | 214/255 (7) | 203–222/254–263 (7 mỗi lượt) |
+| Mở note nhỏ warm | 191/245 (7) | 188–199/230–245 (7 mỗi lượt) |
+| Chuyển nhanh giữa note | 413/483 (7) | 408–444/459–477 (7 mỗi lượt) |
 
-Thời gian mở note trong mẫu không cải thiện rõ ràng; list warm có p50 giảm nhưng p95 tăng nhẹ. Không tuyên bố Production đã nhanh hơn theo phần trăm. Đo chỉ ra một tối ưu xác định được: trong chuỗi mở note nhanh có response trễ, bỏ GET cũ còn xếp hàng trước khi gửi giảm content GET từ 3 xuống 2; response đến muộn bị chặn theo lựa chọn hiện tại. Không rút ngắn kiểm tra revision, không trả cache như dữ liệu mới nhất, không sửa backend/Firestore. Cache danh sách chỉ ghi bất đồng bộ sau render server và bỏ write cũ đã lỗi thời.
+Ba lượt candidate cho thấy dao động đáng kể (đặc biệt cold list 782–1,340 ms với chỉ một mẫu mỗi lượt); baseline chỉ có một lượt. Mở note không cải thiện rõ ràng và không thể phân biệt thay đổi nhỏ với nhiễu máy. Không tuyên bố Production đã nhanh hơn theo phần trăm. Đo chỉ ra một tối ưu xác định được: trong chuỗi mở note nhanh có response trễ, bỏ GET cũ còn xếp hàng trước khi gửi giảm content GET từ 3 xuống 2; response đến muộn bị chặn theo lựa chọn hiện tại. Không rút ngắn kiểm tra revision, không trả cache như dữ liệu mới nhất, không sửa backend/Firestore. Cache danh sách chỉ ghi bất đồng bộ sau render server và bỏ write cũ đã lỗi thời.
 
 Backend hiện vẫn trả metadata/history theo hợp đồng hiện hành. Không tách tải history trong candidate vì chưa có số đo cloud chứng minh đó là nút thắt và thay đổi backend cần qualify Production OIDC trên candidate chính xác. Do đó mức cải thiện mở note còn chưa được chứng minh; nếu yêu cầu là giảm độ trễ đáng kể ở Production, đây là giới hạn còn lại cần đo tiếp bằng cloud OIDC, không dùng NAS ADC/fixture thay thế.
 
@@ -33,7 +33,9 @@ Gemini wrapper `/home/admin/bin/gemini-task` đã được kiểm tra bằng `--
 
 ## Kiểm chứng và phát hành
 
-Kết quả ở đây được cập nhật sau browser suite, Gemini lượt 2, CI và Vercel candidate/Production kiểm chứng. Không đưa vào bằng chứng này dữ liệu Notes, response body, cookies, token hoặc session. Nếu Production deployment thành công, ghi đúng SHA/deployment/aliases/asset/Firestore health và rollback deployment ở đây và `OPERATIONS.md`; nếu cloud OIDC không đạt thì giữ candidate, không tuyên bố Production tăng tốc.
+CI lần đầu trên PR #30 phát hiện hai sai sót test-only: retry-load còn dựa vào DraftVault, và assertion browser race khóa title theo thứ tự note cố định. Đã sửa retry-load để kiểm tra operation trong RAM, dùng title từ fixture đang được kiểm tra; full local suite chạy lại đạt. CI cần chạy lại trên commit cập nhật.
+
+Kết quả phát hành sẽ được cập nhật sau CI retry, Gemini lượt 2 và Vercel candidate/Production kiểm chứng. Không đưa vào bằng chứng này dữ liệu Notes, response body, cookies, token hoặc session. Nếu Production deployment thành công, ghi đúng SHA/deployment/aliases/asset/Firestore health và rollback deployment ở đây và `OPERATIONS.md`; nếu cloud OIDC không đạt thì giữ candidate, không tuyên bố Production tăng tốc.
 
 ## Gemini lượt 2 — review diff và kết quả
 

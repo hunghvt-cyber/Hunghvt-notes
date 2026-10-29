@@ -149,11 +149,12 @@ phía trên về khôi phục draft sau reload mô tả source cũ và đã bị
 Đo trên Chromium headless/NAS với 20 note tổng hợp nhỏ và một note 128 KiB,
 API handler/Firestore repository mô phỏng bằng in-memory fixture; không có
 Notes Production. Trước `d5d815932a0b` → candidate: danh sách cold p50/p95
-889/889 ms (n=1) → 782/782 ms (n=1); warm 312/363 ms (n=6) → 298/326 ms
-(n=6). Mở note nhỏ cold 213/282 ms → 208/243 ms (n=7), lớn 214/255 ms →
-203/256 ms (n=7), nhỏ warm 191/245 ms → 199/230 ms (n=7), quick switch
-413/483 ms → 408/459 ms (n=7). Không có cải thiện ổn định về thời gian mở
-note trong mẫu nhỏ này; p95 có dao động. Ở burst chuyển nhanh có response
+889/889 ms (n=1) → 782–1.340/782–1.340 ms (n=1 mỗi lượt); warm 312/363 ms
+(n=6) → candidate 273–298/312–374 ms (n=6 mỗi lượt). Mở note nhỏ cold
+213/282 ms → candidate 180–225/238–243 ms (n=7 mỗi lượt), lớn 214/255 ms →
+203–222/254–263 ms, nhỏ warm 191/245 ms → 188–199/230–245 ms, quick switch
+413/483 ms → 408–444/459–477 ms. Không có cải thiện ổn định về thời gian mở
+note trong các lượt nhỏ này; cold list dao động đáng kể. Ở burst chuyển nhanh có response
 trễ, số content GET giảm 3→2; request stale đang chờ bị bỏ trước khi gửi.
 Cold list chỉ có một mẫu nên p95 không có ý nghĩa phân phối. Candidate báo cáo
 request/browser handler duration cùng tách server duration; đây không phải
