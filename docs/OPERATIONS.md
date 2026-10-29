@@ -213,6 +213,13 @@ GitHub CI run [40891155789](https://github.com/hunghvt-cyber/web-notes/actions/r
 đạt cả test và browser trên Node 24 cho candidate commit
 `80439c206bc8b8021e2f1cb08d3afed4e39a0bae`, tree
 `85ac693dab747d5f9a10d4adb6a66c7ac6e12d8f` (khớp tree candidate local).
+PR head sau cập nhật hồ sơ là
+`9ca07c08fc272f45a662e3a2deadb22fc194e014`, tree
+`79a747ae6f4c1c70b293f6a000ddd4e63bb7cde3`. Workflow
+[40891609172](https://github.com/hunghvt-cyber/web-notes/actions/runs/40891609172)
+đạt cả hai job ở attempt 2 trên exact head này; attempt 1 có browser flake ở
+keyboard focus của menu backup (`#backup`), job test đạt. Không có code đổi
+giữa hai attempt; rerun browser job đạt.
 Vercel Production chưa được qualify cho candidate. Cloud gate còn thiếu là
 đường đọc note/history qua Firestore thật bằng Vercel OIDC với vault thử cô
 lập và dữ liệu tổng hợp. Không dùng Production Notes/session để thay thế và
