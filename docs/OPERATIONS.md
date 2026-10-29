@@ -207,7 +207,12 @@ còn trên 100 ms và quick switch chậm hơn fixture baseline, không kết lu
 đã nhanh hơn tổng thể hay đạt trải nghiệm 8/10. Xem [bảng số đo đầy đủ đã
 lọc](CACHE-PERFORMANCE-20261029.json).
 
-Offline/source/browser tests chạy local bằng Node 22.23.4; CI Node 24 và
+Offline/source/browser tests chạy local bằng Node 22.23.4. Candidate được lưu
+trong PR draft [#34](https://github.com/hunghvt-cyber/web-notes/pull/34).
+GitHub CI run [40891155789](https://github.com/hunghvt-cyber/web-notes/actions/runs/40891155789)
+đạt cả test và browser trên Node 24 cho candidate commit
+`80439c206bc8b8021e2f1cb08d3afed4e39a0bae`, tree
+`85ac693dab747d5f9a10d4adb6a66c7ac6e12d8f` (khớp tree candidate local).
 Vercel Production chưa được qualify cho candidate. Cloud gate còn thiếu là
 đường đọc note/history qua Firestore thật bằng Vercel OIDC với vault thử cô
 lập và dữ liệu tổng hợp. Không dùng Production Notes/session để thay thế và
