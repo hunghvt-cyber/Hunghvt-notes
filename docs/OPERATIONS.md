@@ -179,14 +179,15 @@ alias map are in [release verification](SPEED-AND-DRAFTS-20261029.md). The
 temporary Vercel share-link bypass used by the protected-URL check was revoked;
 the final alias readback has no protection-bypass entries.
 
-## Follow-up candidate: cache-first và mở note — 2026-10-29
+## Historical candidate: cache-first trước tải theo viewport — superseded 2026-10-29
 
 Ghi chú: đoạn dưới ghi snapshot PR #34 trước khi chuyển sang tải trước theo
 viewport. Các con số/hành vi `first 8`, `2 note/phiên` và phép đo rapid switch
 chỉ mô tả snapshot lịch sử; candidate hiện hành và trạng thái phát hành nằm ở
 phần [viewport-driven prefetch follow-up](VIEWPORT-PREFETCH-20261029.md).
 
-Đây là candidate trên nhánh `codex/cache-first-note-cache-20261029`, bắt đầu
+Đây là số liệu bàn giao lịch sử của candidate trước trên nhánh
+`codex/cache-first-note-cache-20261029`, bắt đầu
 từ `main` tại `d735659d1457f5aa2144ed45fb1aaa9ca07ec495`. Chưa merge và chưa
 deploy. Dữ liệu IndexedDB dùng để cache chỉ là snapshot đã được server ACK,
 scoped theo auth; client xác thực trước khi đọc, hiện bản cache với trạng thái
@@ -268,3 +269,10 @@ bác bỏ có trong báo cáo. Vercel OIDC chưa có Preview scope/vault cô l�
 thực hiện note/history read trên cloud. Không deploy, không đổi alias/bypass,
 không bật billing. Production và rollback giữ nguyên; S25 Ultra/iPad chưa đo.
 Không tuyên bố đạt 8/10 Google Keep trước người dùng đánh giá.
+
+Candidate cuối được lưu tại commit `f4408dcc285484401773af100302d5050519b9ec`,
+tree `8cd0526e79265507f3785fd0948df1dc5055c34b`. GitHub Actions run
+[40906542285](https://github.com/hunghvt-cyber/web-notes/actions/runs/40906542285)
+đạt cả `test` và `browser` trên exact commit này. PR #34 vẫn draft. Đây là
+CI/source evidence, không thay thế cloud OIDC qualification hay phép đo trên
+thiết bị thật.
