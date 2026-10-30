@@ -192,7 +192,7 @@ CI run `40975850784` hoàn tất thành công cho exact PR head `05d21af625fd915
 
 Quyết định UX: giữ candidate frontend-only #35 vì profile ba note bằng cache ngang nhau không cho thấy regression đáng kể, đồng thời giảm request revision nền và cải thiện paint trong fixture. Các mục tiêu cache note 100 ms và list 300 ms chưa đạt; không tuyên bố nhanh hơn Production. Production giữ `dpl_2bPR3FTkbDabFjmNu7BwcEofEfUu` trong lượt này.
 
-Không lặp lại billing query. Read APIs hiện có không xác minh được Vercel plan/free entitlement; kết quả `costs_not_found` chỉ là thiếu thông tin, không phải bằng chứng có phí. Không triển khai khi chưa chứng minh thao tác đó miễn phí; không bật billing, nâng gói, thêm payment method, trial hay công việc hạ tầng mới. Không có alias/deployment/Production thay đổi. Phần API/backend mới ở PR #34 vẫn độc lập và chưa được qualify; fixture không thay thế Vercel OIDC.
+Tại thời điểm ghi nhận trước phát hành, không lặp lại billing query: read APIs không xác minh được plan/free entitlement; `costs_not_found` chỉ là thiếu thông tin, không phải bằng chứng có phí. Trạng thái này được thay thế sau khi chủ tài khoản xác nhận gói miễn phí; kết quả phát hành cuối cùng được ghi ở mục PR #35 Production release bên dưới. Phần API/backend mới ở PR #34 vẫn độc lập và chưa được qualify; fixture không thay thế Vercel OIDC.
 
 ## PR #35 Production release — 30/10/2026
 
