@@ -2,7 +2,37 @@
 
 Ngày 30/10/2026. Đây là candidate để người dùng duyệt giao diện; **chưa merge, chưa deploy**, Production giữ nguyên `dpl_EJ7Dp2NjCzn6aA5WhNcbZgnnHz1J`. Candidate dựa trên main `91f7118a56b3a20bda0474b2e17b46c16f91440c` (tree `147bcb084f34ab644ab2e642f831a4258894499f`), tức bản compact PR #38 đã phát hành. PR #34, API/backend, Firestore, auth/config, prefetch và lazy history không được đưa vào.
 
-Source candidate: `0540d0a1faa61885243d83a178b094623bb8e6c2` (tree `52e6f5506ae34fc92df5c8ee4d9610510b2fa90e`), dựa trên app source commit `b04649a773cef67833b02d90bbf569656af1f237`. Screenshot và `measurements.json` được dựng từ app source này với dữ liệu tổng hợp/in-memory fixture. Không dùng Notes thật. `vercel.json` chỉ thêm branch review này vào `git.deploymentEnabled=false`, để PR không tạo Vercel Preview deployment; không đổi cấu hình Production hay branch khác.
+Source candidate vòng trước: `0540d0a1faa61885243d83a178b094623bb8e6c2` (tree `52e6f5506ae34fc92df5c8ee4d9610510b2fa90e`), dựa trên app source commit `b04649a773cef67833b02d90bbf569656af1f237`. Screenshot và `measurements.json` được dựng từ app source này với dữ liệu tổng hợp/in-memory fixture. Không dùng Notes thật. `vercel.json` chỉ thêm branch review này vào `git.deploymentEnabled=false`, để PR không tạo Vercel Preview deployment; không đổi cấu hình Production hay branch khác.
+
+## Cập nhật vòng sửa PR #39 — composer, quản lý folder và rename
+
+Candidate vẫn ở draft; **không merge/deploy** và Production giữ `dpl_EJ7Dp2NjCzn6aA5WhNcbZgnnHz1J`. Vòng này sửa đúng phản hồi screenshot: bỏ nút `+` trùng; toolbar chọn thay toolbar thường và ẩn tạo note; quick composer có Đóng/trạng thái/mở rộng/Lưu/menu; history/share chỉ nằm trong menu và ẩn khi note chưa ACK; nội dung co giãn theo chiều cao. Desktop giữ hai pane mặc định, icon mở rộng chuyển editor thành vùng chính. Bảng folder có thao tác theo từng hàng và scroll trong menu. Danh sách folder không bị dựng lại khi chỉ note thay đổi, tránh làm mất focus trường rename.
+
+**Rename thật:** endpoint `POST /api/app?route=folders` nhận `action=rename`, folder cũ/mới và `clientOpId`; chỉ owner. Firestore transaction đổi folder references ở note active/trash, tăng revision để cache cũ bị tái xác minh, chuyển share rows sang tên mới mà vẫn giữ share ID/token/permission/revocation; `tokenBoxTarget` nội bộ giữ AAD gốc để tạo lại cùng link. Alias tên cũ được ghi vào snapshot và nén về target đang hoạt động khi rename lặp lại. Tên cũ không thể tái tạo thành folder mới. Rename chặn nếu có note đang purge, nếu guard share không khớp hoặc nếu transaction vượt 450 writes; khi vượt giới hạn trả `FOLDER_RENAME_TOO_LARGE` nếu vượt giới hạn; không có chunked rename và không commit một phần. Đây là transaction atomic; fixture kiểm tra đọc shared folder, idempotent replay, backup alias và revoke. **Cloud Firestore/Vercel runtime chưa được qualify**, nên tính năng backend này chưa đủ điều kiện phát hành Production dù test mô phỏng đạt.
+
+| Checklist vòng này | Kết quả | Bằng chứng tổng hợp |
+|---|---|---|
+| Phone list, 390 px; tiêu đề dài, nhiều đoạn, code, checklist, nhiều folder/tên dài | Đạt trong Chromium | [Danh sách phone 390](candidate/list-phone-390.png) |
+| iPad dọc/ngang, PC list | Đạt trong Chromium | [iPad dọc](candidate/list-ipad-portrait.png), [iPad ngang](candidate/list-ipad-landscape.png), [PC 1280](candidate/list-pc-1280.png) |
+| Chọn nhiều ngang trên phone/iPad | Đạt | [Phone](candidate/selection-phone.png), [iPad](candidate/selection-ipad.png) |
+| Menu chuyển folder, mục Di chuyển trong viewport | Đạt | [Phone](candidate/move-menu-phone.png), [iPad](candidate/move-menu-ipad.png) |
+| Quick composer ở 390×844 và viewport thấp 390×420 mô phỏng bàn phím | Đạt trong Chromium | [Composer phone](candidate/quick-compose-phone-390.png), [390×420](candidate/quick-compose-phone-390-low-viewport.png) |
+| Editor PC split mặc định và mở rộng thành vùng chính | Đạt | [Editor mở rộng 1280](candidate/editor-pc-1280-expanded.png) |
+| Folder table/scroll và thao tác hàng cuối | Đạt | [Đầu bảng](candidate/folder-management-pc-1280.png), [cuối bảng](candidate/folder-management-pc-1280-bottom.png) |
+| Rename giữ link/quyền/revoke/retry và alias backup | Đạt trong Firestore fake + API fixture; chưa cloud-qualified | `test/firestore-native-repository.test.mjs`, `test/preview-api.test.mjs` |
+| Thiết bị thật/IME/keyboard OS | Chưa thử | Chỉ Chromium; thấp viewport là mô phỏng, không phải bàn phím thật |
+
+Assets raw/gzip, so với `origin/main` trước vòng này: `index.html` 8,563/2,683 → 9,537/2,887 B; `app.css` 25,583/5,859 → 25,448/5,489 B; `app.js` 58,344/15,698 → 62,713/16,579 B. UI CSS gzip giảm 370 B; HTML+JS gzip tăng do folder rename/state handling.
+
+Local verification vòng này: `npm test` 193/193; `npm run check:source` pass (49 files); full `npm run test:browser` 34/34 pass, gồm menu manager bottom, selection/move phone+iPad, viewport thấp, editor PC expanded, cache/autosave/conflict/paste/undo; `git diff --check` pass. Lần chạy đầu tìm được test cũ bấm `#new` đã bỏ; sửa test dùng `#quick-create`, assertion save đang chạy và retry sau đó đều pass. Không bỏ assertion. Dùng synthetic fixture/in-memory Firestore; không dùng Notes thật. Browser PNG đã được Codex mở và xem thật.
+
+Gemini vòng kiểm tra mới: wrapper đã kiểm tra, key4/key5 chạy song song an toàn (concurrency tối đa 2); mỗi key gọi 2 lượt (review và follow-up), không lỗi/retry/timeout. Lượt follow-up key4 mất 2.980 s, key5 3.977 s; wall time batch 3.977 s. Thời gian lượt đầu không được đo. Key4 xác nhận các sửa về alias, query phạm vi, focus bảng folder và access guard; không còn finding cụ thể. Key5 đối chiếu checklist/test/asset, nhắc cloud runtime và thiết bị thật chưa kiểm tra; wrapper text-only nên không được coi là pixel review. Không có baseline để khẳng định Gemini tiết kiệm thời gian. Key4 tìm thấy loop cập nhật alias bị lặp (đã xóa), full collection scans (đã đổi thành query theo folderId/trashFolder/scope/state để giảm reads), và render bảng folder làm mất focus (đã chỉ rebuild khi folder list đổi). Lo ngại phantom-read được bác bỏ dựa trên [Firestore serializable transactions](https://firebase.google.com/docs/firestore/transaction-data-contention), nhưng vẫn giảm phạm vi query để tiết kiệm reads; unit fake chưa chứng minh cloud. Cảnh báo activeCount được xử lý chặt hơn: transaction yêu cầu guard bằng số share active quan sát được, nếu lệch sẽ fail đóng với `FOLDER_ACCESS_STATE`. Key4 nhận định API contract mismatch bị bác bỏ vì route và UI cùng dùng `folder`/`newFolder`/`clientOpId`, có endpoint test. Key5 xác nhận evidence map; không xem pixel (wrapper nhận text), nên không được xem là visual review.
+
+Key/model: key4, key5 / gemini-3.5-flash-lite; 2 lượt mỗi key cho review/follow-up. Codex tự mở screenshot PNG để kiểm tra pixel. Chuẩn bị context, kiểm chứng và tổng hợp không bấm giờ; không có baseline tương đương để kết luận tiết kiệm thời gian.
+
+Source candidate final SHA/tree và hosted Actions sẽ được ghi sau khi exact tree đã đẩy; PR #39 vẫn draft. `vercel.json` vẫn chặn Preview deployment cho branch này; không có Production deployment mới. Rollback dự kiến nếu có lần phát hành sau: gán lại cả ba alias về `dpl_EJ7Dp2NjCzn6aA5WhNcbZgnnHz1J` và xác minh health.
+
+---
 
 ## Thay đổi và checklist
 
@@ -16,11 +46,11 @@ Source candidate: `0540d0a1faa61885243d83a178b094623bb8e6c2` (tree `52e6f5506ae3
 | Editor đủ rộng/cao; nội dung lấp phần còn lại, mở desktop thành hai pane và tablet/phone thành lớp editor | Đạt trong Chromium viewport | Screenshot sáu editor; writing-area đo 317–900 px ngang và 333–874 px cao theo viewport |
 | Tạo note dùng cùng editor/autosave dạng bottom sheet có thể mở rộng và có navigation guard | Đạt trong browser fixture | `candidate/quick-compose-phone-390.png`; rect ở 390×844 cao dưới 340 px; test đóng khi chưa ACK |
 | Folder list/create/delete/share/revoke còn hoạt động | Đạt với fixture tổng hợp | Browser tests tái sử dụng link, link folder không cần mật khẩu chủ, badge, revoke và quyền sau revoke |
-| Đổi tên folder lưu ở server | **Chưa đạt — API hiện hành không có rename** | `lib/preview-api.mjs` chỉ có list/create/delete; repository không có phương thức rename. Không giả lập client-side |
+| Đổi tên folder lưu ở server | **Trạng thái ở vòng candidate trước — đã được thay thế ở phần cập nhật phía trên** | Vòng này bổ sung owner API/Firestore transaction, fixture cover share và retry; cloud runtime vẫn chưa qualify |
 | Bỏ nút Tải backup/Khóa Notes khỏi app; giữ workflow backup tự động và Homepage lock | Đạt phần UI/tích hợp đã kiểm tra | Không còn control `#backup`/`#logout`; API không đổi. Repo Homepage canonical là `hunghvt-cyber/web-home`, SHA `02806ac4c1c4903b3489c59904250f970b389c05`; kiểm tra unauthenticated owner API trả `authenticated:false`. Không dùng session thật |
 | Cache-first/revision, autosave/ACK/CAS/clientOpId/retry/conflict, history/trash/sharing và draft RAM | Không đổi | Diff không có API, cache/sync, Firestore hay auth file; browser suite kiểm revision đến muộn, conflict, retry một operation, draft RAM, logout/expired-scope purge, history/share/trash hiện có |
 
-Phương án backend tối thiểu cho rename: thêm owner-authenticated API action và repository transaction cập nhật tên folder cùng mọi note reference; kiểm tra trùng tên; giữ nguyên ACL/quyền và thao tác rename atomically để không có trạng thái nửa đổi; cập nhật revision/snapshot/restore. Ảnh hưởng share: hiện route và capability scope nhắm folder bằng tên folder. Cần chuyển share target sang định danh folder ổn định hoặc transactionally chuyển binding, bảo toàn token/link hiện có và revoke đúng cùng folder; không được làm link cũ trỏ sang folder khác hoặc mở rộng quyền. Ảnh hưởng cache: invalidate list/folder cache cho tên cũ/mới và cập nhật revision đã ACK; response cũ không được hồi sinh tên cũ. Chưa có endpoint nên toàn bộ rename remains out of scope cho UI review.
+Phương án backend tối thiểu đã thực hiện ở vòng cập nhật: owner API + Firestore transaction đổi note refs/revision, đổi share row target nhưng giữ share ID/token/permission/revoke và AAD gốc tokenBox qua `tokenBoxTarget`; folder alias được snapshot/restore. Cache list revision thay đổi khiến content cũ không còn reusable. Đây là contract mới và chưa được verify trên Vercel/Cloud Firestore thật; không promote khi chưa đủ qualification.
 
 ## Các thao tác đã bỏ khỏi giao diện Notes
 

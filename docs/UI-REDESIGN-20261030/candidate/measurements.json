@@ -112,9 +112,9 @@
     {
       "name": "phone-360",
       "editor": {
-        "width": 360,
+        "width": 348,
         "height": 800,
-        "writingWidth": 317,
+        "writingWidth": 305,
         "writingHeight": 541,
         "focus": "",
         "ariaModal": "true"
@@ -123,9 +123,9 @@
     {
       "name": "phone-390",
       "editor": {
-        "width": 390,
+        "width": 378,
         "height": 844,
-        "writingWidth": 347,
+        "writingWidth": 335,
         "writingHeight": 585,
         "focus": "",
         "ariaModal": "true"
@@ -134,9 +134,9 @@
     {
       "name": "ipad-portrait",
       "editor": {
-        "width": 744,
+        "width": 728,
         "height": 1133,
-        "writingWidth": 670,
+        "writingWidth": 654,
         "writingHeight": 874,
         "focus": "",
         "ariaModal": "true"
@@ -145,7 +145,7 @@
     {
       "name": "ipad-landscape",
       "editor": {
-        "width": 1133,
+        "width": 1109,
         "height": 744,
         "writingWidth": 927,
         "writingHeight": 463,
