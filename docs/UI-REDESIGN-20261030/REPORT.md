@@ -62,7 +62,7 @@ Raw và gzip deterministic (`mtime=0`), so với main ban đầu; chỉ HTML/CSS
 - `node --check scripts/browser-smoke.mjs`, `git diff --check`: đạt.
 - `node scripts/retry-load.mjs --patient`: pass simulated retry load; virtual clock/fake WebDAV, không phải live latency/capacity.
 - Browser fixture trọng điểm: 22/22, gồm 6 viewport, selection/menu/quick-compose, folder share/revoke, response sai thứ tự, cache/revision, draft chưa ACK, retry/idempotency, conflict hai tab, paste/undo, view-only và touch target. Full `npm run test:browser`: 34/34 pass; `browser-result.local.json` báo `passed=true`. Runner tổng kết được sửa để không hard-code số test.
-- Hosted GitHub CI chưa chạy cho candidate local, vì candidate chưa được đẩy/mở PR. Không tạo deployment preview hoặc thay alias.
+- Hosted GitHub Actions draft PR #39: `test` và `browser` đều success, run `41026303191`, head `d10707fa2c4a64721a362edfe56e39706c41ee73`, tree `cc5638977b116b32d4e3d6f5f3767729f9321943`. Browser screenshot/update fixture cũng đạt local sau khi thêm bảng quản lý folder. Vercel list theo SHA và branch trả 0 deployment; `vercel.json` loại branch review khỏi Preview. Không thay alias/Production.
 - Home integration chỉ kiểm tra source/repo canonical và unauthenticated owner API; không dùng login/session thật. Share/revoke cloud OIDC chưa chạy; test chỉ dùng fixture tổng hợp. Không thay bằng chứng này bằng benchmark NAS.
 
 Lệnh browser fixture tạo `docs/PERFORMANCE-BASELINE-20261029.json` ngoài phạm vi candidate; file này không dùng để tuyên bố UX nhanh hơn. IME, bàn phím hệ điều hành, xoay máy thật và thiết bị S25 Ultra/iPad chưa được thử trực tiếp. Composition event/paste/selection chỉ được mô phỏng trong Chromium.
@@ -85,4 +85,4 @@ Bài học điều phối chung đã ghi vào repo canonical `hunghvt-cyber/ai-t
 
 ## Gate và rollback dự kiến
 
-Candidate được chuẩn bị để duyệt giao diện; quyết định phát hành sau khi người dùng xem và chốt. Folder rename còn blocker backend rõ ràng. Nếu sau khi duyệt candidate được phát hành, rollback dự kiến là gán lại từng alias Production về `dpl_EJ7Dp2NjCzn6aA5WhNcbZgnnHz1J`, rồi đọc lại đủ ba alias và health. Lượt này chưa deploy, nên không có rollback/deployment mới.
+Candidate được chuẩn bị để duyệt giao diện trong [draft PR #39](https://github.com/hunghvt-cyber/web-notes/pull/39); không merge/deploy. Checks `test`/`browser` hosted đều success cho tree code candidate. Folder rename còn blocker backend rõ ràng. Nếu sau khi duyệt candidate được phát hành, rollback dự kiến là gán lại từng alias Production về `dpl_EJ7Dp2NjCzn6aA5WhNcbZgnnHz1J`, rồi đọc lại đủ ba alias và health. Lượt này chưa deploy, nên không có rollback/deployment mới.
