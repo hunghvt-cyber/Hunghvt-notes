@@ -96,19 +96,22 @@ function visibleNotes(){if(inTrash)return trashNotes;const q=$('search').value.t
 function applySearchFilter(){const q=$('search').value.toLocaleLowerCase('vi'),root=$('note-list');let count=0;for(const card of root.querySelectorAll('.card[data-note]')){const match=!q||(searchIndex.get(card.dataset.note)??'').includes(q);card.hidden=!match;if(match)count++;}let empty=root.querySelector(':scope > .list-empty');if(!empty){empty=document.createElement('p');empty.className='list-empty';empty.setAttribute('role','status');root.append(empty);}empty.hidden=count>0;empty.textContent=count?'':q?'Không có kết quả phù hợp.':notes.length?'Không có Note trong thư mục này.':'Chưa có Note trong kho này.';}
 function selectionUI(){
  $('workspace').classList.toggle('selection-active',selecting);
+ $('workspace').classList.toggle('trash-active',inTrash);
  $('select-all').disabled=organizing;
  $('deselect-all').disabled=organizing||!selected.size;
  for(const radio of document.querySelectorAll('input[name="sort-mode"]')){radio.checked=radio.value===sortMode;radio.disabled=organizing;}
  $('cancel-select').disabled=organizing;
  for(const id of ['move-label','move-folder','bulk-move'])$(id).hidden=inTrash||!!shared;
+ $('bulk-move-menu').hidden=inTrash||!!shared;
  $('bulk-move').disabled=!selected.size||organizing;
- $('bulk-toolbar').hidden=!selecting;
+ $('bulk-toolbar').hidden=!(selecting||inTrash);
+ $('trash-back-to-notes').hidden=!inTrash;
  $('bulk-delete').hidden=inTrash;
  $('bulk-restore').hidden=!inTrash;
  $('bulk-restore').disabled=organizing||!selected.size;
  $('bulk-purge').hidden=!inTrash||!!shared;
  $('bulk-purge').disabled=organizing||!selected.size;
- $('cancel-select').hidden=inTrash;
+ $('cancel-select').hidden=!selecting;
  $('quick-create').hidden=selecting||inTrash||!!shared&&(!canEdit||shared.kind==='note');
  $('select-mode').hidden=inTrash||!!shared||selecting;
  $('select-mode').disabled=organizing;
@@ -139,7 +142,9 @@ async function refresh({background=false,security=false}={}){
   render();void cacheList();if(shared&&active&&(!active.dirty||!canEdit)&&(shared.route==='shared-note'||!canEdit))fill();if(!background)status(navigator.onLine?'Đã tải danh sách Notes.':'Ngoại tuyến · đang hiện danh sách đã lưu trên thiết bị; bản này có thể cũ.');
  }catch(e){if(e.status===401||e.status===403)fail(e);else if(!background)status(cacheState.notes?.length?'Không kiểm tra được máy chủ · đang hiện danh sách đã lưu trên thiết bị; bản này có thể cũ.':'Chưa tải được danh sách Notes. Hãy kiểm tra kết nối rồi thử lại.');}finally{refreshing=false;if(!background)busy(false);if(refreshQueued){refreshQueued=false;queueMicrotask(refresh);}}
 }
-async function showTrash(){openSequence++;if(!await hold({navigation:true}))return;clearTimeout(timer);inTrash=true;trashSelection.clear();$('search').setAttribute('aria-label','Tìm trong Thùng rác, gồm nội dung và checklist');selecting=true;selected.clear();setEditorOpen(false);showListSurface();await refresh();}
+async function showTrash(){openSequence++;if(!await hold({navigation:true}))return;clearTimeout(timer);inTrash=true;trashSelection.clear();$('search').setAttribute('aria-label','Tìm trong Thùng rác, gồm nội dung và checklist');selecting=false;selected.clear();setEditorOpen(false);showListSurface();await refresh();}
+async function leaveTrash(){openSequence++;if(!await hold({navigation:true}))return;inTrash=false;selecting=false;selected.clear();trashSelection.clear();$('search').removeAttribute('aria-label');setEditorOpen(false);showListSurface();await refresh();const target=$('note-list').querySelector('.card')??$('select-mode');target.focus({preventScroll:true});}
+document.getElementById('trash-back-to-notes').addEventListener('click',()=>leaveTrash().catch(fail));
 async function openTrash(id){const request=++openSequence;if(!await hold({navigation:true}))return;const n=await api('trash',{query:'&id='+encodeURIComponent(id)});if(request!==openSequence)return;active=makeSession(n);fill();}
 $('bulk-restore').addEventListener('click',async()=>{const targets=[...trashSelection.values()].filter(n=>selected.has(n.id));let restored=0;busy(true);try{for(const n of targets){try{await api('trash',{method:'POST',data:{action:'restore',id:n.id,revision:n.revision}});selected.delete(n.id);trashSelection.delete(n.id);contentCache.delete(n.id);restored++;}catch(e){fail(e);}}setEditorOpen(false);await refresh();status('Đã khôi phục '+restored+'/'+targets.length+' Note.');}finally{busy(false);}});
 $('bulk-purge').addEventListener('click',async()=>{
