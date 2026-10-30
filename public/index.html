@@ -54,14 +54,10 @@
         </aside>
 
         <section id="list-pane" aria-label="Danh sách ghi chú">
-          <div class="list-mobile-top">
-            <button id="folder-drawer-toggle" aria-label="Mở thư mục" aria-controls="folder-panel" aria-expanded="false">☰</button>
-            <strong>Notes</strong>
-            <button id="mobile-new" aria-label="Tạo note mới">＋</button>
-          </div>
           <div class="list-heading">
+            <button id="folder-drawer-toggle" aria-label="Mở thư mục" aria-controls="folder-panel" aria-expanded="false">☰</button>
             <h2 id="list-title">Tất cả ghi chú</h2>
-            <button id="sort-toggle" type="button" aria-label="Sắp xếp ghi chú" aria-controls="sort-mode" aria-expanded="false">☷ Sắp xếp</button>
+            <button id="sort-toggle" type="button" aria-label="Sắp xếp ghi chú" aria-controls="sort-mode" aria-expanded="false">Sắp xếp</button>
           </div>
           <select id="sort-mode" aria-label="Kiểu sắp xếp" hidden>
             <option value="updated-desc">Cập nhật mới nhất</option>
@@ -70,15 +66,19 @@
             <option value="title-desc">Tiêu đề Z → A</option>
             <option value="custom">Tùy chỉnh</option>
           </select>
-          <label class="search-field" for="search">Tìm ghi chú<input id="search" type="search"></label>
-          <div id="bulk-toolbar" class="toolbar" hidden>
-            <button id="select-all">Chọn tất cả</button><button id="deselect-all">Bỏ chọn tất cả</button>
-            <span id="selected-count">0 Note đã chọn</span><label id="move-label" for="move-folder">Chuyển đến</label>
-            <select id="move-folder" aria-label="Thư mục đích"></select><button id="bulk-move">Di chuyển</button>
-            <button id="order-up" hidden>Lên</button><button id="order-down" hidden>Xuống</button>
-            <button id="bulk-restore" hidden disabled>Khôi phục đã chọn</button>
-            <button id="bulk-purge" hidden disabled>Xóa vĩnh viễn đã chọn</button>
-            <button id="bulk-delete" disabled>Xóa các Note đã chọn</button><button id="cancel-select">Hủy chọn</button>
+          <label class="search-field" for="search"><span class="visually-hidden">Tìm ghi chú</span><input id="search" type="search" placeholder="Tìm ghi chú…"></label>
+          <div id="bulk-toolbar" class="toolbar" aria-label="Thao tác với ghi chú đã chọn" hidden>
+            <button id="cancel-select" aria-label="Thoát chế độ chọn">Đóng</button>
+            <span id="selected-count" aria-live="polite">0 Note đã chọn</span>
+            <details id="bulk-move-menu" class="bulk-menu">
+              <summary>Di chuyển</summary>
+              <div><label id="move-label" for="move-folder">Thư mục đích</label><select id="move-folder" aria-label="Thư mục đích"></select><button id="bulk-move">Di chuyển</button></div>
+            </details>
+            <button id="bulk-delete" disabled>Thùng rác</button>
+            <details id="bulk-more-menu" class="bulk-menu">
+              <summary>Khác</summary>
+              <div><button id="select-all">Chọn tất cả</button><button id="deselect-all">Bỏ chọn tất cả</button><button id="order-up" hidden>Lên</button><button id="order-down" hidden>Xuống</button><button id="bulk-restore" hidden disabled>Khôi phục đã chọn</button><button id="bulk-purge" hidden disabled>Xóa vĩnh viễn đã chọn</button></div>
+            </details>
           </div>
           <div id="note-list" class="grid"></div>
         </section>
@@ -100,6 +100,7 @@
             <summary>Chia sẻ</summary>
             <div class="menu-panel"><button id="share-note">Tạo link sửa Note</button><div id="share-list"></div></div>
           </details>
+          <button id="save" class="editor-save-top" aria-label="Lưu ngay" title="Lưu ngay">Lưu</button>
           <details id="editor-more" class="action-menu">
             <summary aria-label="Thao tác khác">···</summary>
             <div class="menu-panel">
@@ -112,14 +113,13 @@
         </header>
         <div class="editor-scroll" id="editor-scroll">
           <div class="editor-content">
-            <label for="title">Tiêu đề</label>
-            <textarea id="title" rows="1" maxlength="200" aria-label="Tiêu đề ghi chú"></textarea>
+            <label class="visually-hidden" for="title">Tiêu đề</label>
+            <textarea id="title" rows="1" maxlength="200" aria-label="Tiêu đề ghi chú" placeholder="Tiêu đề"></textarea>
             <div class="note-meta"><label for="folder">Thư mục</label><input id="folder" list="folders" maxlength="80"><datalist id="folders"></datalist><label id="pin-label"><input id="pinned" type="checkbox"> Ghim</label></div>
-            <label for="text">Nội dung</label>
-            <textarea id="text" rows="10" spellcheck="false" wrap="soft" aria-label="Nội dung ghi chú"></textarea>
+            <label class="visually-hidden" for="text">Nội dung</label>
+            <textarea id="text" rows="10" spellcheck="false" wrap="soft" aria-label="Nội dung ghi chú" placeholder="Bắt đầu viết…"></textarea>
             <div id="checklist"></div>
             <button id="add-check" aria-label="Chèn mục checklist">＋ Chèn checklist</button>
-            <div class="toolbar editor-save-toolbar"><button id="save">Lưu ngay</button></div>
             <p id="copy-status" role="status" aria-live="polite"></p>
             <div id="conflict" hidden>
               <p>Note đã thay đổi ở phiên khác. Nội dung bạn đang soạn vẫn được giữ.</p>
