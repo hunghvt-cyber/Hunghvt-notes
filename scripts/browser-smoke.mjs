@@ -47,7 +47,7 @@ async function fixture(seed=0,{hasTouch=false,diverse=false}={}){
  return {b,store,context,page,hooks,errors,ids,login,async done(){await context.close();store.agent.destroy();assertNoErrors(errors);}};
 }
 function assertNoErrors(errors){if(errors.length)throw Error('BROWSER_PAGE_ERRORS: '+errors.join(';'));}
-async function openFolderControls(page){const summary=page.locator('#folder-controls summary'),panel=page.locator('.menu-panel-portal[data-menu-owner=folder-controls]');if(!await panel.isVisible())await summary.click();await expect(panel).toBeVisible();return panel;}
+async function openFolderControls(page){const details=page.locator('#folder-controls'),summary=page.locator('#folder-controls summary'),panel=page.locator('.menu-panel-portal[data-menu-owner=folder-controls]');if(!await details.evaluate(el=>el.open))await summary.click();await expect(panel).toBeVisible();return panel;}
 async function scrollFolderControlsToAction(page,selector){const panel=await openFolderControls(page);await panel.evaluate(el=>el.scrollTop=el.scrollHeight);const action=panel.locator(selector);await expect(action).toBeVisible();return action;}
 async function run(name,fn){if(process.env.BROWSER_ONLY&&!process.env.BROWSER_ONLY.split(',').includes(name))return;const started=Date.now();try{await fn();results.push({name,passed:true,ms:Date.now()-started});console.log(JSON.stringify(results.at(-1)));}catch(e){results.push({name,passed:false,error:String(e.message).slice(0,1200)});console.error(JSON.stringify(results.at(-1)));throw e;}}
 try{
