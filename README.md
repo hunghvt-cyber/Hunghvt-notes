@@ -15,10 +15,16 @@ Autosave gửi thay đổi lên Firestore; nhãn “Đã lưu” chỉ xuất hi
 
 ## Source và triển khai
 
+Source ứng dụng hiện hành ở `main`; các SHA PR #16 bên dưới là checkpoint tích hợp lịch sử, không phải HEAD hoặc deployment mới nhất. Vercel không liên kết Git nên push/merge không tự deploy; xem [OPERATIONS](docs/OPERATIONS.md) và hồ sơ phát hành theo ngày để đối chiếu runtime.
+
 `hunghvt-cyber/web-notes` (repository ID `1423348828`) là repo canonical. PR #16 đã hợp nhất vào `main` tại commit `7c3598a34691a7983e08208e55c97c34bf596f0c`, tree `035a07789aa235f0e1b79938688633c9c963984f`. Candidate ban đầu `186479392acf793caf628831075d98405231562b` / tree `04f3183c5b29165014985d1b992c88e2ef0d0c73` đã được xác minh; tree cuối sau cập nhật claims là tree trên. GitHub CI [run 40601380216](https://github.com/hunghvt-cyber/web-notes/actions/runs/40601380216) đạt ở hai job test/browser. PR không deploy runtime Vercel.
 
 ## Backup
 
-Workflow backup đã ở `main`, lịch `30 20 * * *` UTC (03:30 Asia/Ho_Chi_Minh), có `workflow_dispatch`; next expected cron là 03:30 ngày 29/10/2026 giờ Việt Nam. Chưa có run backup thủ công hoặc theo cron, Koofr upload/readback/hash verification hay restore parity. GitHub CI không phải backup run. WIF/IAM cần được đọc lại theo canonical repo sau rename; workflow yêu cầu secret `NOTES_BACKUP_KOOFR_CREDENTIAL`. Xem [runbook](docs/NOTES-BACKUP-RUNBOOK.md).
+Workflow backup ở `main`, lịch `30 20 * * *` UTC (03:30 Asia/Ho_Chi_Minh), có `workflow_dispatch`. Lịch có thể chạy trễ; thời gian thực phải đọc từ run, không dùng mốc “next expected” cũ.
+
+Backup theo lịch [40977423422](https://github.com/hunghvt-cyber/web-notes/actions/runs/40977423422), source `d735659d1457f5aa2144ed45fb1aaa9ca07ec495`, phát `backup_verified` lúc 07:06:08 ICT ngày 30/10/2026. Restore tự động [40977519777](https://github.com/hunghvt-cyber/web-notes/actions/runs/40977519777) phát `restore_parity_pass` lúc 07:07:30 và `restore_vault_removed` lúc 07:07:31. Cùng backup ID `firestore-notes-2026-10-30T00-05-31Z-40977423422-1.json.gz`, fingerprint/counts khớp (38 notes, 3 folders, 11 shares, 102 receipts, 0 erased). Đây là bằng chứng upload/readback/hash và restore qualification trong log, không chỉ CI xanh. Không đọc snapshot/Notes thật trong đợt cập nhật tài liệu.
+
+Lượt cron 29/10 cũng đã được xác minh và chạy trễ khoảng 3 giờ 41 phút; xem [hồ sơ cron](docs/BACKUP-CRON-VERIFICATION-20261029.md). Luồng WIF và credential backup đã được sử dụng thành công trong các run này; không suy ra toàn bộ IAM live đã được audit lại. Secret vẫn là `NOTES_BACKUP_KOOFR_CREDENTIAL`, không đưa giá trị vào chat/repo. Xem [runbook](docs/NOTES-BACKUP-RUNBOOK.md).
 
 Không commit credential, nội dung Notes, snapshot hoặc log riêng tư vào repo công khai. Không xóa Firestore, lịch sử, thùng rác, share hoặc draft khi dọn backend cũ.
