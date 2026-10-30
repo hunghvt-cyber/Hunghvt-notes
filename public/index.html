@@ -26,11 +26,6 @@
     </section>
 
     <div id="workspace" hidden>
-      <nav class="toolbar workspace-toolbar" aria-label="Thao tác Notes">
-        <button id="folder-collapse-toggle" aria-label="Thu gọn thư mục" aria-pressed="false" title="Thu gọn thư mục">Thư mục</button>
-        <button id="select-mode" aria-pressed="false">Chọn</button>
-        <span id="workspace-status" role="status"></span>
-      </nav>
       <div class="layout">
         <aside id="folder-panel" aria-label="Thư mục">
           <div id="folder-list"></div>
@@ -56,29 +51,34 @@
         <section id="list-pane" aria-label="Danh sách ghi chú">
           <div class="list-heading">
             <button id="folder-drawer-toggle" aria-label="Mở thư mục" aria-controls="folder-panel" aria-expanded="false">Thư mục</button>
+            <button id="folder-collapse-toggle" aria-label="Thu gọn thư mục" aria-pressed="false" title="Thu gọn thư mục">Thư mục</button>
             <h2 id="list-title">Tất cả ghi chú</h2>
-            <button id="sort-toggle" type="button" aria-label="Sắp xếp ghi chú" aria-controls="sort-mode" aria-expanded="false">Sắp xếp</button>
+            <button id="select-mode" type="button" aria-label="Chọn ghi chú" aria-pressed="false" title="Chọn ghi chú"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 12h8M8 16h5"/></svg><span>Chọn</span></button>
+            <details id="sort-menu" class="action-menu sort-menu">
+              <summary id="sort-toggle" aria-label="Sắp xếp ghi chú" title="Sắp xếp"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 6h16M7 12h10m-7 6h4"/></svg><span>Sắp xếp</span></summary>
+              <fieldset class="menu-panel sort-options" aria-label="Kiểu sắp xếp">
+                <legend class="visually-hidden">Kiểu sắp xếp</legend>
+                <label><input type="radio" name="sort-mode" value="updated-desc"><span>Cập nhật mới nhất</span></label>
+                <label><input type="radio" name="sort-mode" value="updated-asc"><span>Cập nhật cũ nhất</span></label>
+                <label><input type="radio" name="sort-mode" value="title-asc"><span>Tiêu đề A → Z</span></label>
+                <label><input type="radio" name="sort-mode" value="title-desc"><span>Tiêu đề Z → A</span></label>
+              </fieldset>
+            </details>
+            <div id="bulk-toolbar" class="toolbar" aria-label="Thao tác với ghi chú đã chọn" hidden>
+              <button id="cancel-select" aria-label="Thoát chế độ chọn">Đóng</button>
+              <span id="selected-count" aria-live="polite">0 Note đã chọn</span>
+              <details id="bulk-move-menu" class="bulk-menu action-menu">
+                <summary aria-label="Di chuyển đã chọn" title="Di chuyển"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6"/></svg></summary>
+                <div class="menu-panel"><label id="move-label" for="move-folder">Thư mục đích</label><select id="move-folder" aria-label="Thư mục đích"></select><button id="bulk-move">Di chuyển</button></div>
+              </details>
+              <button id="bulk-delete" aria-label="Chuyển vào thùng rác" title="Thùng rác" disabled><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3m3 0-1 13H7L6 7m4 3v6m4-6v6"/></svg></button>
+              <details id="bulk-more-menu" class="bulk-menu action-menu">
+                <summary aria-label="Thao tác khác" title="Thao tác khác"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg></summary>
+                <div class="menu-panel"><button id="select-all">Chọn tất cả</button><button id="deselect-all">Bỏ chọn tất cả</button><button id="bulk-restore" hidden disabled>Khôi phục đã chọn</button><button id="bulk-purge" hidden disabled>Xóa vĩnh viễn đã chọn</button></div>
+              </details>
+            </div>
           </div>
-          <select id="sort-mode" aria-label="Kiểu sắp xếp" hidden>
-            <option value="updated-desc">Cập nhật mới nhất</option>
-            <option value="updated-asc">Cập nhật cũ nhất</option>
-            <option value="title-asc">Tiêu đề A → Z</option>
-            <option value="title-desc">Tiêu đề Z → A</option>
-          </select>
           <label class="search-field" for="search"><span class="visually-hidden">Tìm ghi chú</span><input id="search" type="search" placeholder="Tìm ghi chú…"></label>
-          <div id="bulk-toolbar" class="toolbar" aria-label="Thao tác với ghi chú đã chọn" hidden>
-            <button id="cancel-select" aria-label="Thoát chế độ chọn">Đóng</button>
-            <span id="selected-count" aria-live="polite">0 Note đã chọn</span>
-            <details id="bulk-move-menu" class="bulk-menu action-menu">
-              <summary aria-label="Di chuyển đã chọn" title="Di chuyển"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6"/></svg></summary>
-              <div class="menu-panel"><label id="move-label" for="move-folder">Thư mục đích</label><select id="move-folder" aria-label="Thư mục đích"></select><button id="bulk-move">Di chuyển</button></div>
-            </details>
-            <button id="bulk-delete" aria-label="Chuyển vào thùng rác" title="Thùng rác" disabled><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3m3 0-1 13H7L6 7m4 3v6m4-6v6"/></svg></button>
-            <details id="bulk-more-menu" class="bulk-menu action-menu">
-              <summary aria-label="Thao tác khác" title="Thao tác khác"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg></summary>
-              <div class="menu-panel"><button id="select-all">Chọn tất cả</button><button id="deselect-all">Bỏ chọn tất cả</button><button id="bulk-restore" hidden disabled>Khôi phục đã chọn</button><button id="bulk-purge" hidden disabled>Xóa vĩnh viễn đã chọn</button></div>
-            </details>
-          </div>
           <button id="quick-create" class="quick-create" type="button">Ghi chú mới…</button>
           <div id="note-list" class="grid"></div>
         </section>
@@ -142,11 +142,6 @@
       </section>
     </div>
 
-    <nav id="mobile-nav" aria-label="Điều hướng chính">
-      <button id="nav-notes" class="active"><span aria-hidden="true">▦</span><span>Ghi chú</span></button>
-      <button id="nav-search"><span aria-hidden="true">⌕</span><span>Tìm kiếm</span></button>
-      <button id="nav-trash"><span aria-hidden="true">▤</span><span>Thùng rác</span></button>
-    </nav>
   </main>
   <button id="drawer-backdrop" aria-label="Đóng thư mục" hidden></button>
   <script type="module" src="/app.js"></script>
