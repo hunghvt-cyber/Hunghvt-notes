@@ -1,5 +1,7 @@
 # Giao diện workspace/editor — candidate review
 
+> Cập nhật sau phản hồi screenshot: PR #39 giờ chỉ giữ UI; backend/API rename và test liên quan đã tách sang [draft PR #40](https://github.com/hunghvt-cyber/web-notes/pull/40), chưa cloud-qualified và không được xem là hoàn tất. PR #39 không còn chứa rename.
+
 Ngày 30/10/2026. Đây là candidate để người dùng duyệt giao diện; **chưa merge, chưa deploy**, Production giữ nguyên `dpl_EJ7Dp2NjCzn6aA5WhNcbZgnnHz1J`. Candidate dựa trên main `91f7118a56b3a20bda0474b2e17b46c16f91440c` (tree `147bcb084f34ab644ab2e642f831a4258894499f`), tức bản compact PR #38 đã phát hành. PR #34, API/backend, Firestore, auth/config, prefetch và lazy history không được đưa vào.
 
 Source candidate vòng trước: `0540d0a1faa61885243d83a178b094623bb8e6c2` (tree `52e6f5506ae34fc92df5c8ee4d9610510b2fa90e`), dựa trên app source commit `b04649a773cef67833b02d90bbf569656af1f237`. Screenshot và `measurements.json` được dựng từ app source này với dữ liệu tổng hợp/in-memory fixture. Không dùng Notes thật. `vercel.json` chỉ thêm branch review này vào `git.deploymentEnabled=false`, để PR không tạo Vercel Preview deployment; không đổi cấu hình Production hay branch khác.
@@ -118,3 +120,19 @@ Bài học điều phối chung đã ghi vào repo canonical `hunghvt-cyber/ai-t
 Candidate được chuẩn bị để duyệt giao diện trong [draft PR #39](https://github.com/hunghvt-cyber/web-notes/pull/39); không merge/deploy. Checks `test`/`browser` hosted đều success cho tree code candidate. Folder rename còn blocker backend rõ ràng. Nếu sau khi duyệt candidate được phát hành, rollback dự kiến là gán lại từng alias Production về `dpl_EJ7Dp2NjCzn6aA5WhNcbZgnnHz1J`, rồi đọc lại đủ ba alias và health. Lượt này chưa deploy, nên không có rollback/deployment mới.
 
 Hosted CI final handoff: current PR head `0bd98e5e5528e635be1e50833bc5f29438a5ea0e` (tree `dc294b4986daf3589473ea2ae1063bbcc2ffbee6`) passed GitHub Actions [run #503](https://github.com/hunghvt-cyber/web-notes/actions/runs/41037196725), both `test` and `browser`. This commit only updates the handoff docs; application code remains the code candidate SHA above.
+
+
+## Screenshot correction — composer and folder manager
+
+- Composer 390×420: `editor-scroll` và `editor-content` giờ là flex column có chiều cao xác định; textarea nhận phần dư (`flex: 1 1 0`, `min-height: 0`). Khi checklist có phần tử thật, nó giữ vùng riêng giới hạn chiều cao và tự cuộn; checklist rỗng không chiếm chỗ. Browser assertion đo textarea cao hơn 180 px và khoảng dư cuối dưới 24 px; screenshot [composer 390×420](candidate/quick-compose-phone-390-low-viewport.png).
+- Folder manager là panel nổi gọn; danh sách có vùng cuộn riêng, panel ngoài vẫn cuộn để tới các thao tác cuối. Test fixture tạo nhiều folder synthetic, cuộn đến hàng cuối và click `Chọn` ở phone 390×844, iPad dọc và PC 1280×720; đồng thời cuộn panel và click `Quản lý chia sẻ`. Ảnh: [phone đầu](candidate/folder-management-phone-390-top.png), [phone cuối](candidate/folder-management-phone-390-bottom.png), [iPad đầu](candidate/folder-management-ipad-portrait-top.png), [iPad cuối](candidate/folder-management-ipad-portrait-bottom.png), [PC đầu](candidate/folder-management-pc-1280-top.png), [PC cuối](candidate/folder-management-pc-1280-bottom.png).
+- Chỉ chạy browser case `workspace-redesign-synthetic-layout-menus-editor-and-compose`: PASS; không chạy lại benchmark hoặc toàn bộ suite. Thay đổi không đụng API/auth/Firestore; PR #39 bỏ phần rename khỏi frontend/backend và test của nó. Rename giữ riêng ở draft PR #40, fixture 32/32 PASS; cloud runtime/Firestore qualification còn thiếu. Project/quota blocker cũ không được thử lại, billing/IAM/Production không đổi.
+- Screenshot Chromium headless với dữ liệu tổng hợp; không xác minh S25 Ultra/iPad thật, bàn phím OS hay IME.
+
+## Review incremental sau hai sửa
+
+- Key4/key5, model `gemini-3.5-flash-lite`, mỗi key một lượt, chạy song song (concurrency 2); wrapper help xác nhận `--key key4/key5`, cả hai exit 0, không timeout/retry. Thời gian batch đo từ hai exec/wait khoảng 2.7 s; duration tách từng key không có số đo wrapper đáng tin cậy.
+- Key4 cảnh báo textarea có thể co quá mức khi viewport/keyboard cực thấp, popup vượt viewport, và cần kiểm chứng click thực. Đã thêm min-height fallback 40 px; menu định vị tính theo visual viewport, giới hạn chiều cao theo vùng trống. Browser kiểm rectangle của hàng đầu/hàng cuối và thao tác cuối rồi click thật ở 390×844, 744×1133, 1280×720; các nút được assert visible ngay trước click. Bàn phím OS/device thật vẫn chưa thử.
+- Key5 nhắc không gọi text-only review là xem ảnh; Codex tự mở bảy PNG tổng hợp cập nhật bằng image viewer. Bổ sung assert checklist rỗng `display:none`, checklist có mục có vùng cuộn; kiểm bounds hàng đầu/cuối ở cả ba viewport. Key4/5 không xem pixel.
+- Kết quả test liên quan: `BROWSER_ONLY=workspace-redesign-synthetic-layout-menus-editor-and-compose npm run test:browser` PASS (khoảng 12.5 s); `npm run check:source` PASS, 49 file; `node --check scripts/browser-smoke.mjs` và `git diff --check` PASS. Không chạy benchmark hoặc toàn suite.
+- Rename không còn trong diff UI PR #39. Backend/API/repository và fixture tests được giữ ở [draft PR #40](https://github.com/hunghvt-cyber/web-notes/pull/40), chưa qualification Vercel OIDC/Cloud Firestore. Không thử lại GCP project/quota và không thay billing/IAM/Production.
