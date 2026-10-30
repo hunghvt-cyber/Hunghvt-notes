@@ -40,3 +40,17 @@ test('only safe GET requests retry BUSY with a bounded jittered delay',async()=>
  calls=0;await assert.rejects(client('notes-save',{method:'POST',data:{action:'save'}}),e=>e.status===423);assert.equal(calls,1);
  const capped=apiClient({fetcher:async()=>{calls++;return Response.json({code:'BUSY'},{status:423});},wait:async()=>{}});calls=0;await assert.rejects(capped('notes'),e=>e.status===423);assert.equal(calls,4);
 });
+
+test('SyncDraft default diagnostics are off and an injected clock measures exact valid ACK duration',async()=>{
+ let reads=0,time=10,events=[];const {d}=setup(async p=>{time=37;return ack(p);},{clock:()=>{reads++;return time;},onMeasure:(...event)=>events.push(event)});
+ let offReads=0;const off=new SyncDraft({note:note(),send:async p=>ack(p),clock:()=>{offReads++;return 0;}});assert.equal(off.onMeasure,null);off.edit({text:'off'});await off.flush();assert.equal(offReads,0);
+ d.edit({text:'clocked'});await d.flush();
+ assert.equal(reads,4);assert.deepEqual(events,[['save_guard_ms',0],['server_ack_ms',27,{version:1}]]);
+});
+
+test('typing during save ACKs only the frozen version and leaves the later input for its own ACK',async()=>{
+ const gate=wait(),began=wait(),events=[];let time=0;const {d}=setup(async p=>{began.resolve();await gate.promise;time=25;return ack(p);},{clock:()=>time,onMeasure:(...event)=>events.push(event)});
+ d.edit({text:'sent'});const sending=d.flush();await began.promise;d.edit({text:'typed while sending'});gate.resolve();await sending;
+ assert.deepEqual(events.find(e=>e[0]==='server_ack_ms'),['server_ack_ms',25,{version:1}]);
+ assert.equal(d.version,2);assert.equal(d.dirty,true);assert.equal(d.status,'draft');
+});

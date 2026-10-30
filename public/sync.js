@@ -1,7 +1,7 @@
 export const clone=v=>JSON.parse(JSON.stringify(v));
 export class SyncDraft{
- constructor({note,send,onChange=()=>{},onMeasure=()=>{},uuid=()=>crypto.randomUUID()}){
-  this.uuid=uuid;this.send=send;this.onChange=onChange;this.onMeasure=onMeasure;
+ constructor({note,send,onChange=()=>{},onMeasure=null,clock=null,uuid=()=>crypto.randomUUID()}){
+  this.uuid=uuid;this.send=send;this.onChange=onChange;this.onMeasure=onMeasure;this.clock=clock;
   this.note=clone(note);this.baseRevision=note.revision??null;
   this.version=0;this.pending=null;this.dirty=false;this.status='clean';this.error=null;
   this.running=null;this.disposed=false;
@@ -16,17 +16,17 @@ export class SyncDraft{
  }
  async saveOne(){
   if(!this.note.title?.trim()){this.status='draft';this.emit();return;}
-  const guardStarted=this.onMeasure?performance.now():0;
+  const clock=this.onMeasure&&this.clock?this.clock:null,guardStarted=clock?clock():0;
   // The frozen operation is kept in this page's memory for exact retries.
   if(!this.pending)this.pending={clientOpId:this.uuid(),version:this.version,payload:{action:'save',id:this.note.id,revision:this.baseRevision,title:this.note.title,text:this.note.text,checklist:clone(this.note.checklist??[]),...(this.note.folder!==undefined?{folder:this.note.folder}:{}),...(this.note.pinned!==undefined?{pinned:this.note.pinned}:{})}};
   const pending=clone(this.pending);this.status='saving';this.emit();
   try{
-   if(this.onMeasure)this.onMeasure('save_guard_ms',performance.now()-guardStarted);
-   const ackStarted=this.onMeasure?performance.now():0;
+   if(clock)this.onMeasure('save_guard_ms',clock()-guardStarted);
+   const ackStarted=clock?clock():0;
    const result=await this.send({...pending.payload,clientOpId:pending.clientOpId});
    if(result.clientOpId!==pending.clientOpId||!result.acknowledgedRevision)throw Error('ACK_UNVERIFIED');
    if(result.revision!==result.acknowledgedRevision){this.status='conflict';this.error=Object.assign(Error('HEAD_CHANGED_AFTER_ACK'),{status:409});this.emit();return;}
-   if(this.onMeasure)this.onMeasure('server_ack_ms',performance.now()-ackStarted);
+   if(clock)this.onMeasure('server_ack_ms',clock()-ackStarted,{version:pending.version});
    this.baseRevision=result.acknowledgedRevision;this.note.revision=this.baseRevision;this.pending=null;
    if(this.version===pending.version){
     this.note=clone(result);this.dirty=false;this.status='saved';

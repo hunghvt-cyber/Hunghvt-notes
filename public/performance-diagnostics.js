@@ -6,7 +6,8 @@ const CACHES = new Set(['hit', 'miss', 'na']);
 const PHASES = new Set([
   'guard_wait_ms', 'save_guard_ms', 'debounce_wait_ms', 'queue_wait_ms', 'network_ms',
   'response_body_ms', 'cache_read_ms', 'content_assign_ms', 'frame_after_update_ms',
-  'retry_wait_ms', 'input_to_ack_ms', 'server_ack_ms', 'flow_total_ms'
+  'retry_wait_ms', 'input_to_ack_ms', 'server_ack_ms', 'flow_total_ms', 'render_ms',
+  'click_to_content_assign_ms', 'click_to_first_frame_ms', 'background_revision_assign_ms'
 ]);
 const ALLOWED_STATUS = new Set([400, 401, 403, 404, 408, 409, 413, 423, 429, 500, 502, 503, 504]);
 
@@ -24,7 +25,8 @@ export class PerformanceDiagnostics {
     this.clock = clock;
     this.samples = [];
     this.active = new Set();
-    this.lastInputAt = null;
+    this.inputTimes = new WeakMap();
+    this.ackedInputs = new WeakMap();
     if (this.enabled && typeof document !== 'undefined') this.mountPanel();
   }
 
@@ -33,7 +35,7 @@ export class PerformanceDiagnostics {
     const trace = {
       flow, state: STATES.has(state) ? state : 'na', cache: CACHES.has(cache) ? cache : 'na',
       startedAt: Number.isFinite(startAt) ? startAt : this.clock(),
-      phases: Object.create(null), requests: 0, errors: Object.create(null), finished: false
+      phases: Object.create(null), requests: 0, errors: Object.create(null), finished: false, firstContentAssigned: false
     };
     this.active.add(trace);
     return trace;
@@ -59,7 +61,7 @@ export class PerformanceDiagnostics {
     if (!trace || trace.finished || trace.cancelled) return;
     trace.finished = true;
     this.active.delete(trace);
-    this.phase(trace, 'flow_total_ms', this.clock() - trace.startedAt);
+    if (trace.flow !== 'open_note') this.phase(trace, 'flow_total_ms', this.clock() - trace.startedAt);
     if (error) {
       const code = ALLOWED_STATUS.has(Number(error.status)) ? String(Number(error.status)) : 'network';
       if (!trace.errors[code]) this.error(trace, error.status);
@@ -69,12 +71,37 @@ export class PerformanceDiagnostics {
     this.renderSummary();
   }
 
-  afterUpdate(trace, startedAt) {
+  afterUpdate(trace, startedAt, firstContent = false) {
     if (!this.enabled || !trace || typeof this.frame !== 'function') return;
-    this.frame(() => this.phase(trace, 'frame_after_update_ms', this.clock() - startedAt));
+    this.frame(() => { const at = this.clock(); this.phase(trace, 'frame_after_update_ms', at - startedAt); if (firstContent) this.phase(trace, 'click_to_first_frame_ms', at - trace.startedAt); });
   }
 
-  markInput() { if (this.enabled) this.lastInputAt = this.clock(); }
+  markInput(session, version) {
+    if (!this.enabled) return;
+    const at = this.clock();
+    if (session && Number.isInteger(version)) {
+      let versions = this.inputTimes.get(session); if (!versions) this.inputTimes.set(session, versions = new Map());
+      versions.set(version, at);
+      while (versions.size > 32) versions.delete(versions.keys().next().value);
+    }
+  }
+
+  inputTime(session, version) { return this.enabled ? this.inputTimes.get(session)?.get(version) ?? null : null; }
+
+  acknowledgeInput(trace, session, version) {
+    if (!this.enabled || !trace || !session || !Number.isInteger(version)) return;
+    let versions = this.ackedInputs.get(session); if (!versions) this.ackedInputs.set(session, versions = new Set());
+    if (versions.has(version)) return;
+    const at = this.inputTimes.get(session)?.get(version); if (!Number.isFinite(at)) return;
+    versions.add(version); this.phase(trace, 'input_to_ack_ms', this.clock() - at);
+  }
+
+  firstContent(trace, assignmentAt) {
+    if (!this.enabled || !trace || trace.firstContentAssigned) return;
+    trace.firstContentAssigned = true;
+    this.phase(trace, 'click_to_content_assign_ms', assignmentAt - trace.startedAt);
+
+  }
 
   summary() {
     const grouped = new Map();

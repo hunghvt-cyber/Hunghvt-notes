@@ -21,7 +21,7 @@ test('opt-in summary contains only bounded timing, cache, request, and allowed e
  const result=diagnostics.summary();
  assert.deepEqual(result.groups[0],{
   flow:'open_note',editor:'clean',cache:'hit',samples:1,requests:1,
-  phases:{queue_wait_ms:{count:1,p50_ms:4,p95_ms:4,min_ms:4,max_ms:4},network_ms:{count:1,p50_ms:21,p95_ms:21,min_ms:21,max_ms:21},content_assign_ms:{count:1,p50_ms:2,p95_ms:2,min_ms:2,max_ms:2},frame_after_update_ms:{count:1,p50_ms:20,p95_ms:20,min_ms:20,max_ms:20},flow_total_ms:{count:1,p50_ms:30,p95_ms:30,min_ms:30,max_ms:30}},errors:{'409':1,network:1}
+  phases:{queue_wait_ms:{count:1,p50_ms:4,p95_ms:4,min_ms:4,max_ms:4},network_ms:{count:1,p50_ms:21,p95_ms:21,min_ms:21,max_ms:21},content_assign_ms:{count:1,p50_ms:2,p95_ms:2,min_ms:2,max_ms:2},frame_after_update_ms:{count:1,p50_ms:20,p95_ms:20,min_ms:20,max_ms:20}},errors:{'409':1,network:1}
  });
  const json=JSON.stringify(result);
  assert.doesNotMatch(json,/must-not-export|title|id|url|token|session|folder/i);
@@ -41,4 +41,21 @@ test('in-flight traces are capped and clear also drops pending samples',()=>{
  diagnostics.clear();assert.equal(diagnostics.active.size,0);
  for(const trace of traces)diagnostics.finish(trace);
  assert.equal(diagnostics.samples.length,0);
+});
+
+test('input-to-ACK is recorded once against the acknowledged session version',()=>{
+ let time=100;const diagnostics=new PerformanceDiagnostics({enabled:true,clock:()=>time,frame:()=>{}}),session={},trace=diagnostics.begin('save');
+ diagnostics.markInput(session,1);time=115;diagnostics.markInput(session,2);time=140;
+ diagnostics.acknowledgeInput(trace,session,1);diagnostics.acknowledgeInput(trace,session,1);diagnostics.finish(trace);
+ assert.equal(trace.phases.input_to_ack_ms,40);
+ const next=diagnostics.begin('save');diagnostics.acknowledgeInput(next,session,2);diagnostics.finish(next);
+ assert.equal(next.phases.input_to_ack_ms,25);
+});
+
+test('open-note measures first content separately and omits flow total',()=>{
+ let time=10,frameCallback;const diagnostics=new PerformanceDiagnostics({enabled:true,clock:()=>time,frame:fn=>{frameCallback=fn;}}),trace=diagnostics.begin('open_note');
+ time=18;diagnostics.firstContent(trace,18);diagnostics.afterUpdate(trace,18);time=45;diagnostics.afterUpdate(trace,18,true);frameCallback();diagnostics.finish(trace);
+ assert.equal(trace.phases.click_to_content_assign_ms,8);
+ assert.equal(trace.phases.click_to_first_frame_ms,35);
+ assert.equal(trace.phases.flow_total_ms,undefined);
 });
