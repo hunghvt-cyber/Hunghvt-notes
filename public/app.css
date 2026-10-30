@@ -55,3 +55,7 @@
 /* One folder navigation control per breakpoint; do not let shared touch styles override it. */
 #folder-drawer-toggle{display:none}
 @media(max-width:1200px){.list-heading #folder-collapse-toggle{display:none}.list-heading #folder-drawer-toggle{display:inline-flex}}
+.trash-active .list-heading>*:not(#bulk-toolbar){display:none!important}
+.trash-active .list-heading #bulk-toolbar{display:flex;align-items:center;min-height:44px}
+#trash-back-to-notes{flex:0 0 auto;min-height:44px;white-space:nowrap}
+#bulk-move-menu[hidden]{display:none!important}
