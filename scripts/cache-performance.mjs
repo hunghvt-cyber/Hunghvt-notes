@@ -1,0 +1,50 @@
+// Reproducible UI timing against synthetic in-memory storage only.
+import {chromium,expect} from '@playwright/test';
+import {readFile,writeFile} from 'node:fs/promises';
+import {randomUUID} from 'node:crypto';
+import {join} from 'node:path';
+import {backend} from '../test/helpers/collection.mjs';
+import {createAppHandler,productionProject} from '../lib/app-config.mjs';
+import {provisionStore} from '../lib/production-store.mjs';
+
+const origin='https://notes.perf.test',password='synthetic-only',samples=20;
+const asset=name=>process.env.BROWSER_APP_PUBLIC_DIR?join(process.env.BROWSER_APP_PUBLIC_DIR,name):new URL('../public/'+name,import.meta.url);
+const browser=await chromium.launch({headless:true,...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH?{executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH}:{})});
+const b=backend(),namespace='Hunghvt-Notes-Data-'+randomUUID(),input={user:'synthetic',password:'synthetic',namespace},store=b.makeStore(input);await provisionStore(store);
+const ids=[];for(let i=0;i<20;i++){const id=randomUUID();ids.push(id);let saved=await store.save(id,{title:'Fixture note '+i,text:'Synthetic body '+i,checklist:[],folder:''},null,randomUUID());for(let rev=0;rev<5;rev++)saved=await store.save(id,{title:'Fixture note '+i,text:'Synthetic body '+i+' revision '+rev,checklist:[],folder:''},saved.revision,randomUUID());}
+const largeId=randomUUID();await store.save(largeId,{title:'Fixture large',text:'L'.repeat(128*1024),checklist:[],folder:''},null,randomUUID());
+const env={NOTES_MODE:'live-v1',NOTES_PROJECT_ID:productionProject,VERCEL_PROJECT_ID:productionProject,VERCEL_ENV:'production',NOTES_BASE_URL:origin,NOTES_DATA_NAMESPACE:namespace,NOTES_SESSION_PASSWORD:randomUUID()+randomUUID(),NOTES_PASSWORD:password,KOOFR_NOTES_USER:'fixture',KOOFR_NOTES_APP_PASSWORD:'fixture'};
+const handler=createAppHandler({env:()=>env,makeStore:b.makeStore,observe:()=>{}}),context=await browser.newContext({viewport:{width:1024,height:768}}),server=[],errors=[];
+let delayReads=false,holdFirst=false;
+await context.route(origin+'/**',async route=>{
+  const req=route.request(),u=new URL(req.url());if(u.pathname==='/api/app'){
+  const body=req.postData(),started=performance.now();if(delayReads&&req.method()==='GET'&&u.searchParams.has('id'))await new Promise(r=>setTimeout(r,120));
+  const response=await handler(new Request(req.url(),{method:req.method(),headers:await req.allHeaders(),...(body?{body}:{})}));const bytes=Buffer.from(await response.arrayBuffer());server.push({route:u.searchParams.get('route'),method:req.method(),shape:u.searchParams.has('id')?'content':u.searchParams.has('includeFolders')?'list':'other',prefetch:u.searchParams.get('prefetch')==='1',status:response.status,serverMs:+(performance.now()-started).toFixed(1),responseBytes:bytes.length});
+  await route.fulfill({status:response.status,headers:Object.fromEntries(response.headers),body:bytes});return;
+ }
+ const name=u.pathname==='/'?'index.html':u.pathname.slice(1);if(!['index.html','app.css','app.js','sync.js','cache.js','sort.js'].includes(name))return route.fulfill({status:404,body:''});
+ await route.fulfill({status:200,contentType:name.endsWith('.js')?'application/javascript':name.endsWith('.css')?'text/css':'text/html',body:await readFile(asset(name))});
+});
+const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));
+await page.addInitScript(()=>{const f=window.fetch.bind(window);window.__fetchRows=[];window.fetch=async(...args)=>{const start=performance.now(),url=new URL(typeof args[0]==='string'?args[0]:args[0].url,location.href);try{const r=await f(...args);window.__fetchRows.push({ms:performance.now()-start,status:r.status,prefetch:url.searchParams.get('prefetch')==='1'});return r;}catch(e){window.__fetchRows.push({ms:performance.now()-start,error:e.name,prefetch:url.searchParams.get('prefetch')==='1'});throw e;}};});
+const metrics=[];
+const percentile=a=>{const s=[...a].sort((x,y)=>x-y);return {p50Ms:+s[Math.floor((s.length-1)*.5)].toFixed(1),p95Ms:+s[Math.ceil((s.length-1)*.95)].toFixed(1),n:s.length};};
+const measure=async(name,fn)=>{const ms=[],requestRows=[],serverRows=[];for(let i=0;i<samples;i++){const start=performance.now(),before=server.length;let actionStart=before;const elapsed=await fn(i,()=>{actionStart=server.length;});ms.push(typeof elapsed==='number'?elapsed:performance.now()-start);await page.waitForTimeout(180);const rows=await page.evaluate(()=>window.__fetchRows.splice(0));requestRows.push(...rows);serverRows.push(...server.slice(actionStart));server.splice(0);}const foreground=requestRows.filter(x=>!x.prefetch),prefetch=requestRows.filter(x=>x.prefetch),serverForeground=serverRows.filter(x=>!x.prefetch),serverPrefetch=serverRows.filter(x=>x.prefetch);metrics.push({name,...percentile(ms),requests:requestRows.length,foregroundRequests:foreground.length,prefetchRequests:prefetch.length,requestErrors:requestRows.filter(x=>x.error||x.status>=400).length,errorNames:requestRows.filter(x=>x.error).reduce((a,x)=>(a[x.error]=(a[x.error]??0)+1,a),{}),errorStatuses:requestRows.filter(x=>x.status>=400).reduce((a,x)=>(a[x.status]=(a[x.status]??0)+1,a),{}),requestP50Ms:foreground.length?percentile(foreground.map(x=>x.ms)).p50Ms:null,requestP95Ms:foreground.length?percentile(foreground.map(x=>x.ms)).p95Ms:null,responseBytes:serverRows.reduce((n,x)=>n+x.responseBytes,0),foregroundResponseBytes:serverForeground.reduce((n,x)=>n+x.responseBytes,0),prefetchResponseBytes:serverPrefetch.reduce((n,x)=>n+x.responseBytes,0),serverMsP50:serverForeground.length?percentile(serverForeground.map(x=>x.serverMs)).p50Ms:null,serverMsP95:serverForeground.length?percentile(serverForeground.map(x=>x.serverMs)).p95Ms:null,serverRequests:serverRows.length,foregroundServerRequests:serverForeground.length,prefetchServerRequests:serverPrefetch.length});};
+try{
+await page.goto(origin);await page.locator('#login').waitFor({state:'visible'});await page.locator('#password').fill(password);await page.locator('#login-form button').click();await page.locator('.card').first().waitFor();
+ server.splice(0);await page.evaluate(()=>window.__fetchRows.splice(0));
+ const auth=await page.evaluate(async()=>{const r=await fetch('/api/app?route=auth');return r.json();});
+ await measure('navigation-list-cold-cache',async()=>{await page.evaluate(async scope=>{const r=indexedDB.open('hunghvt-notes-cache-v1',1);const db=await new Promise((ok,no)=>{r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error);});await new Promise((ok,no)=>{const tx=db.transaction('cache','readwrite');tx.objectStore('cache').delete(scope);tx.oncomplete=ok;tx.onerror=()=>no(tx.error);});db.close();},auth.cacheScope);await page.reload();await page.locator('.card').first().waitFor();});
+ await measure('navigation-list-warm-cache',async()=>{await page.reload();await page.locator('.card').first().waitFor();});
+ await measure('open-small-cold-session',async i=>{const card=page.locator(`.card[data-note="${ids[i]}"]`);await card.click();await page.locator('#text').waitFor();await page.locator('#close-editor').click();});
+ await page.locator(`.card[data-note="${largeId}"]`).click();await page.locator('#editor').waitFor({state:'visible'});await page.locator('#close-editor').click();
+ await measure('open-large-after-reload',async(_,mark)=>{await page.reload();await page.locator('.card').first().waitFor();await page.evaluate(()=>window.__fetchRows.splice(0));mark();const start=performance.now();await page.locator(`.card[data-note="${largeId}"]`).click();await page.locator('#editor').waitFor({state:'visible'});await expect(page.locator('#text')).toHaveValue('L'.repeat(128*1024));const elapsed=performance.now()-start;await page.locator('#close-editor').click();return elapsed;});
+ await measure('open-small-after-reload',async(i,mark)=>{await page.reload();await page.locator('.card').first().waitFor();await page.evaluate(()=>window.__fetchRows.splice(0));mark();const start=performance.now();await page.locator(`.card[data-note="${ids[i]}"]`).click();await page.locator('#editor').waitFor({state:'visible'});await expect(page.locator('#text')).toHaveValue('Synthetic body '+i+' revision 4');const elapsed=performance.now()-start;await page.locator('#close-editor').click();return elapsed;});
+ delayReads=true;
+ for(const id of ids){await page.locator(`.card[data-note="${id}"]`).click();await page.locator('#editor').waitFor({state:'visible'});await page.locator('#close-editor').click();}
+ await measure('typing-while-revalidation-is-delayed-120ms',async i=>{await page.locator(`.card[data-note="${ids[i]}"]`).click();await page.locator('#editor').waitFor({state:'visible'});const text=page.locator('#text'),start=performance.now();await text.press('End');await text.press('x');const elapsed=performance.now()-start;await page.locator('#save').click();await page.waitForFunction(()=>document.querySelector('#save-status').dataset.state==='saved');await page.locator('#close-editor').click();return elapsed;});
+ await measure('rapid-switch-with-120ms-content-read',async i=>{const a=ids[i%ids.length],bb=ids[(i+1)%ids.length],c=ids[(i+2)%ids.length];await page.locator(`.card[data-note="${a}"]`).click();await page.locator(`.card[data-note="${bb}"]`).click();await page.locator(`.card[data-note="${c}"]`).click();await page.waitForFunction(id=>document.querySelector('#title').value==='Fixture note '+id,((i+2)%20));});
+ const result={source:process.env.PERF_SOURCE??'working-tree',browser:'Chromium headless on NAS; synthetic Firestore-compatible API + in-memory fixture; 20 small notes and one 128 KiB note',samplesPerCase:samples,authScope:'synthetic fixture only; no production data',measurements:metrics};
+ await writeFile(process.env.PERF_OUTPUT??'/tmp/cache-performance.json',JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify(result));
+ if(errors.length)throw Error('PAGE_ERRORS '+errors.join(';'));
+}finally{await page.waitForTimeout(200).catch(()=>{});await context.unrouteAll({behavior:'ignoreErrors'}).catch(()=>{});await context.close();store.agent.destroy();await browser.close();}

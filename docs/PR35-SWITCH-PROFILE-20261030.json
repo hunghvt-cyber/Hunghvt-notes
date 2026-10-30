@@ -1,0 +1,53 @@
+{
+  "purpose": "diagnose PR35 rapid switching without cache-capacity mismatch",
+  "fixture": "synthetic in-memory API/Firestore-compatible data only; no real Notes or session",
+  "conditions": {
+    "browser": "Chromium headless on NAS",
+    "samplesPerCase": 20,
+    "notesInRepeatedSwitchSet": 3,
+    "notesWarmedBeforeEachRun": 3,
+    "revisionReadDelayMs": 120,
+    "auth": "already authenticated synthetic fixture; auth/startup excluded from note-switch interval",
+    "measurement": "capture click event; final title/text assignment; two requestAnimationFrames after title assignment; revision fetch start/end separately",
+    "scope": "main and candidate source assets, same fixture handler and generated data"
+  },
+  "initialMeasurement": {
+    "mainP50P95Ms": [344.6, 460.2],
+    "candidateP50P95Ms": [402.0, 474.7],
+    "validForConclusion": false,
+    "reasons": [
+      "Rotated across 20 notes, exceeding candidate's 12-note/1 MiB content-cache bound while main contentCache had no equivalent bound.",
+      "Timed three sequential Playwright locator.click calls and final title wait, not last-click-to-editor paint."
+    ]
+  },
+  "corrected": {
+    "main": {
+      "lastClickToTitleMs": { "p50": 0, "p95": 1 },
+      "lastClickToTwoRafPaintMs": { "p50": 30, "p95": 43 },
+      "firstClickToFinalPaintMs": { "p50": 275, "p95": 331 },
+      "threePlaywrightClickCallsMs": { "p50": 345.7, "p95": 505.5 },
+      "revisionRequests": 60,
+      "fullContentRequests": 0,
+      "revisionDurationMs": { "p50": 147.2, "p95": 167.2 },
+      "errors": 0,
+      "observedLongTasks": 2
+    },
+    "candidate": {
+      "lastClickToTitleMs": { "p50": 1, "p95": 2 },
+      "lastClickToTwoRafPaintMs": { "p50": 20, "p95": 36 },
+      "firstClickToFinalPaintMs": { "p50": 200, "p95": 254 },
+      "threePlaywrightClickCallsMs": { "p50": 266.7, "p95": 354.5 },
+      "revisionRequests": 36,
+      "fullContentRequests": 0,
+      "revisionDurationMs": { "p50": 142, "p95": 152 },
+      "errors": 0,
+      "observedLongTasks": 0
+    }
+  },
+  "limitations": [
+    "Synthetic NAS headless browser measurements; not Vercel runtime, S25 Ultra, or iPad.",
+    "Three Playwright clicks are sequential; per-click paint and final-click-to-paint are separately reported.",
+    "The 100 ms cached-note and 300 ms warm-list goals remain unmet in the broader benchmark; this targeted profile does not change those results."
+  ],
+  "decision": "retain the frontend-only candidate as release-worthy based on the controlled three-note result; Production was not changed in this task."
+}

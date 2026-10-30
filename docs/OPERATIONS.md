@@ -178,3 +178,18 @@ candidate qualification and final promotion. Full filtered evidence and exact
 alias map are in [release verification](SPEED-AND-DRAFTS-20261029.md). The
 temporary Vercel share-link bypass used by the protected-URL check was revoked;
 the final alias readback has no protection-bypass entries.
+
+
+## PR #34 frontend-only split — 30/10/2026
+
+PR #34 có thêm API/Firestore query contract cho lazy history, bounded prefetch và preview summary. Phần đó vẫn ở draft do chưa có Firestore thử nghiệm cô lập. Một split frontend-only được tạo từ `main` tại branch `codex/pr34-frontend-cache-first-20261030`: cache-first list/content và background revision check dùng endpoint Production hiện hành; không có API/backend/auth/config diff. Prefetch theo viewport và lazy history không nằm trong split.
+
+Source check 49 files, offline 191/191, browser fixture 30/30 đã đạt trên candidate. Benchmark main/candidate 20 mẫu, chỉ dữ liệu tổng hợp; kết quả ở [bảng so sánh](PR35-FRONTEND-CACHE-20261030.json) và [báo cáo](PR35-FRONTEND-CACHE-20261030.md). Candidate cải thiện p95 mở note cache nhỏ 208→161 ms, note lớn 305→224 ms với bytes giảm 2.63 MB→1.44 KB, và gõ khi GET nền bị trễ 142→94 ms. Warm-list p95 315 ms chưa đạt 300 ms; cached-note p95 161 ms chưa đạt 100 ms; quick-switch p95 475 ms so với main 460 ms và p50 402 so với 345 ms. Không tuyên bố nhanh hơn Production hoặc trên thiết bị thật.
+
+Gemini key4 trước đó không tìm thấy lỗi blocker có bằng chứng; không gọi lại vì code không đổi. Key5 follow-up review bộ đo chuyển note đã hiệu chỉnh và chấp nhận rằng regression trước bị nhiễu do 20 note vượt giới hạn cache candidate 12 note, còn main giữ cache không cùng giới hạn; metric trước cũng tính ba thao tác click harness. Bộ 20 mẫu mới, cùng ba note cache ấm: last-click→editor paint p95 43→36 ms; revision GET 60→36; lỗi 0→0. Đánh giá key5: giữ PR #35 làm candidate phát hành; chưa có bằng chứng thiết bị thật. Chi tiết ở [profile JSON](PR35-SWITCH-PROFILE-20261030.json).
+
+CI run `40975850784` hoàn tất thành công cho exact PR head `05d21af625fd9159ac2a6c7ddc1d41fcbe10d185`, gồm source/unit và browser jobs. Không có code thay đổi trong lượt profile này.
+
+Quyết định UX: giữ candidate frontend-only #35 vì profile ba note bằng cache ngang nhau không cho thấy regression đáng kể, đồng thời giảm request revision nền và cải thiện paint trong fixture. Các mục tiêu cache note 100 ms và list 300 ms chưa đạt; không tuyên bố nhanh hơn Production. Production giữ `dpl_2bPR3FTkbDabFjmNu7BwcEofEfUu` trong lượt này.
+
+Không lặp lại billing query. Read APIs hiện có không xác minh được Vercel plan/free entitlement; kết quả `costs_not_found` chỉ là thiếu thông tin, không phải bằng chứng có phí. Không triển khai khi chưa chứng minh thao tác đó miễn phí; không bật billing, nâng gói, thêm payment method, trial hay công việc hạ tầng mới. Không có alias/deployment/Production thay đổi. Phần API/backend mới ở PR #34 vẫn độc lập và chưa được qualify; fixture không thay thế Vercel OIDC.

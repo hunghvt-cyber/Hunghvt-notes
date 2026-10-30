@@ -11,7 +11,7 @@
 - [Lịch sử nghiên cứu/bàn giao đã chuyển từ ai-nas-lab](docs/history/ai-nas-lab/README.md).
 - [Quy tắc tiếp quản](AGENTS.md).
 
-Autosave gửi thay đổi lên Firestore; nhãn “Đã lưu” chỉ xuất hiện sau ACK hợp lệ. Thay đổi chưa được ACK chỉ còn trong RAM của trang đang mở, và có thể mất khi đóng hoặc tải lại trang. Trình duyệt không còn khôi phục persistent draft; database IndexedDB cũ được để nguyên, không đọc hay xóa. Cache danh sách/nội dung chỉ dùng để hiển thị trước khi xác nhận dữ liệu máy chủ.
+Autosave gửi thay đổi lên Firestore; nhãn “Đã lưu” chỉ xuất hiện sau ACK hợp lệ. Thay đổi chưa được ACK chỉ còn trong RAM của trang đang mở, và có thể mất khi đóng hoặc tải lại trang. Trình duyệt không còn khôi phục persistent draft; database IndexedDB cũ được để nguyên, không đọc hay xóa. Cache danh sách/nội dung chỉ dùng để hiển thị trước khi xác nhận dữ liệu máy chủ. Split cache-first frontend từ PR #34 (dùng API hiện hành; không có prefetch/lazy history) và số đo main/candidate được ghi tại [PR35 report](docs/PR35-FRONTEND-CACHE-20261030.md).
 
 ## Source và triển khai
 
