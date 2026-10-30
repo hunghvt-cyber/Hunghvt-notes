@@ -39,7 +39,7 @@ async function fixture(seed=0,{hasTouch=false,diverse=false}={}){
    return route.fulfill({status:response.status,headers:Object.fromEntries(response.headers),body:Buffer.from(await response.arrayBuffer())});
   }
   const name=u.pathname==='/'?'index.html':u.pathname.slice(1);
-  if(!['index.html','app.css','app.js','sync.js','cache.js','sort.js'].includes(name))return route.fulfill({status:404,body:''});
+  if(!['index.html','app.css','app.js','sync.js','cache.js','sort.js','performance-diagnostics.js'].includes(name))return route.fulfill({status:404,body:''});
   await route.fulfill({status:200,contentType:name.endsWith('.js')?'application/javascript':name.endsWith('.css')?'text/css':'text/html',body:await readFile(appAsset(name))});
  });
  const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));page.on('dialog',async d=>{hooks.dialogs.push(d.type);if(hooks.onDialog)await hooks.onDialog(d);else await d.accept();});
@@ -219,4 +219,10 @@ try{
   }finally{await f.done();}
  });
  await run('view-only-share-disables-editor',async()=>{const f=await fixture(1);try{const link=await f.store.share('note',f.ids[0],'view');await f.page.goto(origin+'/#note='+link.token);await expect(f.page.locator('.home-link')).toBeHidden();await expect(f.page.locator('#editor')).toBeVisible();await expect(f.page.locator('#text')).toBeDisabled();await expect(f.page.locator('#save')).toBeDisabled();}finally{await f.done();}});
+ await run('opt-in-diagnostics-export-synthetic-only',async()=>{const f=await fixture(1);try{
+  await f.page.goto(origin+'/?diag=1');await expect(f.page.locator('#performance-diagnostics')).toBeVisible();await f.page.locator('#password').fill(password);await f.page.locator('#login-form button').click();await expect(f.page.locator('.card')).toHaveCount(1);await f.page.locator('.card').first().click();await expect(f.page.locator('#editor')).toBeVisible();await f.page.locator('#close-editor').click();await expect(f.page.locator('#editor')).toBeHidden();
+  await f.page.locator('#quick-create').click();await expect(f.page.locator('#editor')).toBeVisible();await f.page.locator('#title').fill('Diagnostic synthetic title');await f.page.locator('#text').fill('Diagnostic synthetic body sentinel');await expect(f.page.locator('#save-status')).toHaveAttribute('data-state','saved',{timeout:20000});
+  await f.page.locator('#performance-diagnostics summary').click();await f.page.locator('#performance-diagnostics button').first().click();const summary=await f.page.locator('#performance-diagnostics textarea').inputValue();expect(summary).toContain('open_note');expect(summary).toContain('new_note');expect(summary).toContain('save');expect(summary).toContain('requests');expect(summary).toContain('network_ms');expect(summary).toContain('server_ack_ms');expect(summary).toContain('input_to_ack_ms');expect(summary).not.toContain('Diagnostic synthetic title');expect(summary).not.toContain('Diagnostic synthetic body sentinel');expect(summary).not.toContain(f.ids[0]);
+  const normal=await f.context.newPage();await normal.goto(origin);expect(await normal.locator('#performance-diagnostics').count()).toBe(0);await normal.close();
+ }finally{await f.done();}});
 }finally{await browser.close();await writeFile('browser-result.local.json',JSON.stringify({kind:'CHROMIUM_UI_REAL_BROWSER_SIMULATED_WEBDAV',passed:results.length>0&&results.every(x=>x.passed),tests:results},null,2)+'\n');}
