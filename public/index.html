@@ -37,14 +37,18 @@
           <details id="folder-controls" class="action-menu">
             <summary>Quản lý thư mục</summary>
             <div class="menu-panel folder-manager-panel">
-            <input id="new-folder" maxlength="80" aria-label="Tên thư mục mới">
-            <button id="create-folder">Tạo thư mục</button>
-            <div class="folder-table" role="group" aria-label="Danh sách thư mục"><div id="folder-manager-rows"></div></div>
-            <select id="manage-folder" aria-label="Chọn thư mục" hidden></select>
-            <label><input id="delete-folder-notes" type="checkbox"> Chuyển cả Notes trong thư mục vào Thùng rác</label>
-            <button id="remove-folder">Xóa thư mục</button>
-            <button id="share-folder">Chia sẻ thư mục</button>
-            <button id="manage-folder-shares">Quản lý chia sẻ</button>
+              <header class="folder-manager-heading"><h2>Thư mục</h2><button id="close-folder-manager" type="button" aria-label="Đóng quản lý thư mục" title="Đóng">×</button></header>
+              <div class="folder-create-row"><label class="visually-hidden" for="new-folder">Tên thư mục mới</label><input id="new-folder" maxlength="80" aria-label="Tên thư mục mới" placeholder="Tạo thư mục mới…"><button id="create-folder" type="button" aria-label="Tạo thư mục" title="Tạo thư mục">+</button></div>
+              <div class="folder-table" role="group" aria-label="Danh sách thư mục"><div id="folder-manager-rows"></div></div>
+              <details id="folder-row-actions" class="action-menu">
+                <summary class="visually-hidden" aria-label="Thao tác thư mục">Thao tác thư mục</summary>
+                <div class="menu-panel folder-row-actions-panel">
+                  <strong id="folder-action-name" class="folder-row-actions-title"></strong>
+                  <button id="folder-action-share" type="button">Chia sẻ</button>
+                  <button id="folder-action-manage-shares" type="button">Quản lý chia sẻ</button>
+                  <button id="folder-action-delete" type="button">Xóa thư mục</button>
+                </div>
+              </details>
             </div>
           </details>
         </aside>
@@ -81,6 +85,12 @@
       </div>
 
       <button id="editor-backdrop" type="button" aria-label="Đóng trình soạn thảo" hidden></button>
+      <dialog id="folder-delete-dialog" aria-labelledby="folder-delete-title">
+        <h2 id="folder-delete-title">Xóa thư mục</h2>
+        <p id="folder-delete-description"></p>
+        <label class="folder-delete-notes"><input id="delete-folder-notes" type="checkbox"> Chuyển cả Notes trong thư mục vào Thùng rác</label>
+        <div class="folder-delete-actions"><button id="cancel-folder-delete" type="button">Hủy</button><button id="confirm-folder-delete" type="button">Xóa thư mục</button></div>
+      </dialog>
       <section id="editor" role="dialog" aria-modal="true" aria-label="Trình soạn thảo" hidden>
         <header class="editor-top">
           <button id="close-editor">← Danh sách</button>
