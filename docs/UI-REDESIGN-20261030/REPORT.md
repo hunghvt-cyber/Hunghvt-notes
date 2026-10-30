@@ -116,3 +116,5 @@ Bài học điều phối chung đã ghi vào repo canonical `hunghvt-cyber/ai-t
 ## Gate và rollback dự kiến
 
 Candidate được chuẩn bị để duyệt giao diện trong [draft PR #39](https://github.com/hunghvt-cyber/web-notes/pull/39); không merge/deploy. Checks `test`/`browser` hosted đều success cho tree code candidate. Folder rename còn blocker backend rõ ràng. Nếu sau khi duyệt candidate được phát hành, rollback dự kiến là gán lại từng alias Production về `dpl_EJ7Dp2NjCzn6aA5WhNcbZgnnHz1J`, rồi đọc lại đủ ba alias và health. Lượt này chưa deploy, nên không có rollback/deployment mới.
+
+Hosted CI final handoff: current PR head `0bd98e5e5528e635be1e50833bc5f29438a5ea0e` (tree `dc294b4986daf3589473ea2ae1063bbcc2ffbee6`) passed GitHub Actions [run #503](https://github.com/hunghvt-cyber/web-notes/actions/runs/41037196725), both `test` and `browser`. This commit only updates the handoff docs; application code remains the code candidate SHA above.
