@@ -17,7 +17,7 @@
   - `hunghvt-notes-git-main-hunghvt.vercel.app`
 - Health: HTTP 200 on all three; backend `firestore-native-v1`, `firestoreRead=PASS`, `Cache-Control: no-store`. Checks were read-only and did not read or mutate Notes.
 - Assets: `/`, `/app.js`, and `/app.css` exactly matched merge-source contents on each alias. SHA-256 on primary alias: HTML `c71b6857a033ad57275e80940be5b79a24d04c663df7c6f838e957ff072a90e4`; JS `bd71732f02a00507d3e3c52c71ffd43f6f379c49df30f6fa9bf084c86c7d05db`; CSS `e10dabc300a535425892616381a2e8ad36bb578cf78e57096917cb7a665aa339`. On primary, `cache.js`, `sort.js`, and `sync.js` also matched exact merge-source hashes.
-- Protection: alias readbacks show empty protection-bypass objects. Secondary protected aliases were checked through the authenticated Vercel URL fetch; no persistent alias bypass was configured.
+- Protection: checking the SSO-protected Git-main alias created one temporary shareable-link bypass. It was revoked without regeneration immediately after verification. Final alias readback shows no bypass entries on any of the three aliases.
 
 ## Rollback
 
