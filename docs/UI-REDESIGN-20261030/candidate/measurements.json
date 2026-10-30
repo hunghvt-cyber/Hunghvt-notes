@@ -1,0 +1,179 @@
+{
+  "browser": "Chromium headless, Playwright CSS viewports, synthetic notes and isolated in-memory API fixture; screenshots contain no user data",
+  "metrics": [
+    {
+      "width": 360,
+      "height": 800,
+      "name": "phone-360",
+      "listWidth": 348,
+      "sidebarWidth": 0,
+      "editorHidden": true,
+      "grid": "grid",
+      "mobileNav": {
+        "display": "flex",
+        "box": {
+          "x": 0,
+          "y": 745,
+          "w": 360,
+          "h": 55
+        }
+      }
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "name": "phone-390",
+      "listWidth": 378,
+      "sidebarWidth": 0,
+      "editorHidden": true,
+      "grid": "grid",
+      "mobileNav": {
+        "display": "flex",
+        "box": {
+          "x": 0,
+          "y": 789,
+          "w": 390,
+          "h": 55
+        }
+      }
+    },
+    {
+      "width": 744,
+      "height": 1133,
+      "name": "ipad-portrait",
+      "listWidth": 728,
+      "sidebarWidth": 0,
+      "editorHidden": true,
+      "grid": "grid",
+      "mobileNav": {
+        "display": "flex",
+        "box": {
+          "x": 0,
+          "y": 1078,
+          "w": 744,
+          "h": 55
+        }
+      }
+    },
+    {
+      "width": 1133,
+      "height": 744,
+      "name": "ipad-landscape",
+      "listWidth": 1109,
+      "sidebarWidth": 0,
+      "editorHidden": true,
+      "grid": "grid",
+      "mobileNav": {
+        "display": "none",
+        "box": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        }
+      }
+    },
+    {
+      "width": 1280,
+      "height": 720,
+      "name": "pc-1280",
+      "listWidth": 1026,
+      "sidebarWidth": 220,
+      "editorHidden": true,
+      "grid": "grid",
+      "mobileNav": {
+        "display": "none",
+        "box": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        }
+      }
+    },
+    {
+      "width": 1920,
+      "height": 1080,
+      "name": "pc-1920",
+      "listWidth": 1666,
+      "sidebarWidth": 220,
+      "editorHidden": true,
+      "grid": "grid",
+      "mobileNav": {
+        "display": "none",
+        "box": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        }
+      }
+    },
+    {
+      "name": "phone-360",
+      "editor": {
+        "width": 360,
+        "height": 800,
+        "writingWidth": 317,
+        "writingHeight": 541,
+        "focus": "",
+        "ariaModal": "true"
+      }
+    },
+    {
+      "name": "phone-390",
+      "editor": {
+        "width": 390,
+        "height": 844,
+        "writingWidth": 347,
+        "writingHeight": 585,
+        "focus": "",
+        "ariaModal": "true"
+      }
+    },
+    {
+      "name": "ipad-portrait",
+      "editor": {
+        "width": 744,
+        "height": 1133,
+        "writingWidth": 670,
+        "writingHeight": 874,
+        "focus": "",
+        "ariaModal": "true"
+      }
+    },
+    {
+      "name": "ipad-landscape",
+      "editor": {
+        "width": 1133,
+        "height": 744,
+        "writingWidth": 927,
+        "writingHeight": 463,
+        "focus": "",
+        "ariaModal": "true"
+      }
+    },
+    {
+      "name": "pc-1280",
+      "editor": {
+        "width": 794,
+        "height": 618,
+        "writingWidth": 649,
+        "writingHeight": 333,
+        "focus": "",
+        "ariaModal": "false"
+      }
+    },
+    {
+      "name": "pc-1920",
+      "editor": {
+        "width": 1203,
+        "height": 978,
+        "writingWidth": 900,
+        "writingHeight": 693,
+        "focus": "",
+        "ariaModal": "false"
+      }
+    }
+  ]
+}

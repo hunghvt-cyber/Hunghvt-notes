@@ -11,11 +11,10 @@
 <body>
   <main>
     <header class="app-header">
-      <a class="home-link" href="https://homepage-nas.vercel.app/">← Trang chủ</a>
+      <a class="home-link" href="https://homepage-nas.vercel.app/">Trang chủ</a>
       <h1>Notes</h1>
-      <p>Ghi chú, checklist và thư mục</p>
     </header>
-    <div id="sync-banner" role="status"><div id="sync-progress" hidden></div><span id="global-status">Đang kết nối…</span></div>
+    <div id="sync-banner" data-state="normal" role="status"><div id="sync-progress" hidden></div><span id="global-status">Đang kết nối…</span></div>
 
     <section id="login" hidden>
       <h2>Mở Notes</h2>
@@ -28,21 +27,17 @@
 
     <div id="workspace" hidden>
       <nav class="toolbar workspace-toolbar" aria-label="Thao tác Notes">
-        <button id="new">Note mới</button>
-        <button id="select-mode" aria-pressed="false">Chọn nhiều</button>
-        <details id="workspace-actions" class="action-menu">
-          <summary aria-label="Thao tác không gian">···</summary>
-          <div class="menu-panel">
-            <button id="backup">Tải backup</button>
-            <button id="logout">Khóa Notes</button>
-          </div>
-        </details>
+        <button id="folder-collapse-toggle" aria-label="Thu gọn thư mục" aria-pressed="false" title="Thu gọn thư mục">Thư mục</button>
+        <button id="new" aria-label="Tạo ghi chú mới" title="Tạo ghi chú mới"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+        <button id="select-mode" aria-pressed="false">Chọn</button>
+        <span id="workspace-status" role="status"></span>
       </nav>
       <div class="layout">
         <aside id="folder-panel" aria-label="Thư mục">
           <div id="folder-list"></div>
-          <details id="folder-controls">
+          <details id="folder-controls" class="action-menu">
             <summary>Quản lý thư mục</summary>
+            <div class="menu-panel folder-manager-panel">
             <input id="new-folder" maxlength="80" aria-label="Tên thư mục mới">
             <button id="create-folder">Tạo thư mục</button>
             <select id="manage-folder" aria-label="Chọn thư mục"></select>
@@ -50,12 +45,13 @@
             <button id="remove-folder">Xóa thư mục</button>
             <button id="share-folder">Chia sẻ thư mục</button>
             <button id="manage-folder-shares">Quản lý chia sẻ</button>
+            </div>
           </details>
         </aside>
 
         <section id="list-pane" aria-label="Danh sách ghi chú">
           <div class="list-heading">
-            <button id="folder-drawer-toggle" aria-label="Mở thư mục" aria-controls="folder-panel" aria-expanded="false">☰</button>
+            <button id="folder-drawer-toggle" aria-label="Mở thư mục" aria-controls="folder-panel" aria-expanded="false">Thư mục</button>
             <h2 id="list-title">Tất cả ghi chú</h2>
             <button id="sort-toggle" type="button" aria-label="Sắp xếp ghi chú" aria-controls="sort-mode" aria-expanded="false">Sắp xếp</button>
           </div>
@@ -64,28 +60,28 @@
             <option value="updated-asc">Cập nhật cũ nhất</option>
             <option value="title-asc">Tiêu đề A → Z</option>
             <option value="title-desc">Tiêu đề Z → A</option>
-            <option value="custom">Tùy chỉnh</option>
           </select>
           <label class="search-field" for="search"><span class="visually-hidden">Tìm ghi chú</span><input id="search" type="search" placeholder="Tìm ghi chú…"></label>
           <div id="bulk-toolbar" class="toolbar" aria-label="Thao tác với ghi chú đã chọn" hidden>
             <button id="cancel-select" aria-label="Thoát chế độ chọn">Đóng</button>
             <span id="selected-count" aria-live="polite">0 Note đã chọn</span>
-            <details id="bulk-move-menu" class="bulk-menu">
-              <summary>Di chuyển</summary>
-              <div><label id="move-label" for="move-folder">Thư mục đích</label><select id="move-folder" aria-label="Thư mục đích"></select><button id="bulk-move">Di chuyển</button></div>
+            <details id="bulk-move-menu" class="bulk-menu action-menu">
+              <summary aria-label="Di chuyển đã chọn" title="Di chuyển"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6"/></svg></summary>
+              <div class="menu-panel"><label id="move-label" for="move-folder">Thư mục đích</label><select id="move-folder" aria-label="Thư mục đích"></select><button id="bulk-move">Di chuyển</button></div>
             </details>
-            <button id="bulk-delete" disabled>Thùng rác</button>
-            <details id="bulk-more-menu" class="bulk-menu">
-              <summary>Khác</summary>
-              <div><button id="select-all">Chọn tất cả</button><button id="deselect-all">Bỏ chọn tất cả</button><button id="order-up" hidden>Lên</button><button id="order-down" hidden>Xuống</button><button id="bulk-restore" hidden disabled>Khôi phục đã chọn</button><button id="bulk-purge" hidden disabled>Xóa vĩnh viễn đã chọn</button></div>
+            <button id="bulk-delete" aria-label="Chuyển vào thùng rác" title="Thùng rác" disabled><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3m3 0-1 13H7L6 7m4 3v6m4-6v6"/></svg></button>
+            <details id="bulk-more-menu" class="bulk-menu action-menu">
+              <summary aria-label="Thao tác khác" title="Thao tác khác"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg></summary>
+              <div class="menu-panel"><button id="select-all">Chọn tất cả</button><button id="deselect-all">Bỏ chọn tất cả</button><button id="bulk-restore" hidden disabled>Khôi phục đã chọn</button><button id="bulk-purge" hidden disabled>Xóa vĩnh viễn đã chọn</button></div>
             </details>
           </div>
+          <button id="quick-create" class="quick-create" type="button">Ghi chú mới…</button>
           <div id="note-list" class="grid"></div>
         </section>
       </div>
 
-      <div id="editor-empty" aria-live="polite"><span>Chọn một ghi chú để xem hoặc chỉnh sửa.</span></div>
-      <section id="editor" aria-label="Trình soạn thảo" hidden>
+      <button id="editor-backdrop" type="button" aria-label="Đóng trình soạn thảo" hidden></button>
+      <section id="editor" role="dialog" aria-modal="true" aria-label="Trình soạn thảo" hidden>
         <header class="editor-top">
           <button id="close-editor">← Danh sách</button>
           <span id="save-status" role="status"></span>
@@ -118,6 +114,7 @@
             <div class="note-meta"><label for="folder">Thư mục</label><input id="folder" list="folders" maxlength="80"><datalist id="folders"></datalist><label id="pin-label"><input id="pinned" type="checkbox"> Ghim</label></div>
             <label class="visually-hidden" for="text">Nội dung</label>
             <textarea id="text" rows="10" spellcheck="false" wrap="soft" aria-label="Nội dung ghi chú" placeholder="Bắt đầu viết…"></textarea>
+            <button id="expand-composer" type="button" hidden>Mở rộng trình soạn thảo</button>
             <div id="checklist"></div>
             <button id="add-check" aria-label="Chèn mục checklist">＋ Chèn checklist</button>
             <p id="copy-status" role="status" aria-live="polite"></p>
