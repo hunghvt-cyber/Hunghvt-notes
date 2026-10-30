@@ -50,3 +50,13 @@ Wrapper: `/home/admin/bin/gemini-task`, model `gemini-3.5-flash-lite`, text-only
 ## Release state
 
 Candidate only. No merge and no Production deployment. Production remains unchanged. Hosted CI will run after opening the draft PR. No physical S25 Ultra/iPad or real IME validation is claimed.
+
+## Follow-up: grid row overlap reported in phone screenshots
+
+The narrow one-column grid used implicit `auto` tracks while cards were aligned to the start. At a 360 CSS px viewport, computed rows were only 75 px high even though card boxes reached 122.7 px; the 7 px row gap therefore still allowed boxes to overlap. The fix sets `grid-auto-rows: max-content`, retaining the current columns, card sizing, preview clamp and 7 px gap. No masonry, library, or app logic was added.
+
+A dedicated synthetic Chromium test, `scripts/grid-layout-smoke.mjs`, checks long titles, multiline preview and long folder metadata at 360×844 and 390×844. It asserts the computed track mode, each card's folder metadata fits its card, content is not vertically clipped, and every card bottom plus the computed row gap is at or above the next row. It captures normal and open-sort screenshots at both widths.
+
+After the fix, computed rows at 360 px vary from 83.6 to 122.7 px; at 390 px they vary from 103.8 to 122.7 px. All successive rows have the full 7 px gap and the bounding-box assertions pass. Updated images: `after/list-phone-360.png`, `after/list-phone-390.png`, `after/sort-open-phone-360.png`, and `after/sort-open-phone-390.png`.
+
+Related verification after the fix: focused header browser test passed; dedicated grid test passed at both widths; source check passed (50 files); script syntax and `git diff --check` passed. The full local browser suite is unchanged from the prior candidate; hosted CI is being rerun for this follow-up. No speed/auth/cache/save files were edited. The separate speed worktree remains dirty in `public/app.js`, `public/cache.js`, and `scripts/browser-smoke.mjs`; this follow-up only touches CSS, the CI workflow, a new standalone test, this report, and synthetic screenshots.
