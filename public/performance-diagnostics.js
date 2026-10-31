@@ -3,11 +3,13 @@ const MAX_ACTIVE_TRACES = 8;
 const FLOWS = new Set(['list', 'open_note', 'new_note', 'save']);
 const STATES = new Set(['clean', 'dirty', 'na']);
 const CACHES = new Set(['hit', 'miss', 'na']);
+const CACHE_MISS_REASONS = new Set(['entry_absent', 'revision_mismatch', 'missing_from_list', 'note_too_large', 'content_budget_eviction', 'shared_content_disabled', 'cache_unavailable']);
 const PHASES = new Set([
   'guard_wait_ms', 'save_guard_ms', 'debounce_wait_ms', 'queue_wait_ms', 'network_ms',
   'response_body_ms', 'cache_read_ms', 'content_assign_ms', 'frame_after_update_ms',
   'retry_wait_ms', 'input_to_ack_ms', 'server_ack_ms', 'flow_total_ms', 'render_ms',
-  'click_to_content_assign_ms', 'click_to_first_frame_ms', 'background_revision_assign_ms'
+  'click_to_content_assign_ms', 'click_to_first_frame_ms', 'background_revision_assign_ms',
+  'server_pre_response_ms', 'server_auth_ms', 'server_store_init_ms', 'server_store_operation_ms'
 ]);
 const ALLOWED_STATUS = new Set([400, 401, 403, 404, 408, 409, 413, 423, 429, 500, 502, 503, 504]);
 
@@ -35,7 +37,7 @@ export class PerformanceDiagnostics {
     const trace = {
       flow, state: STATES.has(state) ? state : 'na', cache: CACHES.has(cache) ? cache : 'na',
       startedAt: Number.isFinite(startAt) ? startAt : this.clock(),
-      phases: Object.create(null), requests: 0, errors: Object.create(null), finished: false, firstContentAssigned: false
+      phases: Object.create(null), requests: 0, errors: Object.create(null), cacheMissReasons: Object.create(null), finished: false, firstContentAssigned: false
     };
     this.active.add(trace);
     return trace;
@@ -49,6 +51,10 @@ export class PerformanceDiagnostics {
   request(trace) { if (trace) trace.requests += 1; }
 
   setCache(trace, cache) { if (trace && CACHES.has(cache)) trace.cache = cache; }
+  cacheMissReason(trace, reason) {
+    if (!trace || !CACHE_MISS_REASONS.has(reason)) return;
+    trace.cacheMissReasons[reason] = (trace.cacheMissReasons[reason] ?? 0) + 1;
+  }
   setState(trace, state) { if (trace && STATES.has(state)) trace.state = state; }
 
   error(trace, status) {
@@ -111,6 +117,10 @@ export class PerformanceDiagnostics {
       const group = grouped.get(key);
       group.samples += 1;
       group.requests += sample.requests;
+      for (const [reason, count] of Object.entries(sample.cacheMissReasons)) {
+        group.cache_miss_reasons ??= {};
+        group.cache_miss_reasons[reason] = (group.cache_miss_reasons[reason] ?? 0) + count;
+      }
       for (const [name, value] of Object.entries(sample.phases)) (group.phases[name] ??= []).push(Math.round(value));
       for (const [code, count] of Object.entries(sample.errors)) group.errors[code] = (group.errors[code] ?? 0) + count;
     }

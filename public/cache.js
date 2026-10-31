@@ -12,6 +12,7 @@ export class NoteCache {
  async clearAll(){await this.tx('readwrite',s=>s.clear());}
 }
 export function reusableNote(note,row){return !!note&&!!row&&note.id===row.id&&note.revision===row.revision;}
+export function cachedNoteSize(note){try{return new TextEncoder().encode(JSON.stringify(note)).byteLength;}catch{return Infinity;}}
 export const MAX_CACHED_NOTE_BYTES=256*1024;
 export const MAX_CACHED_CONTENT_BYTES=1024*1024;
 export const MAX_CACHED_NOTES=12;

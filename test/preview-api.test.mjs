@@ -43,6 +43,13 @@ test('session login, Origin/JSON checks, tamper, logout and password rotation ke
  const out=await call(s,'auth',{method:'DELETE',session});assert.equal(out.status,200);assert.match(out.r.headers.get('set-cookie'),/Max-Age=0/);
  s.cfg.PREVIEW_PORTAL_PASSWORD='changed-test-password';assert.equal((await call(s,'notes',{session})).status,401);
 });
+test('server timing is absent by default and opt-in exposes only bounded duration names',async()=>{
+ const s=setup();await s.init();const session=await owner(s);
+ const normal=await call(s,'notes',{session});assert.equal(normal.r.headers.get('server-timing'),null);
+ const measured=await call(s,'notes',{session,query:'&diag=1'}),header=measured.r.headers.get('server-timing');
+ assert.equal(measured.status,200);assert.match(header,/^server_pre_response;dur=\d+(?:\.\d+)?, server_auth;dur=\d+(?:\.\d+)?, server_store_init;dur=\d+(?:\.\d+)?, server_store_operation;dur=\d+(?:\.\d+)?$/);
+ assert.doesNotMatch(header,/\b(?:id|title|url|token|session|query|firestore)\b/i);
+});
 test('UUID creation is stable across retry, handles >28KB Unicode, conditional fetch and list delta',async()=>{
  const s=setup();await s.init();const session=await owner(s),op=randomUUID(),data={action:'save',clientOpId:op,title:'UUID thật',text:'đ😀'.repeat(12000),checklist:[{id:'done',text:'Đã làm',checked:true}],folder:'Thư mục mới',pinned:true};
  const saved=await call(s,'notes-save',{method:'POST',session,data});assert.equal(saved.status,200,JSON.stringify(saved.body));assert.equal(saved.body.id,op);assert.equal(saved.body.text,data.text);assert.equal(saved.body.folder,data.folder);
