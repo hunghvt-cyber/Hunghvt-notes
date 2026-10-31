@@ -266,6 +266,23 @@ try{
   }finally{await f.done();}
  });
  await run('view-only-share-disables-editor',async()=>{const f=await fixture(1);try{const link=await f.store.share('note',f.ids[0],'view');await f.page.goto(origin+'/#note='+link.token);await expect(f.page.locator('.home-link')).toBeHidden();await expect(f.page.locator('#editor')).toBeVisible();await expect(f.page.locator('#text')).toBeDisabled();await expect(f.page.locator('#save')).toBeDisabled();}finally{await f.done();}});
+ await run('content-cache-reopen-size-history-and-list-refresh-reasons',async()=>{const f=await fixture(0);try{
+  const smallId=randomUUID(),largeId=randomUUID(),historyId=randomUUID();
+  await f.store.save(smallId,{title:'Small synthetic',text:'small',checklist:[]},null,randomUUID());
+  await f.store.save(largeId,{title:'Large synthetic',text:'l'.repeat(300*1024),checklist:[]},null,randomUUID());
+  let history=await f.store.save(historyId,{title:'History synthetic',text:'base',checklist:[]},null,randomUUID());
+  for(let i=0;i<6;i++)history=await f.store.save(historyId,{title:'History synthetic',text:`version-${i}-`+'h'.repeat(60*1024),checklist:[]},history.revision,randomUUID());
+  history=await f.store.save(historyId,{title:'History synthetic',text:'small current value',checklist:[]},history.revision,randomUUID());
+  const historyNote=await f.store.get(historyId);expect(historyNote.text).toBe('small current value');expect(new TextEncoder().encode(JSON.stringify(historyNote)).byteLength).toBeGreaterThan(256*1024);
+  await f.page.goto(origin+'/?diag=1');await f.page.setViewportSize({width:1280,height:800});await f.page.locator('#password').fill(password);await f.page.locator('#login-form button').click();await expect(f.page.locator('.card')).toHaveCount(3);
+  const open=async id=>{await f.page.locator(`.card[data-note="${id}"]`).click();await expect(f.page.locator('#editor')).toBeVisible();};
+  const closeAndRefresh=async()=>{await f.page.locator('#close-editor').click();await f.page.locator('#folder-list button[data-kind=all]').click();await expect(f.page.locator('#editor')).toBeHidden();};
+  await open(smallId);await closeAndRefresh();await open(smallId);await expect.poll(()=>f.hooks.serverMetrics.filter(x=>x.shape==='known-revision-read').length).toBeGreaterThan(0);await closeAndRefresh();
+  for(const id of [largeId,historyId]){await open(id);await closeAndRefresh();await open(id);await closeAndRefresh();}
+  const reads=f.hooks.serverMetrics.filter(x=>x.route==='notes'&&x.method==='GET'&&x.shape==='content-read');expect(reads.length).toBe(5);
+  await f.page.locator('#performance-diagnostics summary').click();await f.page.locator('#performance-diagnostics button').first().click();const summary=JSON.parse(await f.page.locator('#performance-diagnostics textarea').inputValue()),miss=summary.groups.find(x=>x.flow==='open_note'&&x.cache==='miss');
+  expect(summary.groups.some(x=>x.flow==='open_note'&&x.cache==='hit')).toBeTruthy();expect(miss.cache_miss_reasons.note_too_large).toBeGreaterThanOrEqual(2);expect(miss.cache_miss_reasons.entry_absent).toBeGreaterThanOrEqual(3);expect(miss.phases.server_pre_response_ms.count).toBeGreaterThan(0);expect(miss.phases.server_store_operation_ms.count).toBeGreaterThan(0);
+ }finally{await f.done();}});
  await run('opt-in-diagnostics-export-synthetic-only',async()=>{const f=await fixture(1);try{
   await f.page.goto(origin+'/?diag=1');await expect(f.page.locator('#performance-diagnostics')).toBeVisible();await f.page.locator('#password').fill(password);await f.page.locator('#login-form button').click();await expect(f.page.locator('.card')).toHaveCount(1);await f.page.locator('.card').first().click();await expect(f.page.locator('#editor')).toBeVisible();await f.page.locator('#close-editor').click();await expect(f.page.locator('#editor')).toBeHidden();
   await f.page.locator('#quick-create').click();await expect(f.page.locator('#editor')).toBeVisible();await f.page.locator('#title').fill('Diagnostic synthetic title');await f.page.locator('#text').fill('Diagnostic synthetic body sentinel');await expect(f.page.locator('#save-status')).toHaveAttribute('data-state','saved',{timeout:20000});

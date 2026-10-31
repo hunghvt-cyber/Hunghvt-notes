@@ -9,7 +9,7 @@ phụ, không gửi telemetry và không ghi dữ liệu vào storage. Bộ đ�
 người dùng chủ động sao chép, duration được làm tròn tới 1 ms.
 
 Bản tổng hợp chỉ có loại thao tác, trạng thái editor `clean`/`dirty`, cache
-`hit`/`miss`, số request, duration và mã HTTP lỗi trong allowlist. Không xuất
+`hit`/`miss`, enum lý do cache miss, số request, duration và mã HTTP lỗi trong allowlist. Không xuất
 nội dung, title, ID, folder, token, URL, timestamp hoặc session. Instrumentation
 không render lại theo từng phím; khi tắt, listener nhập liệu không được gắn và
 đồng hồ không được đọc trong API client hay `SyncDraft`; callback `onMeasure` mặc định là `null`.
@@ -18,7 +18,7 @@ không render lại theo từng phím; khi tắt, listener nhập liệu không 
 
 - `list`: đọc cache IndexedDB và dựng danh sách cache; sau đó request danh sách
   server và dựng danh sách đã đồng bộ. `cache_read_ms` gồm IndexedDB read, lọc/kiểm tra và hydrate state, dừng trước `render_ms`; thời gian render danh sách được tách riêng.
-- `open_note`: `guard_wait_ms`, cache hit/miss của nội dung, request count,
+- `open_note`: `guard_wait_ms`, cache hit/miss của nội dung, enum lý do miss (`entry_absent`, `revision_mismatch`, `missing_from_list`, `note_too_large`, `content_budget_eviction`, `shared_content_disabled`, `cache_unavailable`), request count,
   guard wait, click→lần gán nội dung đầu tiên và frame kế tiếp. Cache hit vẫn xác minh revision ở nền; phần gán revision nền được ghi riêng, không kéo dài mốc click→nội dung. Không dùng `flow_total_ms` để đại diện thời gian mở note.
 - `new_note`: chờ guard hiện hành và gán nội dung vào editor.
 - `save`: debounce từ input cuối tới lúc bắt đầu lưu, phần tạo request/guard,
@@ -49,9 +49,25 @@ lập với thiết bị thật.
 
 Phép đo client bắt đầu sau bước xác thực/mở khóa; không gán toàn bộ thời gian
 trước đó cho thao tác mở note. `network_ms` là fetch từ lúc gọi `fetch` tới khi
-nhận response headers; `response_body_ms` đo parse JSON. Không dùng chúng để
-suy ra riêng thời gian server, Homepage auth hoặc Firestore. Cache lạnh/ấm chỉ phân biệt presence của cache danh sách trên thiết bị; phép đo này không xóa dữ liệu site và không đại diện cho cold network/cache Firestore. Chưa có số đo thiết bị thật từ thay đổi này. PR chỉ thêm instrumentation; không thay đổi giao diện
-mặc định, auth, CAS, ACK, retry, backend hoặc Production.
+nhận response headers; `response_body_ms` gồm nhận body và parse JSON.
+Khi instrumentation bật, cùng request đó thêm `Server-Timing` chỉ chứa duration
+cho thời gian handler trước khi tạo response, auth, khởi tạo store và store
+operation. Các span có thể chồng lên nhau; `store operation` gộp OIDC/Google
+SDK/Firestore, không tách riêng thời gian Firestore. `server_pre_response_ms`
+chưa gồm serialize JSON body hoặc thời gian platform trước khi hàm chạy. Không
+gửi timing ra log/telemetry. Không dùng `network_ms` hoặc
+`response_body_ms` để suy ra riêng thời gian server, Homepage auth hoặc Firestore.
+Cache lạnh/ấm chỉ phân biệt presence của cache danh sách trên thiết bị; phép đo
+này không xóa dữ liệu site và không đại diện cho cold network/cache Firestore.
+Chưa có số đo thiết bị thật từ thay đổi này.
+
+Cache nội dung chỉ chứa note đã được server xác nhận trong cùng IndexedDB cache
+scope. Giới hạn là 12 note, tổng 1 MiB, tối đa 256 KiB mỗi note. Kích thước là
+UTF-8 của `JSON.stringify(note)`, nên gồm title, text, checklist, history, folder
+và metadata có trong object. Enum miss phân biệt entry thiếu, revision/list
+invalidation, note quá lớn và eviction khi còn bằng chứng trong phiên RAM; không
+lưu ID hoặc nội dung trong diagnostics. Nếu entry đã vắng sau reload và nguyên
+nhân trước đó không còn trong RAM, phép đo không thể khôi phục nguyên nhân lịch sử.
 
 ## CI526 grid fixture
 
