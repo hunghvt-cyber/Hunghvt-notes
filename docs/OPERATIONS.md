@@ -1,4 +1,11 @@
-# Notes vận hành — 28/10/2026
+# Notes vận hành — cập nhật bằng chứng 30/10/2026
+
+## Backup hiện hành — 30/10/2026
+
+Backup theo lịch [40977423422](https://github.com/hunghvt-cyber/web-notes/actions/runs/40977423422), source `d735659d1457f5aa2144ed45fb1aaa9ca07ec495`, phát `backup_verified` lúc 07:06:08 ICT ngày 30/10/2026. Restore tự động [40977519777](https://github.com/hunghvt-cyber/web-notes/actions/runs/40977519777) phát `restore_parity_pass` lúc 07:07:30 và `restore_vault_removed` lúc 07:07:31. Cùng backup ID `firestore-notes-2026-10-30T00-05-31Z-40977423422-1.json.gz`, fingerprint/counts khớp (38 notes, 3 folders, 11 shares, 102 receipts, 0 erased). Đây là bằng chứng upload/readback/hash và restore qualification trong log, không chỉ CI xanh. Không đọc snapshot/Notes thật trong đợt cập nhật tài liệu.
+
+README/runbook và AGENTS đã bỏ cách diễn giải “chưa có cron/backup” ở checkpoint 28/10. Các mục theo ngày bên dưới giữ lịch sử rollout; đọc hồ sơ ngày mới nhất trước, không dùng câu UNKNOWN hoặc rollout cũ để suy trạng thái hiện tại. Đợt này chỉ cập nhật tài liệu, không chạy backup/restore hay đổi deployment. Chi tiết runtime frontend tiếp tục theo hồ sơ phát hành tương ứng; HEAD tài liệu không phải deployment SHA.
+
 
 ## Performance baseline — 2026-10-28
 
