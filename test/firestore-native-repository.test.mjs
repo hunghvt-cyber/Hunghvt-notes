@@ -123,6 +123,20 @@ test('simultaneous identical operation IDs commit once and the loser observes th
  assert.equal((await repo.read(id)).revision,'0000000000000001:1');
 });
 
+test('folder rename preserves share capability, CAS, retry receipt and backup alias',async()=>{
+ const db=new FakeFirestore(),repo=await setup(db),id=rid(23),op=rid(230);
+ await repo.save(id,{...note('before rename'),folder:'Inbox'},null,rid(231));
+ const {id:shareId,token}=await repo.createShare({scope:'folder',target:'Inbox',permission:'view',tokenBox:'encrypted-old-context'});
+ const renamed=await repo.renameFolder('Inbox','Workspace',op);
+ assert.equal(renamed.renamed,true);assert.equal(renamed.notesUpdated,1);
+ assert.equal((await repo.renameFolder('Inbox','Workspace',op)).replay,true);
+ const read=await repo.read(id,{capabilityToken:token});assert.equal(read.note.folder,'Workspace');
+ assert.equal((await repo.list({token}))[0].folder,'Workspace');
+ const row=db.rows.get(`notesVaults/test-vault/shares/${shareId}`).data;assert.equal(row.target,'Workspace');assert.equal(row.tokenBoxTarget,'Inbox');
+ const snapshot=await repo.capture();assert.equal(snapshot.folderAliases.Inbox,'Workspace');assert.equal(snapshot.shares[shareId].target,'Workspace');
+ await repo.revokeShare(shareId);await assert.rejects(repo.read(id,{capabilityToken:token}),e=>e.status===403);
+});
+
 test('sharing is checked on every read/write and revocation takes effect',async()=>{
  const db=new FakeFirestore(),repo=await setup(db),id=rid(3);
  await repo.save(id,note(),null,rid(103));

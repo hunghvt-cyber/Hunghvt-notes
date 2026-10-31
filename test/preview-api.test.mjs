@@ -64,6 +64,17 @@ test('public note/folder edit and view scopes reject cross-scope access, pin/mov
  const f=await call(s,'note-share',{method:'POST',session,data:{action:'create',folder:'Shared folder'}});const made=await call(s,'shared-folder',{method:'POST',cap:f.body.token,data:{action:'save',clientOpId:randomUUID(),title:'Folder created',text:'Unicode 日本語'}});assert.equal(made.status,200);
  const listed=await call(s,'shared-folder',{cap:f.body.token});assert.equal(listed.body.notes.length,2);assert.ok(listed.body.notes.every(x=>x.folder==='Shared folder'));
 });
+test('authenticated folder rename keeps folder share token, scope and revocation intact',async()=>{
+ const s=setup();await s.init();const session=await owner(s),folder='Original workspace';await call(s,'folders',{method:'POST',session,data:{action:'create',folder}});
+ const saved=await call(s,'notes-save',{method:'POST',session,data:{action:'save',clientOpId:randomUUID(),title:'Scoped note',text:'synthetic',folder}});const link=await call(s,'note-share',{method:'POST',session,data:{action:'create',folder,permission:'view'}});assert.equal(link.status,200);
+ const op=randomUUID(),renamed=await call(s,'folders',{method:'POST',session,data:{action:'rename',folder,newFolder:'Workspace',clientOpId:op}});assert.equal(renamed.status,200,JSON.stringify(renamed.body));assert.equal(renamed.body.notesUpdated,1);
+ assert.equal((await call(s,'folders')).status,401);const list=await call(s,'shared-folder',{cap:link.body.token});assert.equal(list.status,200);assert.equal(list.body.folder,'Workspace');assert.equal(list.body.notes[0].folder,'Workspace');
+ const replay=await call(s,'folders',{method:'POST',session,data:{action:'rename',folder,newFolder:'Workspace',clientOpId:op}});assert.equal(replay.body.replay,true);
+ const links=await call(s,'note-share',{session,query:'&folder=Workspace'});assert.equal(links.body.links[0].token,link.body.token);
+ await call(s,'note-share',{method:'POST',session,data:{action:'revoke',folder:'Workspace',id:link.body.id}});assert.equal((await call(s,'shared-folder',{cap:link.body.token})).status,403);
+ assert.equal((await call(s,'notes',{session,query:'&id='+saved.body.id})).body.folder,'Workspace');
+});
+
 test('empty folder shares allow scoped creation and keep view/revocation/deletion guards',async()=>{
  const s=setup();await s.init();const session=await owner(s),folder='Thư mục trống 😀';
  const post=(route,data,cap)=>call(s,route,{method:'POST',data,...(cap?{cap}:{session})});
