@@ -282,3 +282,10 @@ Production deployment [`dpl_CYyjsrnFTbUvD87w4wWF7J3VUvfX`](https://vercel.com/hu
 Rollback target: previous Production deployment `dpl_HL8rpL4ciJg1V4Jt3LmkkxDpUkdB`. To roll back, assign each of the three aliases above to that deployment, read back all three mappings and empty bypass state, and check `/api/app?route=health` for Firestore PASS. No billing/plan/IAM/env changes. No physical iPad/phone test was performed.
 
 Speed-session handoff: the existing worktree `notes-speed-no-persistent-drafts-20261029` was observed dirty (including `public/app.js` and `public/cache.js`) and left untouched. It is behind current `main` and overlaps this hotfix in `public/app.js`. Before a later speed release, reconcile with `main` at `f2eef8490a8b9a50e3da0c987a0646e808736788`, review the overlap, then rerun relevant checks; do not deploy its stale tree as-is.
+
+## PR #43 — diagnostics and responsive UI Production release — 31/10/2026
+
+PR [#43](https://github.com/hunghvt-cyber/web-notes/pull/43) merged at `b3a4de5b7a86d3adc95ab4064de5c0a9cdddb249`, tree `49b1392155a735500fa6a7771ad585aba6c8931f`. Hosted CI run [41180959356](https://github.com/hunghvt-cyber/web-notes/actions/runs/41180959356) passed test and browser. Production deployment `dpl_6JvV65W8wi6AQgyNfbUfA7gjC5LJ` reached READY from that exact source SHA. All three Notes aliases point to it; bypass state is empty. Read-only health reports Firestore PASS. The immediate rollback target is PR42 deployment `dpl_CYyjsrnFTbUvD87w4wWF7J3VUvfX` (source `f2eef8490a8b9a50e3da0c987a0646e808736788`).
+
+Local verification: 199/199 offline tests, 39/39 Chromium browser cases, source check 50 files, and grid smoke 360/390 px passed. Synthetic screenshots reviewed; no physical-device check is claimed. The deployment used the exact 38 runtime/config files from the merged tree because the Vercel project is not Git-connected. Full asset hashes, alias readback, health evidence, and rollback procedure: [PR43 Production release record](PR43-PRODUCTION-RELEASE-20261031.md). This runbook-only update is after the deployed code SHA and does not change the running source.
+
