@@ -1,4 +1,4 @@
-export const sortModes=['updated-desc','updated-asc','title-asc','title-desc','custom'];
+export const sortModes=['updated-desc','updated-asc','title-asc','title-desc'];
 export function sortNotes(notes,mode,order=[]){
  const ranks=new Map(order.map((id,i)=>[id,i]));
  return [...notes].sort((a,b)=>{

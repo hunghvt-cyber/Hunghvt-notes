@@ -28,7 +28,8 @@
   "git": {
     "deploymentEnabled": {
       "codex/notes-firestore-cloudshell-20261027": false,
-      "release/minimal-notes": false
+      "release/minimal-notes": false,
+      "ui/workspace-editor-rethink-20261030": false
     }
   }
 }

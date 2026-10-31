@@ -1,0 +1,77 @@
+{
+  "browser": "Chromium headless on NAS; simulated WebDAV fixture only",
+  "measurements": [
+    {
+      "width": 390,
+      "height": 844,
+      "name": "phone",
+      "folders": 0,
+      "list": 0,
+      "editor": 376,
+      "writingArea": 323,
+      "title": 323,
+      "editorScroll": 374,
+      "titleHeight": 200
+    },
+    {
+      "width": 744,
+      "height": 1133,
+      "name": "tablet-portrait",
+      "folders": 0,
+      "list": 0,
+      "editor": 724,
+      "writingArea": 640,
+      "title": 640,
+      "editorScroll": 722,
+      "titleHeight": 114
+    },
+    {
+      "width": 1133,
+      "height": 744,
+      "name": "tablet-landscape",
+      "folders": 170,
+      "list": 358,
+      "editor": 557,
+      "writingArea": 495,
+      "title": 495,
+      "editorScroll": 555,
+      "titleHeight": 147
+    },
+    {
+      "width": 1280,
+      "height": 720,
+      "name": "desktop-small",
+      "folders": 210,
+      "list": 400,
+      "editor": 622,
+      "writingArea": 477,
+      "title": 477,
+      "editorScroll": 620,
+      "titleHeight": 156
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop",
+      "folders": 210,
+      "list": 463,
+      "editor": 719,
+      "writingArea": 558,
+      "title": 558,
+      "editorScroll": 717,
+      "titleHeight": 156
+    },
+    {
+      "width": 1920,
+      "height": 1080,
+      "name": "desktop-wide",
+      "folders": 210,
+      "list": 650,
+      "editor": 1012,
+      "writingArea": 748,
+      "title": 748,
+      "editorScroll": 1010,
+      "titleHeight": 125
+    }
+  ]
+}
