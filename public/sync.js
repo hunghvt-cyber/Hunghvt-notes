@@ -1,7 +1,7 @@
 export const clone=v=>JSON.parse(JSON.stringify(v));
 export class SyncDraft{
- constructor({note,send,onChange=()=>{},uuid=()=>crypto.randomUUID()}){
-  this.uuid=uuid;this.send=send;this.onChange=onChange;
+ constructor({note,send,onChange=()=>{},onMeasure=null,clock=null,uuid=()=>crypto.randomUUID()}){
+  this.uuid=uuid;this.send=send;this.onChange=onChange;this.onMeasure=onMeasure;this.clock=clock;
   this.note=clone(note);this.baseRevision=note.revision??null;
   this.version=0;this.pending=null;this.dirty=false;this.status='clean';this.error=null;
   this.running=null;this.disposed=false;
@@ -16,13 +16,17 @@ export class SyncDraft{
  }
  async saveOne(){
   if(!this.note.title?.trim()){this.status='draft';this.emit();return;}
+  const clock=this.onMeasure&&this.clock?this.clock:null,guardStarted=clock?clock():0;
   // The frozen operation is kept in this page's memory for exact retries.
   if(!this.pending)this.pending={clientOpId:this.uuid(),version:this.version,payload:{action:'save',id:this.note.id,revision:this.baseRevision,title:this.note.title,text:this.note.text,checklist:clone(this.note.checklist??[]),...(this.note.folder!==undefined?{folder:this.note.folder}:{}),...(this.note.pinned!==undefined?{pinned:this.note.pinned}:{})}};
   const pending=clone(this.pending);this.status='saving';this.emit();
   try{
+   if(clock)this.onMeasure('save_guard_ms',clock()-guardStarted);
+   const ackStarted=clock?clock():0;
    const result=await this.send({...pending.payload,clientOpId:pending.clientOpId});
    if(result.clientOpId!==pending.clientOpId||!result.acknowledgedRevision)throw Error('ACK_UNVERIFIED');
    if(result.revision!==result.acknowledgedRevision){this.status='conflict';this.error=Object.assign(Error('HEAD_CHANGED_AFTER_ACK'),{status:409});this.emit();return;}
+   if(clock)this.onMeasure('server_ack_ms',clock()-ackStarted,{version:pending.version});
    this.baseRevision=result.acknowledgedRevision;this.note.revision=this.baseRevision;this.pending=null;
    if(this.version===pending.version){
     this.note=clone(result);this.dirty=false;this.status='saved';
@@ -71,12 +75,16 @@ function requestSignal(external,timeout){
  if(external?.aborted)abort();else external?.addEventListener('abort',abort,{once:true});
  return {signal:controller.signal,dispose(){clearTimeout(timer);external?.removeEventListener('abort',abort);}};
 }
-export function apiClient({route,token,fetcher=fetch,timeout=30000,wait=ms=>new Promise(resolve=>setTimeout(resolve,ms)),random=Math.random,getRetries=3}={}){
- return async(path,{method='GET',data,query='',long=false,signal}={})=>{
+export function apiClient({route,token,fetcher=fetch,timeout=30000,wait=ms=>new Promise(resolve=>setTimeout(resolve,ms)),random=Math.random,getRetries=3,onTiming=null}={}){
+ return async(path,params={})=>{
+  const {method='GET',data,query='',long=false,signal,diagnosticTrace}=params;
   const combined=requestSignal(signal,long?120000:timeout);
   try{
-   let response;for(let attempt=0;;attempt++){response=await fetcher('/api/app?route='+encodeURIComponent(route??path)+query,{method,credentials:'same-origin',headers:{...(method!=='GET'?{'Content-Type':'application/json'}:{}),...(token?{Authorization:'Bearer '+token}:{})},...(data!==undefined?{body:JSON.stringify(data)}:{}),cache:'no-store',signal:combined.signal});if(method!=='GET'||response.status!==423||attempt>=getRetries)break;await response.body?.cancel();await wait(1000+Math.floor(random()*500)+attempt*500);}
-   let body;try{body=await response.json();}catch{throw Object.assign(Error('INVALID_RESPONSE'),{status:response.status});}
+   let response;for(let attempt=0;;attempt++){const networkStarted=onTiming&&diagnosticTrace?performance.now():0;if(onTiming&&diagnosticTrace)onTiming(diagnosticTrace,'request');try{response=await fetcher('/api/app?route='+encodeURIComponent(route??path)+query,{method,credentials:'same-origin',headers:{...(method!=='GET'?{'Content-Type':'application/json'}:{}),...(token?{Authorization:'Bearer '+token}:{})},...(data!==undefined?{body:JSON.stringify(data)}:{}),cache:'no-store',signal:combined.signal});if(onTiming&&diagnosticTrace)onTiming(diagnosticTrace,'network_ms',performance.now()-networkStarted);}
+    catch(error){if(onTiming&&diagnosticTrace){onTiming(diagnosticTrace,'network_ms',performance.now()-networkStarted);onTiming(diagnosticTrace,'error',error?.status);}throw error;}
+    if(method!=='GET'||response.status!==423||attempt>=getRetries)break;await response.body?.cancel();await wait(1000+Math.floor(random()*500)+attempt*500);}
+   const bodyStarted=onTiming&&diagnosticTrace?performance.now():0;let body;try{body=await response.json();if(onTiming&&diagnosticTrace)onTiming(diagnosticTrace,'response_body_ms',performance.now()-bodyStarted);}catch{if(onTiming&&diagnosticTrace){onTiming(diagnosticTrace,'response_body_ms',performance.now()-bodyStarted);onTiming(diagnosticTrace,'error',response.status);}throw Object.assign(Error('INVALID_RESPONSE'),{status:response.status});}
+   if(!response.ok&&onTiming&&diagnosticTrace)onTiming(diagnosticTrace,'error',response.status);
    if(!response.ok)throw Object.assign(Error(body.code??'REQUEST_FAILED'),{status:response.status,reference:body.reference});return body;
   }finally{combined.dispose();}
  };

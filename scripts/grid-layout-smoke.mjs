@@ -25,7 +25,7 @@ try{
    return route.fulfill({status:response.status,headers:Object.fromEntries(response.headers),body:Buffer.from(await response.arrayBuffer())});
   }
   const name=url.pathname==='/'?'index.html':url.pathname.slice(1);
-  if(!['index.html','app.css','app.js','sync.js','cache.js','sort.js'].includes(name))return route.fulfill({status:404,body:''});
+  if(!['index.html','app.css','app.js','sync.js','cache.js','sort.js','performance-diagnostics.js'].includes(name))return route.fulfill({status:404,body:''});
   const file=new URL('../public/'+name,import.meta.url),body=await readFile(file);
   return route.fulfill({status:200,contentType:name.endsWith('.js')?'application/javascript':name.endsWith('.css')?'text/css':'text/html',body});
  });
